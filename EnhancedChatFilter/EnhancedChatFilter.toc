@@ -1,0 +1,27 @@
+## Interface:70000
+## Title: Enhanced Chat Filter MOD Fix
+## Notes: A chat filter base on blackwords and other triggers
+## Notes-zhCN: 基于黑名单的聊天插件，包含了更多过滤器
+## Author: Rubgrsch
+## Version: 7.0.3-6
+## SavedVariables: ecfDB
+
+#@no-lib-strip@
+libs\LibStub\LibStub.lua
+libs\CallbackHandler-1.0\CallbackHandler-1.0.lua
+libs\LibDataBroker-1.1\LibDataBroker-1.1.lua
+libs\LibDBIcon-1.0\LibDBIcon-1.0.lua
+Libs\AceAddon-3.0\AceAddon-3.0.xml
+Libs\AceEvent-3.0\AceEvent-3.0.xml
+Libs\AceDB-3.0\AceDB-3.0.xml
+Libs\AceConsole-3.0\AceConsole-3.0.xml
+Libs\AceGUI-3.0\AceGUI-3.0.xml
+Libs\AceConfig-3.0\AceConfig-3.0.xml
+#@end-no-lib-strip@
+
+## UTF-8字符串处理模块
+libs\utf8.lua
+## Locales
+locales.lua
+## 主过滤模块
+EnhancedChatFilter.lua
