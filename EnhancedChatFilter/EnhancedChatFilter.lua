@@ -1,5 +1,4 @@
---以下内容可自行增加修改
---信息中将被过滤器过滤的 UTF-8 符号（常被用于干扰）
+-- Some UTF-8 symbols that will be auto-changed
 local UTF8Symbols = {['·']='',['＠']='',['＃']='',['％']='',
 	['＆']='',['＊']='',['——']='',['＋']='',['｜']='',['～']='',['　']='',
 	['，']='',['。']='',['、']='',['？']='',['！']='',['：']='',['；']='',
@@ -12,18 +11,19 @@ local UTF8Symbols = {['·']='',['＠']='',['＃']='',['％']='',
 	['Ｉ']='I',['Ｊ']='J',['Ｋ']='K',['Ｌ']='L',['Ｍ']='M',['Ｎ']='N',['Ｏ']='O',['Ｐ']='P',
 	['Ｑ']='Q',['Ｒ']='R',['Ｓ']='S',['Ｔ']='T',['Ｕ']='U',['Ｖ']='V',['Ｗ']='W',['Ｘ']='X',
 	['Ｙ']='Y',['Ｚ']='Z',['〔']='',['〕']='',['〈']='',['〉']='',['‖']=''}
-local RaidAlertTagList = {"%*%*.+%*%*", "EUI:.+施放了", "EUI:.+中断", "EUI:.+就绪", "EUI_RaidCD", "PS 死亡: .+>", "|Hspell.+ => ", "受伤源自 |Hspell.+ %(总计%): ", "Fatality:.+> %d"}  --RaidAlert 特征
-local QuestReportTagList = {"任务进度提示%s?[:：]", "%(任务完成%)", "<大脚组队提示>", "%[接受任务%]", "<大脚团队提示>", "进度:.+:%d+/%d+", "接受任务:%[%d+%]"} --QuestReport 特征
+local RaidAlertTagList = {"%*%*.+%*%*", "EUI:.+施放了", "EUI:.+中断", "EUI:.+就绪", "EUI_RaidCD", "PS 死亡: .+>", "|Hspell.+ => ", "受伤源自 |Hspell.+ %(总计%): ", "Fatality:.+> %d"}  -- RaidAlert Tag
+local QuestReportTagList = {"任务进度提示%s?[:：]", "%(任务完成%)", "<大脚组队提示>", "%[接受任务%]", "<大脚团队提示>", "进度:.+:%d+/%d+", "接受任务:%[%d+%]"} -- QuestReport Tag
 
---EnhancedChatFilter 内部定义
+-- ECF
 local _, ecf = ...
 local utf8replace = ecf.utf8replace -- utf8.lua
 local L = ecf.L -- locales.lua
+
 local chatLines = {}
 local prevLineID = 0
 local filterResult = nil
-local filterCharList = "[|@!/<>\"`'_#&;:~\\]"
-local filterCharListRegex = "[%(%)%.%%%+%-%*%?%[%]%$%^={}]"
+local filterCharList = "[|@!/<>\"`'_#&;:~\\]" -- work on any blackWord
+local filterCharListRegex = "[%(%)%.%%%+%-%*%?%[%]%$%^={}]" -- won't work on regex blackWord
 local allowWisper = {}
 local config
 
@@ -31,6 +31,55 @@ local gsub, select, ipairs, tremove, tinsert, pairs, strsub, format, tonumber, s
 local GetItemInfo, GetCurrencyLink = GetItemInfo, GetCurrencyLink -- options
 local Ambiguate, GetNumFriends, GetFriendInfo, UnitIsUnit, UnitIsInMyGuild, UnitInRaid, UnitInParty, BNGetNumFriends, BNGetNumFriendGameAccounts, BNGetFriendGameAccountInfo = Ambiguate, GetNumFriends, GetFriendInfo, UnitIsUnit, UnitIsInMyGuild, UnitInRaid, UnitInParty, BNGetNumFriends, BNGetNumFriendGameAccounts, BNGetFriendGameAccountInfo -- main filter
 local ChatTypeInfo, GetPlayerInfoByGUID, GetAchievementLink, GetGuildInfo, UnitExists, GetTime, GetRealmName = ChatTypeInfo, GetPlayerInfoByGUID, GetAchievementLink, GetGuildInfo, UnitExists, GetTime, GetRealmName -- acievements
+
+local EnhancedChatFilter = LibStub("AceAddon-3.0"):NewAddon("EnhancedChatFilter", "AceConsole-3.0", "AceEvent-3.0")
+
+--Default Options
+local defaults = {
+	profile = {
+		enableFilter = true, -- Main Filter
+		enableWisper = false, -- Wisper WhiteMode
+		enableDND = true, -- DND
+		enableRPT = true, -- Repeat Filter
+		enableCFA = true, -- Achievement Filter
+		enableRAF = false, -- RaidAlert Filter
+		enableQRF = false, -- QuestReport and Group Filter
+		enableIGM = false, -- IgnoreMore
+		multiLine = false, -- MultiLines, in RepeatFilter
+		blackWordList = {},
+		blackWordFilterGroup = false, -- blackWord enabled in group and raid
+		ignoreMoreList = {},
+		lootItemFilterList = {[118043] = true, [71096] = true}, -- item list, [id] = true
+		lootCurrencyFilterList = {[944] = true}, -- Currency list, [id] = true
+		lootQualityMin = 0, -- loot quality filter, 0..4 = poor..epic
+		minimap = {
+			hide = false, -- minimap
+		},
+		advancedConfig = false, -- show advancedConfig
+		chatLinesLimit = 20, -- in repeatFilter
+		stringDifferenceLimit = 0.1, -- in repeatFilter
+		debugMode = false,
+	}
+}
+
+--------------- Common Functions in ECF ---------------
+--Make sure that blackWord won't be filtered by filterCharList and utf-8 list
+local function checkBlacklist(blackWord, typeModus)
+	local newWord = blackWord:gsub("%s", ""):gsub(filterCharList, "")
+	if (typeModus ~= "regex") then newWord=newWord:gsub(filterCharListRegex, "") end
+	newWord = utf8replace(newWord, UTF8Symbols)
+	if(newWord ~= blackWord or blackWord == "") then return true end -- Also report "" as invalid
+end
+
+local function SendMessage(event, msg)
+	local info = ChatTypeInfo[strsub(event, 10)]
+	for i = 1, NUM_CHAT_WINDOWS do
+		local ChatFrames = _G["ChatFrame"..i]
+		if (ChatFrames and ChatFrames:IsEventRegistered(event)) then
+			ChatFrames:AddMessage(msg, info.r, info.g, info.b)
+		end
+	end
+end
 
 --http://www.wowwiki.com/USERAPI_StringHash
 local function StringHash(text)
@@ -45,45 +94,7 @@ local function StringHash(text)
 	return math.fmod(counter, 4294967291) -- 2^32 - 5: Prime (and different from the prime in the loop)
 end
 
-local EnhancedChatFilter = LibStub("AceAddon-3.0"):NewAddon("EnhancedChatFilter", "AceConsole-3.0", "AceEvent-3.0")
-
---数据库初始设置
-local defaults = {
-	profile = {
-		enableFilter = true, --ECF聊天过滤总开关
-		enableWisper = false, --密语白名单过滤
-		enableDND = true, --“忙碌”玩家过滤
-		enableRPT = true, --重复聊天过滤
-		enableCFA = true, --成就刷屏过滤
-		enableRAF = false, --团队刷屏过滤
-		enableQRF = false, --任务组队过滤
-		enableIGM = false, --扩展屏蔽名单
-		multiLine = false, -- 多行喊话过滤
-		blackWordList = {}, --关键词列表
-		blackWordFilterGroup = false, --关键词过滤是否适用于小队团队
-		ignoreMoreList = {}, --扩展屏蔽名单
-		lootItemFilterList = {[118043] = true, [71096] = true}, --按物品id过滤
-		lootCurrencyFilterList = {[944] = true}, --按货币id过滤
-		lootQualityMin = 0, --按物品质量过滤
-		minimap = {
-			hide = false, --小地图图标选项
-		},
-		advancedConfig = false, --显示高级设置
-		chatLinesLimit = 20,
-		stringDifferenceLimit = 0.1,
-		debugMode = false,
-	}
-}
-
---确保关键词自身不会被预处理干扰
-local function checkBlacklist(blackWord, typeModus)
-	local newWord = blackWord:gsub("%s", ""):gsub(filterCharList, "")
-	if (typeModus ~= "regex") then newWord=newWord:gsub(filterCharListRegex, "") end
-	newWord = utf8replace(newWord, UTF8Symbols)
-	if(newWord ~= blackWord or blackWord == "") then return true end --空关键词也被清理
-end
-
---旧配置文件转化成新的
+--Convert old config to new one
 local function convert()
 	if(config.blackList) then
 		for _,v in ipairs(config.blackList) do config.blackWordList[v[1]] = v[2] or true end
@@ -95,7 +106,7 @@ local function convert()
 	for idx,v in ipairs(config.ignoreMoreList) do config.ignoreMoreList[v], config.ignoreMoreList[idx] = true, nil end
 end
 
---创建小地图图标数据
+--MinimapData
 local ecfLDB = LibStub("LibDataBroker-1.1"):NewDataObject("Enhanced Chat Filter", {
 	type = "data source",
 	text = "Enhanced Chat Filter",
@@ -105,10 +116,10 @@ local ecfLDB = LibStub("LibDataBroker-1.1"):NewDataObject("Enhanced Chat Filter"
 		tooltip:AddLine("|cffecf0f1Enhanced Chat Filter|r\n"..L["ClickToOpenConfig"])
 	end
 })
---创建 Libstub 变量
+--Libstub for icon
 local icon = LibStub("LibDBIcon-1.0")
 
---初始化插件
+--Initialize
 function EnhancedChatFilter:OnInitialize()
 	EnhancedChatFilter:RegisterChatCommand("ecf", "EnhancedChatFilterOpen")
 	EnhancedChatFilter:RegisterChatCommand("ecf-debug", "EnhancedChatFilterDebug")
@@ -118,14 +129,27 @@ function EnhancedChatFilter:OnInitialize()
 	convert()
 end
 
---Options
---这些设置不会被保存
+--------------- Slash Command ---------------
+--method run on /ecf
+function EnhancedChatFilter:EnhancedChatFilterOpen()
+	if(InCombatLockdown()) then return end
+	InterfaceOptionsFrame_OpenToCategory("EnhancedChatFilter")
+end
+
+--method run on /ecf-debug
+function EnhancedChatFilter:EnhancedChatFilterDebug()
+	if(config.debugMode) then print("Debug Mode Off!") else print("Debug Mode On!") end
+	config.debugMode = not config.debugMode
+end
+
+--------------- Options ---------------
+--These settings won't be saved
 local scrollHighlight = {}
 local lootHighlight = {}
 local ignoreHighlight = {}
 local regexToggle = false
-local stringIO = ""
-local lootType = "Item"
+local stringIO = "" -- blackWord input
+local lootType = "Item" -- loot filter type
 
 local options = {
 	type = "group",
@@ -536,17 +560,21 @@ local options = {
 LibStub("AceConfigRegistry-3.0"):RegisterOptionsTable("EnhancedChatFilter", options)
 LibStub("AceConfigDialog-3.0"):AddToBlizOptions("EnhancedChatFilter", "EnhancedChatFilter")
 
---扩展黑名单
-local function SendMessage(event, msg)
-	local info = ChatTypeInfo[strsub(event, 10)]
-	for i = 1, NUM_CHAT_WINDOWS do
-		local ChatFrames = _G["ChatFrame"..i]
-		if (ChatFrames and ChatFrames:IsEventRegistered(event)) then
-			ChatFrames:AddMessage(msg, info.r, info.g, info.b)
-		end
-	end
-end
+--Disable profanityFilter
+local GetCVar,SetCVar = GetCVar,SetCVar
 
+local profanityFilter=CreateFrame("Frame")
+profanityFilter:SetScript("OnEvent", function()
+	if GetCVar("profanityFilter")~="0" then SetCVar("profanityFilter", "0") end
+end)
+profanityFilter:RegisterEvent("VARIABLES_LOADED")
+profanityFilter:RegisterEvent("CVAR_UPDATE")
+profanityFilter:RegisterEvent("PLAYER_ENTERING_WORLD")
+profanityFilter:RegisterEvent("BN_MATURE_LANGUAGE_FILTER")
+profanityFilter:RegisterEvent("BN_CONNECTED")
+
+-------------------------------------- Filters ------------------------------------
+--IgnoreMore
 local function ignoreMore(player)
 	if (not config.enableIGM or not player) then return end
 	local ignore = nil
@@ -570,35 +598,21 @@ end
 hooksecurefunc("AddIgnore", ignoreMore)
 hooksecurefunc("AddOrDelIgnore", ignoreMore)
 
---禁用暴雪内部语言过滤器
-local GetCVar,SetCVar = GetCVar,SetCVar
-
-local profanityFilter=CreateFrame("Frame")
-profanityFilter:SetScript("OnEvent", function()
-	if GetCVar("profanityFilter")~="0" then SetCVar("profanityFilter", "0") end
-end)
-profanityFilter:RegisterEvent("VARIABLES_LOADED")
-profanityFilter:RegisterEvent("CVAR_UPDATE")
-profanityFilter:RegisterEvent("PLAYER_ENTERING_WORLD")
-profanityFilter:RegisterEvent("BN_MATURE_LANGUAGE_FILTER")
-profanityFilter:RegisterEvent("BN_CONNECTED")
-
---登陆/好友列表更新时同步更新允许密语玩家列表
+--Update allowWisper list whenever login/friend list updates
 local login = nil
 local ecfFrame = CreateFrame("Frame")
 ecfFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
 ecfFrame:RegisterEvent("FRIENDLIST_UPDATE")
 ecfFrame:SetScript("OnEvent", function(self, event)
 	if event == "PLAYER_ENTERING_WORLD" then
-		ShowFriends() --强制刷新一次好友列表
+		ShowFriends() --friend list
 	else
-		if not login then --登陆时只添加一次
+		if not login then --once per login
 			login = true
 			local num = GetNumFriends()
 			for i = 1, num do
 				local n = GetFriendInfo(i)
-				--添加好友到允许名单
-				if n then allowWisper[n] = true end
+				if n then allowWisper[n] = true end -- added to allowWisper list
 			end
 			return
 		end
@@ -606,13 +620,13 @@ ecfFrame:SetScript("OnEvent", function(self, event)
 	if config.debugMode then for k in pairs(allowWisper) do print("ECF allowed: "..k) end end
 end)
 
---自己主动密语的玩家加入安全名单
+--Added your wisper played into allowWisper list
 local function addToAllowWisper(self,_,_,player)
 	local trimmedPlayer = Ambiguate(player, "none")
 	allowWisper[trimmedPlayer] = true
 end
 
---字符串不同程度, 范围0..1, 0为完全相同, 1为完全不同
+--stringDifference for repeatFilter, ranged from 0 to 1, while 0 is absolutely the same
 local function stringDifference(stringA, stringB)
 	local len_a, len_b = #stringA, #stringB
 	local templast, temp = {}, {}
@@ -631,38 +645,36 @@ local function stringDifference(stringA, stringB)
 	return temp[len_b+1]/(len_a+len_b)
 end
 
--------------------------------------- Filters ------------------------------------
-
 local chatChannel = {["CHAT_MSG_WHISPER"] = 1, ["CHAT_MSG_SAY"] = 2, ["CHAT_MSG_CHANNEL"] = 3, ["CHAT_MSG_YELL"] = 3, ["CHAT_MSG_PARTY"] = 4, ["CHAT_MSG_PARTY_LEADER"] = 4, ["CHAT_MSG_RAID"] = 4, ["CHAT_MSG_RAID_LEADER"] = 4, ["CHAT_MSG_RAID_WARNING"] = 4, ["CHAT_MSG_INSTANCE_CHAT"] = 4,["CHAT_MSG_INSTANCE_CHAT_LEADER"] = 4, ["CHAT_MSG_DND"] = 101}
 
 local function ECFfilter(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID)
-	--如果不启用过滤直接返回
+	-- if not enabled the main filter then exit
 	if(not config.enableFilter) then return end
 
-	--避免自己被过滤
+	-- don't filter player itself
 	local trimmedPlayer = Ambiguate(player, "none")
 	if UnitIsUnit(trimmedPlayer,"player") then return end
 
-	--对 GM 和 DEV 的密语不做处理
+	-- if it's GM or DEV then exit
 	if type(flags) == "string" and (flags == "GM" or flags == "DEV") then return end
 
-	--如果这行被处理过，则直接引用之前的结果，避免多聊天窗口时触发重复过滤器
+	-- if it has been worked then use the last result
 	if(lineID == prevLineID) then
 		return filterResult
 	else
 		prevLineID = lineID
 		filterResult = nil
 	end
-	
-	if config.debugMode then print("RAWMsg: "..msg) end
-	--删除颜色代码, 物品链接标志, 空格以及一些符号
-	local filterString = msg:upper():gsub("|C[0-9A-F]+",""):gsub("|H[^|]+|H",""):gsub("|H|R",""):gsub("%s", ""):gsub(filterCharList, "")
 
-	--删除 UTF-8 干扰符
+	if config.debugMode then print("RAWMsg: "..msg) end
+
+	-- remove color/hypelink/space/symbols
+	local filterString = msg:upper():gsub("|C[0-9A-F]+",""):gsub("|H[^|]+|H",""):gsub("|H|R",""):gsub("%s", ""):gsub(filterCharList, "")
+	-- remove utf-8 chars
 	filterString = utf8replace(filterString, UTF8Symbols)
 	local newfilterString = filterString:gsub(filterCharListRegex, "")
 
-	if(config.enableIGM and chatChannel[event] <= 1) then --拓展黑名单过滤
+	if(config.enableIGM and chatChannel[event] <= 1) then -- IgnoreMore, only whisper
 		for _,ignorePlayer in ipairs(config.ignoreMoreList) do
 			if (trimmedPlayer == ignorePlayer[1]) then
 				if config.debugMode then print("Trigger: IgnoreMore Filter") end
@@ -672,12 +684,11 @@ local function ECFfilter(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID)
 		end
 	end
 
-	if(config.enableWisper and chatChannel[event] <= 1) then --密语白名单过滤
-		--强制刷新一次好友列表
+	if(config.enableWisper and chatChannel[event] <= 1) then --Whisper Whitelist Mode, only whisper
 		ShowFriends()
-		--同工会，同团队，同小队和好友不做处理
+		--Don't filter players that are from same guild/raid/party or friends
 		if allowWisper[trimmedPlayer] or UnitIsInMyGuild(trimmedPlayer) or UnitInRaid(trimmedPlayer) or UnitInParty(trimmedPlayer) then return end
-		--战网好友不做处理
+		--And battlenet friends
 		for i = 1, select(2, BNGetNumFriends()) do
 			local GameAccount = BNGetNumFriendGameAccounts(i)
 			for j = 1, GameAccount do
@@ -690,7 +701,7 @@ local function ECFfilter(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID)
 		return true
 	end
 
-	if(config.enableDND and (chatChannel[event] <= 3 or chatChannel[event] == 101)) then --"忙碌"玩家过滤
+	if(config.enableDND and (chatChannel[event] <= 3 or chatChannel[event] == 101)) then -- DND, whisper/yell/say/channel and auto-reply
 		if ((type(flags) == "string" and flags == "DND") or chatChannel[event] == 101) then
 			if config.debugMode then print("Trigger: DND Filter") end
 			filterResult = true
@@ -698,7 +709,7 @@ local function ECFfilter(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID)
 		end
 	end
 
-	if(chatChannel[event] <= (config.blackWordFilterGroup and 4 or 3)) then --关键词过滤, 默认不开启团队过滤
+	if(chatChannel[event] <= (config.blackWordFilterGroup and 4 or 3)) then --blackWord Filter, whisper/yell/say/channel
 		--从处理过的聊天信息中过滤包含黑名单词语的聊天内容
 		for keyWord,v in pairs(config.blackWordList) do
 			local currentString
@@ -717,7 +728,7 @@ local function ECFfilter(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID)
 		end
 	end
 
-	if (config.enableRAF and IsInGroup() and (chatChannel[event] == 4 or chatChannel[event] == 2)) then
+	if (config.enableRAF and IsInGroup() and (chatChannel[event] == 4 or chatChannel[event] == 2)) then -- raid
 		for _,RaidAlertTag in ipairs(RaidAlertTagList) do
 			if(strfind(msg,RaidAlertTag)) then
 				if config.debugMode then print("Trigger: "..RaidAlertTag.." in RaidAlertTag") end
@@ -727,7 +738,7 @@ local function ECFfilter(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID)
 		end
 	end
 
-	if (config.enableQRF and IsInGroup() and (chatChannel[event] == 4 or chatChannel[event] == 2)) then
+	if (config.enableQRF and IsInGroup() and (chatChannel[event] == 4 or chatChannel[event] == 2)) then -- quest/party
 		for _,QuestReportTag in ipairs(QuestReportTagList) do
 			if(strfind(msg,QuestReportTag)) then
 				if config.debugMode then print("Trigger: "..QuestReportTag.." in QuestReportTag") end
@@ -737,15 +748,15 @@ local function ECFfilter(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID)
 		end
 	end
 
-	if(config.enableRPT and chatChannel[event] <= 4) then --重复信息过滤
+	if(config.enableRPT and chatChannel[event] <= 4) then --Repeat Filter
 		local msgLine = newfilterString
-		if(msgLine == "") then msgLine = msg end --如果对话只有符号则保留原信息
+		if(msgLine == "") then msgLine = msg end --If it has only symbols, then don't filter it
 
-		--处理重复信息
+		--msgdata
 		local msgtable = {Sender = trimmedPlayer, Msg = msgLine, Time = GetTime()}
 		for i=1, #chatLines do
-			--如果一个人在0.6秒钟之内发了多条信息, 过滤
-			--如果一个人的信息完全相同, 过滤
+			--if there is not much difference between msgs, then filter it
+			--(optional) if someone sends msgs within 0.6s ,then filter it
 			if (chatLines[i].Sender == msgtable.Sender and ((config.multiLine and (msgtable.Time - chatLines[i].Time) < 0.600) or stringDifference(chatLines[i].Msg,msgtable.Msg) <= config.stringDifferenceLimit)) then
 				chatLines[i] = msgtable
 				if config.debugMode then print("Trigger: Repeat Filter") end
@@ -772,19 +783,7 @@ ChatFrame_AddMessageEventFilter("CHAT_MSG_RAID_WARNING", ECFfilter)
 ChatFrame_AddMessageEventFilter("CHAT_MSG_INSTANCE_CHAT", ECFfilter)
 ChatFrame_AddMessageEventFilter("CHAT_MSG_INSTANCE_CHAT_LEADER", ECFfilter)
 
---method run on /ecf
-function EnhancedChatFilter:EnhancedChatFilterOpen()
-	if(InCombatLockdown()) then return end
-	InterfaceOptionsFrame_OpenToCategory("EnhancedChatFilter")
-end
-
---method run on /ecf-debug
-function EnhancedChatFilter:EnhancedChatFilterDebug()
-	if(config.debugMode) then print("Debug Mode Off!") else print("Debug Mode On!") end
-	config.debugMode = not config.debugMode
-end
-
---成就过滤
+--AchievementFilter
 local function SendAchievement(event, achievementID, players)
 	local list = {}
 	for name,guid in pairs(players) do
@@ -859,7 +858,7 @@ end
 ChatFrame_AddMessageEventFilter("CHAT_MSG_ACHIEVEMENT", achievementFilter)
 ChatFrame_AddMessageEventFilter("CHAT_MSG_GUILD_ACHIEVEMENT", achievementFilter)
 
---拾取物品过滤器
+-- LootFilter
 local function lootitemfilter(self,_,msg)
 	if (not config.enableFilter) then return end
 	local itemID = tonumber(strmatch(msg, "|Hitem:(%d+)"))
