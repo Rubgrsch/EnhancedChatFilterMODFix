@@ -669,9 +669,9 @@ local function ECFfilter(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID)
 	if config.debugMode then print("RAWMsg: "..msg) end
 
 	-- remove utf-8 chars
-	filterString = utf8replace(filterString, UTF8Symbols)
+	local filterString = utf8replace(msg, UTF8Symbols)
 	-- remove color/hypelink/space/symbols
-	local filterString = msg:upper():gsub("|C[0-9A-F]+",""):gsub("|H[^|]+|H",""):gsub("|H|R",""):gsub("%s", ""):gsub(filterCharList, "")
+	filterString = filterString:upper():gsub("|C[0-9A-F]+",""):gsub("|H[^|]+|H",""):gsub("|H|R",""):gsub("%s", ""):gsub(filterCharList, "")
 	local newfilterString = filterString:gsub(filterCharListRegex, "")
 
 	if(config.enableIGM and chatChannel[event] <= 1) then -- IgnoreMore, only whisper
