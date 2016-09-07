@@ -2,7 +2,7 @@ local _, ecf = ...
 
 local L = {}
 -----------------------------------------------------------------------
--- zhCN: 07.29.16
+-- zhCN
 -----------------------------------------------------------------------
 if (GetLocale() == "zhCN") then
 	L["Options"] = "选项"
@@ -75,11 +75,11 @@ if (GetLocale() == "zhCN") then
 	L["FAQText"] = [=[这里列出常见的几个问题
 
 1. 如何共享不同账号下的关键词列表和开关设置
-    同一账户(如wow1)下的不同角色共享设置，不同账户的无法直接共享
-    你可以用字符串导入导出的方法复制关键词列表，然后人工进行设置。或者手动复制设置/设置硬链接
+    同一账户(如wow1)下的不同角色共享设置，不同账户的无法直接共享。
+    你可以用字符串导入导出的方法复制关键词列表，然后人工进行设置。或者手动复制设置/设置硬链接。
 
 2. 为何我添加关键词时总是会有"包含会被自动过滤的字符，将忽略该关键词！"这一错误？
-    一句话：不要加入标点符号，直接输入那些汉字
+    不要加入标点符号，这些字符会被自动忽略，只需要添加那些汉字。
 
 3. 正则是什么？
     不知道的请不要用。不知道的请不要用。不知道的请不要用。
@@ -88,7 +88,7 @@ if (GetLocale() == "zhCN") then
 4. 为什么我的关键词都没勾上？每次勾上/rl之后又复原了？
     这些勾只是用来删除的，不是代表关键词启用与否。任何加入的关键词都已启用。]=]
 -----------------------------------------------------------------------
--- zhTW: 07.29.16
+-- zhTW -- NEED HELP
 -- Contributors: 老虎007@NGA
 -----------------------------------------------------------------------
 elseif (GetLocale() == "zhTW") then
@@ -110,63 +110,63 @@ elseif (GetLocale() == "zhTW") then
 	L["Regex"] = "正規"
 	L["And"] = "、"
 	L["GotAchievement"] = "獲得了成就"
-	L["DoYouWantToClear"] = "你确定要清空" -- Fixme
-	L["?"] = "么？" -- Fixme
-	L["BlackList"] = "关键词列表" -- Fixme
-	L["RepeatOptions"] = "重复信息设置" -- Fixme
-	L["chatLinesLimitSlider"] = "重复信息缓存行数" -- Fixme
-	L["stringDifferenceLimitSlider"] = "重复信息区分度" -- Fixme
-	L["UseWithCare"] = "危险设置" -- Fixme
-	L["Filters"] = "過濾器" -- Fixme
+	L["DoYouWantToClear"] = "你确定要清空"
+	L["?"] = "么？"
+	L["BlackList"] = "关键词列表"
+	L["RepeatOptions"] = "重复信息设置"
+	L["chatLinesLimitSlider"] = "重复信息缓存行数"
+	L["stringDifferenceLimitSlider"] = "重复信息区分度"
+	L["UseWithCare"] = "危险设置"
+	L["Filters"] = "過濾器"
 	L["Import"] = "導入"
 	L["Export"] = "導出"
-	L["AlsoFilterGroup"] = "同时过滤小队团队" -- Fixme
-	L["AlsoFilterGroupTooltips"] = "关键词过滤现在也会过滤小队团队中的发言，根据关键词你可能错过团队中有用的信息" -- Fixme
+	L["AlsoFilterGroup"] = "同时过滤小队团队"
+	L["AlsoFilterGroupTooltips"] = "关键词过滤现在也会过滤小队团队中的发言，根据关键词你可能错过团队中有用的信息"
 	L["StringHashMismatch"] = "字符串校驗錯誤"
 	L["ImportSucceeded"] = "導入成功"
-	L["MultiLines"] = "多行喊话过滤" -- Fixme
-	L["EnableAdvancedConfig"] = "启用高级选项" -- Fixme
-	L["AdvancedWarningText"] = "不要随意更改你不清楚的设置，不然你很有可能会把ECF玩坏！如果你已经知道危险性，请继续..." -- Fixme
-	L["LootFilter"] = "拾取过滤器" -- Fixme
-	L["AddItemWithID"] = "添加ID" -- Fixme
-	L["Item"] = "物品" -- Fixme
-	L["Currency"] = "货币" -- Fixme
-	L["NotExists"] = "不存在" -- Fixme
-	L["Type"] = "类型" -- Fixme
-	L["LootFilterList"] = "拾取屏蔽列表" -- Fixme
-	L["LootQualityFilter"] = "拾取物品质量" -- Fixme
-	L["LootQualityFilterTooltips"] = "显示拾取物品所需要的最低质量，低于此质量的物品将被过滤" -- Fixme
-	L["Poor"] = "垃圾" -- Fixme
-	L["Common"] = "普通" -- Fixme
-	L["Uncommon"] = "优秀" -- Fixme
-	L["Rare"] = "精良" -- Fixme
-	L["Epic"] = "史诗" -- Fixme
+	L["MultiLines"] = "多行喊话过滤"
+	L["EnableAdvancedConfig"] = "启用高级选项"
+	L["AdvancedWarningText"] = "不要随意更改你不清楚的设置，不然你很有可能会把ECF玩坏！如果你已经知道危险性，请继续..."
+	L["LootFilter"] = "拾取过滤器"
+	L["AddItemWithID"] = "添加ID"
+	L["Item"] = "物品"
+	L["Currency"] = "货币"
+	L["NotExists"] = "不存在"
+	L["Type"] = "类型"
+	L["LootFilterList"] = "拾取屏蔽列表"
+	L["LootQualityFilter"] = "拾取物品质量"
+	L["LootQualityFilterTooltips"] = "显示拾取物品所需要的最低质量，低于此质量的物品将被过滤"
+	L["Poor"] = "垃圾"
+	L["Common"] = "普通"
+	L["Uncommon"] = "优秀"
+	L["Rare"] = "精良"
+	L["Epic"] = "史诗"
 
-	L["General"] = "常规" -- Fixme
-	L["BlackworldList"] = "黑名单關鍵詞" -- Fixme
-	L["StringIO"] = "字符串導入導出" -- Fixme
-	L["AdvancedConfig"] = "高级" -- Fixme
+	L["General"] = "常规"
+	L["BlackworldList"] = "黑名单關鍵詞"
+	L["StringIO"] = "字符串導入導出"
+	L["AdvancedConfig"] = "高级"
 
-	L["WhisperWhitelistModeTooltip"] = "启用后除了工会、团队、小队、战网好友发送的密语外，只允许你发送过密语的对方才能对你发起密语|n|cffE2252D慎用！" -- Fixme
-	L["MultiLinesTooltip"] = "重复过滤器现在也会过滤同一个人在短时间内的多行信息，这有助于减少各类宏的刷屏但同时也会过滤掉诸如dps统计的各插件通告" -- Fixme
-	L["DNDfilterTooltip"] = "启用后过滤'忙碌'玩家及其自动回复" -- Fixme
-	L["RepeatFilterTooltip"] = "启用后过滤同一玩家发送的相似信息" -- Fixme
-	L["AchievementFilterTooltip"] = "启用后合并显示多个玩家获得同一成就" -- Fixme
-	L["RaidAlertFilterTooltip"] = "启用后过滤各类技能/打断喊话提示" -- Fixme
-	L["QuestReportFilterTooltip"] = "启用后过滤各类组队任务喊话提醒" -- Fixme
-	L["RegexTooltip"] = "标记添加的关键词为正则表达式|n仅对该次添加的关键词有效" -- Fixme
-	L["chatLinesLimitSliderTooltips"] = "重复信息的行数设定。请根据聊天频道的聊天量调整数值。增加数值会提高内存占用。默认值20" -- Fixme
-	L["stringDifferenceLimitSliderTooltips"] = "重复信息判定标准值，范围0%至100%。对于同一个人的发言，0%为只过滤完全相同的内容，100%为过滤任意内容。提高设定值会提高类似信息的过滤效果但会提高误处理几率。默认值10%" -- Fixme
+	L["WhisperWhitelistModeTooltip"] = "启用后除了工会、团队、小队、战网好友发送的密语外，只允许你发送过密语的对方才能对你发起密语|n|cffE2252D慎用！"
+	L["MultiLinesTooltip"] = "重复过滤器现在也会过滤同一个人在短时间内的多行信息，这有助于减少各类宏的刷屏但同时也会过滤掉诸如dps统计的各插件通告"
+	L["DNDfilterTooltip"] = "启用后过滤'忙碌'玩家及其自动回复"
+	L["RepeatFilterTooltip"] = "启用后过滤同一玩家发送的相似信息"
+	L["AchievementFilterTooltip"] = "启用后合并显示多个玩家获得同一成就"
+	L["RaidAlertFilterTooltip"] = "启用后过滤各类技能/打断喊话提示"
+	L["QuestReportFilterTooltip"] = "启用后过滤各类组队任务喊话提醒"
+	L["RegexTooltip"] = "标记添加的关键词为正则表达式|n仅对该次添加的关键词有效"
+	L["chatLinesLimitSliderTooltips"] = "重复信息的行数设定。请根据聊天频道的聊天量调整数值。增加数值会提高内存占用。默认值20"
+	L["stringDifferenceLimitSliderTooltips"] = "重复信息判定标准值，范围0%至100%。对于同一个人的发言，0%为只过滤完全相同的内容，100%为过滤任意内容。提高设定值会提高类似信息的过滤效果但会提高误处理几率。默认值10%"
 	
 	L["FAQ"] = "FAQ"
 	L["FAQText"] = [=[这里列出常见的几个问题
 
 1. 如何共享不同账号下的关键词列表和开关设置
-    同一账户(如wow1)下的不同角色共享设置，不同账户的无法直接共享
-    你可以用字符串导入导出的方法复制关键词列表，然后人工进行设置。或者手动复制设置/设置硬链接
+    同一账户(如wow1)下的不同角色共享设置，不同账户的无法直接共享。
+    你可以用字符串导入导出的方法复制关键词列表，然后人工进行设置。或者手动复制设置/设置硬链接。
 
 2. 为何我添加关键词时总是会有"包含会被自动过滤的字符，将忽略该关键词！"这一错误？
-    一句话：不要加入标点符号，直接输入那些汉字
+    不要加入标点符号，这些字符会被自动忽略，只需要添加那些汉字。
 
 3. 正则是什么？
     不知道的请不要用。不知道的请不要用。不知道的请不要用。
@@ -241,18 +241,18 @@ else
 	L["RaidAlertFilterTooltip"] = "While enabled, it will filter raid alert from other players"
 	L["QuestReportFilterTooltip"] = "While enabled, it will filter many kind of grouping messages"
 	L["RegexTooltip"] = "Blackword that will be added should be a regex expression. Only works for this blackword."
-	L["chatLinesLimitSliderTooltips"] = "Repeat message lines. Please change it to suit your message amount. Increase it will consume more memory. Default 20." -- Fixme
-	L["stringDifferenceLimitSliderTooltips"] = "Message difference limit. Ranging from 0% to 100%. For the same sender, 0% will only filter the same message while 100% will filter any message. Increase it will filter more similar messages but also some unwanted ones. Default 10%." -- Fixme
+	L["chatLinesLimitSliderTooltips"] = "Repeat message lines. Please change it to suit your message amount. Increase it will consume more memory. Default 20."
+	L["stringDifferenceLimitSliderTooltips"] = "Message difference limit. Ranging from 0% to 100%. For the same sender, 0% will only filter the same message while 100% will filter any message. Increase it will filter more similar messages but also some unwanted ones. Default 10%."
 	
 	L["FAQ"] = "FAQ"
 	L["FAQText"] = [=[这里列出常见的几个问题
 
 1. 如何共享不同账号下的关键词列表和开关设置
-    同一账户(如wow1)下的不同角色共享设置，不同账户的无法直接共享
-    你可以用字符串导入导出的方法复制关键词列表，然后人工进行设置。或者手动复制设置/设置硬链接
+    同一账户(如wow1)下的不同角色共享设置，不同账户的无法直接共享。
+    你可以用字符串导入导出的方法复制关键词列表，然后人工进行设置。或者手动复制设置/设置硬链接。
 
 2. 为何我添加关键词时总是会有"包含会被自动过滤的字符，将忽略该关键词！"这一错误？
-    一句话：不要加入标点符号，直接输入那些汉字
+    不要加入标点符号，这些字符会被自动忽略，只需要添加那些汉字。
 
 3. 正则是什么？
     不知道的请不要用。不知道的请不要用。不知道的请不要用。
