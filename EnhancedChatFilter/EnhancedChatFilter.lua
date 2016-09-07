@@ -27,10 +27,10 @@ local filterCharListRegex = "[%(%)%.%%%+%-%*%?%[%]%$%^={}]" -- won't work on reg
 local allowWisper = {}
 local config
 
-local gsub, select, ipairs, tremove, tinsert, pairs, strsub, format, tonumber, strmatch, tconcat, strfind = gsub, select, ipairs, tremove, tinsert, pairs, strsub, format, tonumber, strmatch, table.concat, string.find -- lua
+local gsub, select, ipairs, tinsert, pairs, strsub, format, tonumber, strmatch, tconcat, strfind = gsub, select, ipairs, tinsert, pairs, strsub, format, tonumber, strmatch, table.concat, string.find -- lua
 local GetItemInfo, GetCurrencyLink = GetItemInfo, GetCurrencyLink -- options
-local Ambiguate, GetNumFriends, GetFriendInfo, UnitIsUnit, UnitIsInMyGuild, UnitInRaid, UnitInParty, BNGetNumFriends, BNGetNumFriendGameAccounts, BNGetFriendGameAccountInfo = Ambiguate, GetNumFriends, GetFriendInfo, UnitIsUnit, UnitIsInMyGuild, UnitInRaid, UnitInParty, BNGetNumFriends, BNGetNumFriendGameAccounts, BNGetFriendGameAccountInfo -- main filter
-local ChatTypeInfo, GetPlayerInfoByGUID, GetAchievementLink, GetGuildInfo, UnitExists, GetTime, GetRealmName = ChatTypeInfo, GetPlayerInfoByGUID, GetAchievementLink, GetGuildInfo, UnitExists, GetTime, GetRealmName -- acievements
+local Ambiguate, GetNumFriends = Ambiguate, GetNumFriends -- main filter
+local ChatTypeInfo, GetPlayerInfoByGUID, GetGuildInfo, GetTime = ChatTypeInfo, GetPlayerInfoByGUID, GetGuildInfo, GetTime -- acievements
 
 local EnhancedChatFilter = LibStub("AceAddon-3.0"):NewAddon("EnhancedChatFilter", "AceConsole-3.0", "AceEvent-3.0")
 
