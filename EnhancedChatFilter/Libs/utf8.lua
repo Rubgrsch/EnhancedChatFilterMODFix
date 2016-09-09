@@ -20,23 +20,14 @@ local function utf8charbytes(s, i)
 
 	elseif c >= 194 and c <= 223 then
 		-- UTF8-2
-		local c2 = strbyte(s, i + 1)
-
 		return 2
 
 	elseif c >= 224 and c <= 239 then
 		-- UTF8-3
-		local c2 = strbyte(s, i + 1)
-		local c3 = strbyte(s, i + 2)
-
 		return 3
 
 	elseif c >= 240 and c <= 244 then
 		-- UTF8-4
-		local c2 = strbyte(s, i + 1)
-		local c3 = strbyte(s, i + 2)
-		local c4 = strbyte(s, i + 3)
-
 		return 4
 
 	else

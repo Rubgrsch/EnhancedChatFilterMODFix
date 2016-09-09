@@ -710,16 +710,15 @@ local function ECFfilter(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID)
 	end
 
 	if(chatChannel[event] <= (config.blackWordFilterGroup and 4 or 3)) then --blackWord Filter, whisper/yell/say/channel
-		--从处理过的聊天信息中过滤包含黑名单词语的聊天内容
 		for keyWord,v in pairs(config.blackWordList) do
 			local currentString
-			if (v ~= "regex") then -- 如果不是正则，也过滤正则中使用的特殊字符
+			if (v ~= "regex") then -- if it is not regex, filter most symbols
 				keyWord = keyWord:upper()
 				currentString = newfilterString
 			else
 				currentString = filterString
 			end
-			--检查常规黑名单
+			--Check blackList
 			if (strfind(currentString,keyWord)) then
 				if config.debugMode then print("Trigger: Keyword: "..keyWord) end
 				filterResult = true
