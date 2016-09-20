@@ -753,18 +753,18 @@ local function ECFfilter(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID)
 
 		--msgdata
 		local msgtable = {Sender = trimmedPlayer, Msg = msgLine, Time = GetTime()}
-		for i=1, #chatLines do
+		tinsert(chatLines, msgtable)
+		for i=1, #chatLines-1 do
 			--if there is not much difference between msgs, then filter it
 			--(optional) if someone sends msgs within 0.6s ,then filter it
 			if (chatLines[i].Sender == msgtable.Sender and ((config.multiLine and (msgtable.Time - chatLines[i].Time) < 0.600) or stringDifference(chatLines[i].Msg,msgtable.Msg) <= config.stringDifferenceLimit)) then
-				chatLines[i] = msgtable
+				tremove(chatLines, i)
 				if config.debugMode then print("Trigger: Repeat Filter") end
 				filterResult = true
 				return true
 			end
 			if i >= config.chatLinesLimit then tremove(chatLines, 1) end
 		end
-		tinsert(chatLines, msgtable)
 	end
 end
 
