@@ -515,7 +515,7 @@ local options = {
 					func = function() config.lootItemFilterList, config.lootCurrencyFilterList, lootHighlight = {}, {}, {} end,
 					confirm = true,
 					confirmText = L["DoYouWantToClear"]..L["LootFilterList"]..L["?"],
-					disabled = function() return next(config.lootItemFilterList) == nil and config.lootCurrencyFilterList == nil end,
+					disabled = function() return next(config.lootItemFilterList) == nil and next(config.lootCurrencyFilterList) == nil end,
 				},
 				LootFilterList = {
 					type = "multiselect",
