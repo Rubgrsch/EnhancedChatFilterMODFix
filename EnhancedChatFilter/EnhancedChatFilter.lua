@@ -23,7 +23,7 @@ local chatLines = {}
 local prevLineID = 0
 local filterResult = nil
 local filterCharList = "[|@!/<>\"`'_#&;:~\\]" -- work on any blackWord
-local filterCharListRegex = "[%(%)%.%%%+%-%*%?%[%]%$%^={}]" -- won't work on regex blackWord
+local filterCharListRegex = "[%(%)%.%%%+%-%*%?%[%]%$%^={}]" -- won't work on regex blackWord, but works on others
 local allowWisper = {}
 local config
 
@@ -138,7 +138,7 @@ end
 
 --method run on /ecf-debug
 function EnhancedChatFilter:EnhancedChatFilterDebug()
-	if(config.debugMode) then print("Debug Mode Off!") else print("Debug Mode On!") end
+	print(config.debugMode and "Debug Mode Off!" or "Debug Mode On!")
 	config.debugMode = not config.debugMode
 end
 
@@ -405,11 +405,7 @@ local options = {
 							if (checkBlacklist(key, v)) then
 								EnhancedChatFilter:Print(key..L["IncludeAutofilteredWord"])
 							else
-								if (v == true) then
-									blackStringList[#blackStringList+1] = key
-								else
-									blackStringList[#blackStringList+1] = key..","..v
-								end
+								blackStringList[#blackStringList+1] = (v == true) and key or key..","..v
 							end
 						end
 						local blackString = tconcat(blackStringList,";")
@@ -634,11 +630,7 @@ local function stringDifference(stringA, stringB)
 	for i=1, len_a do
 		temp[1] = i
 		for j=1, len_b do
-			if(stringA:sub(i,i) == stringB:sub(j,j)) then
-				temp[j+1] = templast[j]
-			else
-				temp[j+1] = min(templast[j+1], temp[j], templast[j]) + 1
-			end
+			temp[j+1] = (stringA:sub(i,i) == stringB:sub(j,j)) and templast[j] or (min(templast[j+1], temp[j], templast[j]) + 1)
 		end
 		for j=0, len_b do templast[j+1]=temp[j+1] end
 	end
