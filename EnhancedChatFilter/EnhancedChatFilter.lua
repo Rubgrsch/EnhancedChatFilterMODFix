@@ -466,7 +466,7 @@ local options = {
 					set = function(_,value)
 						local Id = tonumber(value)
 						if(lootType == "Item") then
-							if (Id == nil or GetItemInfo(Id) == nil) then -- TODO: If an item doesn't exist in cache, then it will report as 'NotExists'(nil)
+							if (Id == nil or GetItemInfo(Id) == nil) then -- TODO: If an item doesn't exist in cache, it reports as 'NotExists'(nil)
 								EnhancedChatFilter:Print(format("%s: ID=%d%s",L[lootType],Id,L["NotExists"]))
 							else
 								config.lootItemFilterList[Id] = true
@@ -594,7 +594,7 @@ end
 hooksecurefunc("AddIgnore", ignoreMore)
 hooksecurefunc("AddOrDelIgnore", ignoreMore)
 
---Update allowWisper list whenever login/friend list updates
+--Update allowWisper list whenever login/friendlist updates
 local login = nil
 local ecfFrame = CreateFrame("Frame")
 ecfFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
@@ -616,7 +616,7 @@ ecfFrame:SetScript("OnEvent", function(self, event)
 	if config.debugMode then for k in pairs(allowWisper) do print("ECF allowed: "..k) end end
 end)
 
---Added your wisper played into allowWisper list
+--Add players you wispered into allowWisper list
 local function addToAllowWisper(self,_,_,player)
 	local trimmedPlayer = Ambiguate(player, "none")
 	allowWisper[trimmedPlayer] = true
@@ -640,10 +640,10 @@ end
 local chatChannel = {["CHAT_MSG_WHISPER"] = 1, ["CHAT_MSG_SAY"] = 2, ["CHAT_MSG_CHANNEL"] = 3, ["CHAT_MSG_YELL"] = 3, ["CHAT_MSG_PARTY"] = 4, ["CHAT_MSG_PARTY_LEADER"] = 4, ["CHAT_MSG_RAID"] = 4, ["CHAT_MSG_RAID_LEADER"] = 4, ["CHAT_MSG_RAID_WARNING"] = 4, ["CHAT_MSG_INSTANCE_CHAT"] = 4,["CHAT_MSG_INSTANCE_CHAT_LEADER"] = 4, ["CHAT_MSG_DND"] = 101}
 
 local function ECFfilter(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID)
-	-- if not enabled the main filter then exit
+	-- exit when main filter is off
 	if(not config.enableFilter) then return end
 
-	-- don't filter player itself
+	-- don't filter player himself
 	local trimmedPlayer = Ambiguate(player, "none")
 	if UnitIsUnit(trimmedPlayer,"player") then return end
 
@@ -701,7 +701,7 @@ local function ECFfilter(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID)
 		end
 	end
 
-	if(chatChannel[event] <= (config.blackWordFilterGroup and 4 or 3)) then --blackWord Filter, whisper/yell/say/channel
+	if(chatChannel[event] <= (config.blackWordFilterGroup and 4 or 3)) then --blackWord Filter, whisper/yell/say/channel and party/raid(optional)
 		for keyWord,v in pairs(config.blackWordList) do
 			local currentString
 			if (v ~= "regex") then -- if it is not regex, filter most symbols
