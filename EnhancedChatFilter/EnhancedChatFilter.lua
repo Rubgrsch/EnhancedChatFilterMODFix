@@ -19,12 +19,6 @@ local _, ecf = ...
 local utf8replace = ecf.utf8replace -- utf8.lua
 local L = ecf.L -- locales.lua
 
-local chatLines = {}
-local prevLineID = 0
-local filterResult = nil
-local filterCharList = "[|@!/<>\"`'_#&;:~\\]" -- work on any blackWord
-local filterCharListRegex = "[%(%)%.%%%+%-%*%?%[%]%$%^={}]" -- won't work on regex blackWord, but works on others
-local allowWisper = {}
 local config
 
 local gsub, select, ipairs, tinsert, pairs, strsub, format, tonumber, strmatch, tconcat, strfind = gsub, select, ipairs, tinsert, pairs, strsub, format, tonumber, strmatch, table.concat, string.find -- lua
@@ -596,6 +590,7 @@ hooksecurefunc("AddOrDelIgnore", ignoreMore)
 
 --Update allowWisper list whenever login/friendlist updates
 local login = nil
+local allowWisper = {}
 local ecfFrame = CreateFrame("Frame")
 ecfFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
 ecfFrame:RegisterEvent("FRIENDLIST_UPDATE")
@@ -637,6 +632,11 @@ local function stringDifference(stringA, stringB)
 	return temp[len_b+1]/(len_a+len_b)
 end
 
+local chatLines = {}
+local prevLineID = 0
+local filterResult = nil
+local filterCharList = "[|@!/<>\"`'_#&;:~\\]" -- work on any blackWord
+local filterCharListRegex = "[%(%)%.%%%+%-%*%?%[%]%$%^={}]" -- won't work on regex blackWord, but works on others
 local chatChannel = {["CHAT_MSG_WHISPER"] = 1, ["CHAT_MSG_SAY"] = 2, ["CHAT_MSG_CHANNEL"] = 3, ["CHAT_MSG_YELL"] = 3, ["CHAT_MSG_PARTY"] = 4, ["CHAT_MSG_PARTY_LEADER"] = 4, ["CHAT_MSG_RAID"] = 4, ["CHAT_MSG_RAID_LEADER"] = 4, ["CHAT_MSG_RAID_WARNING"] = 4, ["CHAT_MSG_INSTANCE_CHAT"] = 4,["CHAT_MSG_INSTANCE_CHAT_LEADER"] = 4, ["CHAT_MSG_DND"] = 101}
 
 local function ECFfilter(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID)
