@@ -138,7 +138,7 @@ end
 
 --method run on /ecf-debug
 function EnhancedChatFilter:EnhancedChatFilterDebug()
-	print(config.debugMode and "Debug Mode Off!" or "Debug Mode On!")
+	EnhancedChatFilter:Print(config.debugMode and "Debug Mode Off!" or "Debug Mode On!")
 	config.debugMode = not config.debugMode
 end
 
@@ -299,7 +299,7 @@ local options = {
 					get = nil,
 					set = function(_,value)
 						if (checkBlacklist(value, regexToggle)) then
-							EnhancedChatFilter:Print(value..L["IncludeAutofilteredWord"])
+							EnhancedChatFilter:Printf(L["IncludeAutofilteredWord"],value)
 						else
 							config.blackWordList[value] = regexToggle or true
 							scrollHighlight = {}
@@ -330,7 +330,7 @@ local options = {
 					order = 4,
 					func = function() config.blackWordList, scrollHighlight = {}, {} end,
 					confirm = true,
-					confirmText = L["DoYouWantToClear"]..L["BlackList"]..L["?"],
+					confirmText = format(L["DoYouWantToClear"],L["BlackList"]),
 					disabled = function() return next(config.blackWordList) == nil end,
 				},
 				blackWordList = {
@@ -384,7 +384,7 @@ local options = {
 							if (blacklist ~= nil) then
 								local imNewWord, imTypeWord = strsplit(",",blacklist)
 								if (checkBlacklist(imNewWord, imTypeWord)) then
-									EnhancedChatFilter:Print(imNewWord..L["IncludeAutofilteredWord"])
+									EnhancedChatFilter:Printf(L["IncludeAutofilteredWord"],imNewWord)
 								else
 									config.blackWordList[imNewWord] = imTypeWord or true
 								end
@@ -403,7 +403,7 @@ local options = {
 						local blackStringList = {}
 						for key,v in pairs(config.blackWordList) do
 							if (checkBlacklist(key, v)) then
-								EnhancedChatFilter:Print(key..L["IncludeAutofilteredWord"])
+								EnhancedChatFilter:Printf(L["IncludeAutofilteredWord"],key)
 							else
 								blackStringList[#blackStringList+1] = (v == true) and key or key..","..v
 							end
@@ -436,7 +436,7 @@ local options = {
 					order = 2,
 					func = function() config.ignoreMoreList, ignoreHighlight = {}, {} end,
 					confirm = true,
-					confirmText = L["DoYouWantToClear"]..L["IgnoreMoreList"]..L["?"],
+					confirmText = format(L["DoYouWantToClear"],L["IgnoreMoreList"]),
 					disabled = function() return next(config.ignoreMoreList) == nil end,
 				},
 				ignoreMoreList = {
@@ -510,7 +510,7 @@ local options = {
 					order = 4,
 					func = function() config.lootItemFilterList, config.lootCurrencyFilterList, lootHighlight = {}, {}, {} end,
 					confirm = true,
-					confirmText = L["DoYouWantToClear"]..L["LootFilterList"]..L["?"],
+					confirmText = format(L["DoYouWantToClear"],L["LootFilterList"]),
 					disabled = function() return next(config.lootItemFilterList) == nil and next(config.lootCurrencyFilterList) == nil end,
 				},
 				LootFilterList = {
@@ -536,7 +536,7 @@ local options = {
 					name = L["LootQualityFilter"],
 					desc = L["LootQualityFilterTooltips"],
 					order = 11,
-					values = {[0]="|cFF9D9D9D"..L["Poor"], [1]="|cFFFFFFFF"..L["Common"], [2]="|cFF1EFF00"..L["Uncommon"], [3]="|cFF0070DD"..L["Rare"], [4]="|cFFA335EE"..L["Epic"]}
+					values = {[0]=L["Poor"], [1]=L["Common"], [2]=L["Uncommon"], [3]=L["Rare"], [4]=L["Epic"]}
 				},
 			},
 		},
@@ -791,7 +791,7 @@ local function SendAchievement(event, achievementID, players)
 		end
 		list[#list+1] = format("|cff%02x%02x%02x|Hplayer:%s|h%s|h|r", r*255, g*255, b*255, name, name)
 	end
-	SendMessage(event, format("[%s]"..L["GotAchievement"].."%s!", tconcat(list, L["And"]), GetAchievementLink(achievementID)))
+	SendMessage(event, format(L["GotAchievement"], tconcat(list, L["And"]), GetAchievementLink(achievementID)))
 end
 
 local function achievementReady(id, achievement)
