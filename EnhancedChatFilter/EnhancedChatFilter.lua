@@ -160,7 +160,7 @@ local options = {
 		},
 		MinimapToggle = {
 			type = "toggle",
-			name = L["MinimapButton"],
+			name = L["MinimapIcon"],
 			get = function() return not config.minimap.hide end,
 			set = function(_,toggle)
 					config.minimap.hide = not toggle
@@ -283,7 +283,7 @@ local options = {
 		},
 		blackListTab = {
 			type = "group",
-			name = L["BlackworldList"],
+			name = L["BlackwordList"],
 			order = 4,
 			args = {
 				blackword = {

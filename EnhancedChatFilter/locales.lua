@@ -7,7 +7,7 @@ local L = {}
 if (GetLocale() == "zhCN") then
 --Titles
 	L["MainFilter"] = "总开关"
-	L["MinimapButton"] = "小地图图标"
+	L["MinimapIcon"] = "小地图图标"
 --Minimap Tooltips
 	L["ClickToOpenConfig"] = "点击打开配置界面"
 --Common in tab
@@ -42,7 +42,7 @@ if (GetLocale() == "zhCN") then
 	L["WhisperWhitelistMode"] = "密语白名单模式"
 	L["WhisperWhitelistModeTooltip"] = "启用后除了工会、团队、小队、战网好友发送的密语外，只允许你发送过密语的对方才能对你发起密语|n|cffE2252D慎用！"
 --BlackwordList
-	L["BlackworldList"] = "黑名单关键词"
+	L["BlackwordList"] = "黑名单关键词"
 	L["AddBlackWordTitle"] = "添加新黑名单关键字"
 	L["IncludeAutofilteredWord"] = "%s包含会被自动过滤的字符，将忽略该关键词！"
 	L["Regex"] = "正则"
@@ -97,10 +97,9 @@ if (GetLocale() == "zhCN") then
 -- Contributors: 老虎007@NGA
 -----------------------------------------------------------------------
 elseif (GetLocale() == "zhTW") then
-
 --Titles
 	L["MainFilter"] = "總開關"
-	L["MinimapButton"] = "小地圖圖標"
+	L["MinimapIcon"] = "小地圖圖標"
 --Minimap Tooltips
 	L["ClickToOpenConfig"] = "點擊打開配置介面"
 --Common in tab
@@ -135,7 +134,7 @@ elseif (GetLocale() == "zhTW") then
 	L["WhisperWhitelistMode"] = "密語白名單模式"
 	L["WhisperWhitelistModeTooltip"] = "启用后除了工会、团队、小队、战网好友发送的密语外，只允许你发送过密语的对方才能对你发起密语|n|cffE2252D慎用！"
 --BlackwordList
-	L["BlackworldList"] = "黑名单關鍵詞"
+	L["BlackwordList"] = "黑名单關鍵詞"
 	L["AddBlackWordTitle"] = "添加新黑名單關鍵詞"
 	L["IncludeAutofilteredWord"] = "%s包含會被自動過濾的字符，蔣忽略該關鍵詞！"
 	L["Regex"] = "正規"
@@ -191,7 +190,7 @@ elseif (GetLocale() == "zhTW") then
 else
 --Titles
 	L["MainFilter"] = "Main Filter"
-	L["MinimapButton"] = "Minimap Button"
+	L["MinimapIcon"] = "Minimap Button"
 --Minimap Tooltips
 	L["ClickToOpenConfig"] = "Click To Open Config"
 --Common in tab
@@ -226,7 +225,7 @@ else
 	L["WhisperWhitelistMode"] = "Whisper Whitelist Mode"
 	L["WhisperWhitelistModeTooltip"] = "While enabled, it will filter all whisper unless it's from guild/group/raid/battlenet friend or you have just whisper them|n|cffE2252DUse with care!"
 --BlackwordList
-	L["BlackworldList"] = "BlackWordList"
+	L["BlackwordList"] = "BlackWordList"
 	L["AddBlackWordTitle"] = "Add Blackword"
 	L["IncludeAutofilteredWord"] = "%s includes symbels to be filtered. It will be ignored."
 	L["Regex"] = "Regex"
