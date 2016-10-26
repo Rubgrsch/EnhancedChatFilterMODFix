@@ -36,7 +36,6 @@ local defaults = {
 		enableFilter = true, -- Main Filter
 		enableWisper = false, -- Wisper WhiteMode
 		enableDND = true, -- DND
-		enableRPT = true, -- Repeat Filter
 		enableCFA = true, -- Achievement Filter
 		enableRAF = false, -- RaidAlert Filter
 		enableQRF = false, -- QuestReport and Group Filter
@@ -187,12 +186,6 @@ local options = {
 					desc = L["DNDfilterTooltip"],
 					order = 11,
 				},
-				enableRPT = {
-					type = "toggle",
-					name = L["Repeat"],
-					desc = L["RepeatFilterTooltip"],
-					order = 12,
-				},
 				enableCFA = {
 					type = "toggle",
 					name = L["Achievement"],
@@ -226,12 +219,10 @@ local options = {
 					name = L["chatLinesLimitSlider"],
 					desc = L["chatLinesLimitSliderTooltips"],
 					order = 21,
-					min = 1,
+					min = 0,
 					max = 100,
 					step = 1,
 					bigStep = 5,
-					disabled = function() return not config.enableRPT end,
-					hidden = function() return not config.advancedConfig end,
 				},
 				stringDifferenceLimit = {
 					type = "range",
@@ -243,7 +234,7 @@ local options = {
 					step = 0.01,
 					bigStep = 0.1,
 					isPercent = true,
-					disabled = function() return not config.enableRPT end,
+					disabled = function() return config.chatLinesLimit == 0 end,
 					hidden = function() return not config.advancedConfig end,
 				},
 				multiLine = {
@@ -251,7 +242,7 @@ local options = {
 					name = L["MultiLines"],
 					desc = L["MultiLinesTooltip"],
 					order = 23,
-					disabled = function() return not config.enableRPT end,
+					disabled = function() return config.chatLinesLimit == 0 end,
 				},
 				line3 = {
 					type = "header",
@@ -739,7 +730,7 @@ local function ECFfilter(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID)
 		end
 	end
 
-	if(config.enableRPT and chatChannel[event] <= 4) then --Repeat Filter
+	if(config.chatLinesLimit > 0 and chatChannel[event] <= 4) then --Repeat Filter
 		local msgLine = newfilterString
 		if(msgLine == "") then msgLine = msg end --If it has only symbols, then don't filter it
 
