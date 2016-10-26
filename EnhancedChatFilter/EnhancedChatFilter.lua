@@ -331,7 +331,7 @@ local options = {
 				},
 				blackWordList = {
 					type = "multiselect",
-					name = L["BlackworldList"],
+					name = L["BlackwordList"],
 					order = 10,
 					get = function(_,key) return scrollHighlight[key] end,
 					set = function(_,key,value) scrollHighlight[key] = value or nil end,
