@@ -33,7 +33,7 @@ local EnhancedChatFilter = LibStub("AceAddon-3.0"):NewAddon("EnhancedChatFilter"
 --Default Options
 local defaults = {
 	profile = {
-		enableFilter = true, -- Main Filter
+		enableFilter = true, -- Main Toggle
 		enableWisper = false, -- Wisper WhiteMode
 		enableDND = true, -- DND
 		enableCFA = true, -- Achievement Filter
@@ -51,7 +51,7 @@ local defaults = {
 			hide = false, -- minimap
 		},
 		advancedConfig = false, -- show advancedConfig
-		chatLinesLimit = 20, -- in repeatFilter
+		chatLinesLimit = 20, -- also enable repeatFilter
 		stringDifferenceLimit = 0.1, -- in repeatFilter
 		debugMode = false,
 	}
@@ -190,24 +190,24 @@ local options = {
 					type = "toggle",
 					name = L["Achievement"],
 					desc = L["AchievementFilterTooltip"],
-					order = 13,
+					order = 12,
 				},
 				enableRAF = {
 					type = "toggle",
 					name = L["RaidAlert"],
 					desc = L["RaidAlertFilterTooltip"],
-					order = 14,
+					order = 13,
 				},
 				enableQRF = {
 					type = "toggle",
 					name = L["QuestReport"],
 					desc = L["QuestReportFilterTooltip"],
-					order = 15,
+					order = 14,
 				},
 				enableIGM = {
 					type = "toggle",
 					name = L["IgnoreMoreList"],
-					order = 16,
+					order = 15,
 				},
 				line2 = {
 					type = "header",
@@ -216,8 +216,8 @@ local options = {
 				},
 				chatLinesLimit = {
 					type = "range",
-					name = L["chatLinesLimitSlider"],
-					desc = L["chatLinesLimitSliderTooltips"],
+					name = L["chatLinesLimit"],
+					desc = L["chatLinesLimitTooltips"],
 					order = 21,
 					min = 0,
 					max = 100,
@@ -226,8 +226,8 @@ local options = {
 				},
 				stringDifferenceLimit = {
 					type = "range",
-					name = L["stringDifferenceLimitSlider"],
-					desc = L["stringDifferenceLimitSliderTooltips"],
+					name = L["stringDifferenceLimit"],
+					desc = L["stringDifferenceLimitTooltips"],
 					order = 22,
 					min = 0,
 					max = 1,
@@ -634,14 +634,14 @@ local function ECFfilter(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID)
 	-- exit when main filter is off
 	if(not config.enableFilter) then return end
 
-	-- don't filter player himself
 	local trimmedPlayer = Ambiguate(player, "none")
+	-- don't filter player himself
 	if UnitIsUnit(trimmedPlayer,"player") then return end
 
 	-- if it's GM or DEV then exit
 	if type(flags) == "string" and (flags == "GM" or flags == "DEV") then return end
 
-	-- if it has been worked then use the last result
+	-- if it has been worked then use the worked result
 	if(lineID == prevLineID) then
 		return filterResult
 	else
