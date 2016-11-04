@@ -5,9 +5,9 @@ Description
 -----------
 
 This is a WoW chat filter addon mainly for chinese servers.<br />
-It is now supporting Legion(7.0.3).<br />
+It is now supporting Legion(7.1.0).<br />
 这是一个主要适用于国服魔兽世界的聊天屏蔽插件。<br />
-现已更新至军团再临(7.0.3)。<br />
+现已更新至军团再临(7.1.0)。<br />
 
 The original project, which is abondoned, can be found here: <http://wow.curseforge.com/addons/chat-filter/><br />
 And it has already been localized: <http://bbs.ngacn.cc/read.php?tid=7527032> by szpunk.<br />
@@ -23,11 +23,6 @@ Need some help for english version wiki.<br />
 General issues and pull requests are also welcome.<br />
 
 Curse Link: <http://mods.curse.com/addons/wow/ecfmodfix>
-
-Wiki
-----
-
-各种功能介绍/使用说明/问题请去Wiki页查找帮助。
 
 Issues
 ------
