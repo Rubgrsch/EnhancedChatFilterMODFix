@@ -23,7 +23,7 @@ local L = ecf.L -- locales.lua
 
 local config
 
-local gsub, select, ipairs, tinsert, pairs, strsub, format, tonumber, strmatch, tconcat, strfind = gsub, select, ipairs, tinsert, pairs, strsub, format, tonumber, strmatch, table.concat, string.find -- lua
+local gsub, select, ipairs, tinsert, pairs, strsub, format, tonumber, strmatch, tconcat, strfind, strbyte = gsub, select, ipairs, tinsert, pairs, strsub, format, tonumber, strmatch, table.concat, string.find, string.byte -- lua
 local GetItemInfo, GetCurrencyLink = GetItemInfo, GetCurrencyLink -- options
 local Ambiguate, GetNumFriends = Ambiguate, GetNumFriends -- main filter
 local ChatTypeInfo, GetPlayerInfoByGUID, GetGuildInfo, GetTime = ChatTypeInfo, GetPlayerInfoByGUID, GetGuildInfo, GetTime -- acievements
@@ -611,14 +611,14 @@ local function addToAllowWisper(self,_,_,player)
 end
 
 --stringDifference for repeatFilter, ranged from 0 to 1, while 0 is absolutely the same
-local function stringDifference(stringA, stringB)
-	local len_a, len_b = #stringA, #stringB
+local function stringDifference(sA, sB)
+	local len_a, len_b = #sA, #sB
 	local templast, temp = {}, {}
 	for j=0, len_b do templast[j+1] = j end
 	for i=1, len_a do
 		temp[1] = i
 		for j=1, len_b do
-			temp[j+1] = (stringA:sub(i,i) == stringB:sub(j,j)) and templast[j] or (min(templast[j+1], temp[j], templast[j]) + 1)
+			temp[j+1] = (sA[i] == sB[j]) and templast[j] or (min(templast[j+1], temp[j], templast[j]) + 1)
 		end
 		for j=0, len_b do templast[j+1]=temp[j+1] end
 	end
@@ -735,7 +735,8 @@ local function ECFfilter(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID)
 		if(msgLine == "") then msgLine = msg end --If it has only symbols, then don't filter it
 
 		--msgdata
-		local msgtable = {Sender = trimmedPlayer, Msg = msgLine, Time = GetTime()}
+		local msgtable = {Sender = trimmedPlayer, Msg = {}, Time = GetTime()}
+		for idx=1, #msgLine do msgtable.Msg[idx] = strbyte(msgLine,idx) end
 		tinsert(chatLines, msgtable)
 		for i=1, #chatLines-1 do
 			--if there is not much difference between msgs, then filter it
