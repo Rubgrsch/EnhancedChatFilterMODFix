@@ -23,7 +23,7 @@ local L = ecf.L -- locales.lua
 
 local config
 
-local gsub, select, ipairs, tinsert, pairs, strsub, format, tonumber, strmatch, tconcat, strfind, strbyte = gsub, select, ipairs, tinsert, pairs, strsub, format, tonumber, strmatch, table.concat, string.find, string.byte -- lua
+local gsub, select, ipairs, tinsert, pairs, next, strsub, format, tonumber, strmatch, tconcat, strfind, strbyte = gsub, select, ipairs, tinsert, pairs, next, strsub, format, tonumber, strmatch, table.concat, string.find, string.byte -- lua
 local GetItemInfo, GetCurrencyLink = GetItemInfo, GetCurrencyLink -- options
 local Ambiguate, GetNumFriends = Ambiguate, GetNumFriends -- main filter
 local ChatTypeInfo, GetPlayerInfoByGUID, GetGuildInfo, GetTime = ChatTypeInfo, GetPlayerInfoByGUID, GetGuildInfo, GetTime -- acievements
@@ -79,12 +79,12 @@ end
 --http://www.wowwiki.com/USERAPI_StringHash
 local function StringHash(text)
 	local counter = 1
-	local len = string.len(text)
+	local len = #text
 	for i = 1, len, 3 do
 	counter = math.fmod(counter*8161, 4294967279) +  -- 2^32 - 17: Prime!
-		(string.byte(text,i)*16776193) +
-		((string.byte(text,i+1) or (len-i+256))*8372226) +
-		((string.byte(text,i+2) or (len-i+256))*3932164)
+		(strbyte(text,i)*16776193) +
+		((strbyte(text,i+1) or (len-i+256))*8372226) +
+		((strbyte(text,i+2) or (len-i+256))*3932164)
 	end
 	return math.fmod(counter, 4294967291) -- 2^32 - 5: Prime (and different from the prime in the loop)
 end
@@ -560,21 +560,20 @@ profanityFilter:RegisterEvent("BN_CONNECTED")
 --IgnoreMore
 local function ignoreMore(player)
 	if (not config.enableIGM or not player) then return end
+	local IgnoresNum = GetNumIgnores()
+	if IgnoresNum < 50 then return end
 	local ignore = nil
-	if GetNumIgnores() >= 50 then
-		for i = 1, GetNumIgnores() do
-			local name = GetIgnoreName(i)
-			if (player == name) then
-				ignore = true
-				break
-			end
+	for i = 1, IgnoresNum do
+		if (player == IgnoresNum) then
+			ignore = true
+			break
 		end
-		if (not ignore) then
-			local trimmedPlayer = Ambiguate(player, "none")
-			tinsert(config.ignoreMoreList,{trimmedPlayer})
-			if config.debugMode then print("Added to ECF ignoreMoreList!") end
-			SendMessage("CHAT_MSG_SYSTEM", format(ERR_IGNORE_ADDED_S, trimmedPlayer))
-		end
+	end
+	if (not ignore) then
+		local trimmedPlayer = Ambiguate(player, "none")
+		tinsert(config.ignoreMoreList,{trimmedPlayer})
+		if config.debugMode then print("Added to ECF ignoreMoreList!") end
+		SendMessage("CHAT_MSG_SYSTEM", format(ERR_IGNORE_ADDED_S, trimmedPlayer))
 	end
 end
 
@@ -593,8 +592,7 @@ ecfFrame:SetScript("OnEvent", function(self, event)
 	else
 		if not login then --once per login
 			login = true
-			local num = GetNumFriends()
-			for i = 1, num do
+			for i = 1, GetNumFriends() do
 				local n = GetFriendInfo(i)
 				if n then allowWisper[n] = true end -- added to allowWisper list
 			end
