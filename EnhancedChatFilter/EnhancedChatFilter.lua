@@ -564,7 +564,7 @@ local function ignoreMore(player)
 	if IgnoresNum < 50 then return end
 	local ignore = nil
 	for i = 1, IgnoresNum do
-		if (player == IgnoresNum) then
+		if (player == GetIgnoreName(i)) then
 			ignore = true
 			break
 		end
