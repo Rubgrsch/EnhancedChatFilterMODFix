@@ -25,7 +25,7 @@ local config
 
 local gsub, select, ipairs, tinsert, pairs, next, strsub, format, tonumber, strmatch, tconcat, strfind, strbyte = gsub, select, ipairs, tinsert, pairs, next, strsub, format, tonumber, strmatch, table.concat, string.find, string.byte -- lua
 local GetItemInfo, GetCurrencyLink = GetItemInfo, GetCurrencyLink -- options
-local Ambiguate, GetNumFriends = Ambiguate, GetNumFriends -- main filter
+local Ambiguate = Ambiguate -- main filter
 local ChatTypeInfo, GetPlayerInfoByGUID, GetGuildInfo, GetTime = ChatTypeInfo, GetPlayerInfoByGUID, GetGuildInfo, GetTime -- acievements
 
 local EnhancedChatFilter = LibStub("AceAddon-3.0"):NewAddon("EnhancedChatFilter", "AceConsole-3.0", "AceEvent-3.0")
@@ -38,7 +38,7 @@ local defaults = {
 		enableDND = true, -- DND
 		enableCFA = true, -- Achievement Filter
 		enableRAF = false, -- RaidAlert Filter
-		enableQRF = false, -- QuestReport and Group Filter
+		enableQRF = false, -- Quest/Group Report Filter
 		enableIGM = false, -- IgnoreMore
 		multiLine = false, -- MultiLines, in RepeatFilter
 		blackWordList = {},
@@ -544,8 +544,6 @@ LibStub("AceConfigRegistry-3.0"):RegisterOptionsTable("EnhancedChatFilter", opti
 LibStub("AceConfigDialog-3.0"):AddToBlizOptions("EnhancedChatFilter", "EnhancedChatFilter")
 
 --Disable profanityFilter
-local GetCVar,SetCVar = GetCVar,SetCVar
-
 local profanityFilter=CreateFrame("Frame")
 profanityFilter:SetScript("OnEvent", function()
 	if GetCVar("profanityFilter")~="0" then SetCVar("profanityFilter", "0") end
