@@ -42,6 +42,7 @@ local defaults = {
 		enableIGM = false, -- IgnoreMore
 		multiLine = false, -- MultiLines, in RepeatFilter
 		blackWordList = {},
+		regexToggle = false,
 		blackWordFilterGroup = false, -- blackWord enabled in group and raid
 		ignoreMoreList = {},
 		lootItemFilterList = {[118043] = true, [71096] = true}, -- item list, [id] = true
@@ -142,7 +143,6 @@ end
 local scrollHighlight = {}
 local lootHighlight = {}
 local ignoreHighlight = {}
-local regexToggle = false
 local stringIO = "" -- blackWord input
 local lootType = "Item" -- loot filter type
 
@@ -285,7 +285,7 @@ local options = {
 					order = 1,
 					get = nil,
 					set = function(_,value)
-						if (checkBlacklist(value, regexToggle)) then
+						if (checkBlacklist(value, regexToggle and "regex")) then
 							EnhancedChatFilter:Printf(L["IncludeAutofilteredWord"],value)
 						else
 							config.blackWordList[value] = regexToggle or true
@@ -293,13 +293,11 @@ local options = {
 						end
 					end,
 				},
-				regex = {
+				regexToggle = {
 					type = "toggle",
 					name = L["Regex"],
 					desc = L["RegexTooltip"],
 					order = 2,
-					get = function() return regexToggle end,
-					set = function(_,value) regexToggle = value and "regex" end,
 				},
 				DeleteButton = {
 					type = "execute",
