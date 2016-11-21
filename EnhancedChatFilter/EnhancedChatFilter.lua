@@ -569,7 +569,7 @@ local function ignoreMore(player)
 	end
 	if (not ignore) then
 		local trimmedPlayer = Ambiguate(player, "none")
-		tinsert(config.ignoreMoreList,{trimmedPlayer})
+		config.ignoreMoreList[trimmedPlayer] = true
 		if config.debugMode then print("Added to ECF ignoreMoreList!") end
 		SendMessage("CHAT_MSG_SYSTEM", format(ERR_IGNORE_ADDED_S, trimmedPlayer))
 	end
@@ -654,7 +654,7 @@ local function ECFfilter(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID)
 	local newfilterString = filterString:gsub(filterCharListRegex, "")
 
 	if(config.enableIGM and chatChannel[event] <= 1) then -- IgnoreMore, only whisper
-		for _,ignorePlayer in ipairs(config.ignoreMoreList) do
+		for ignorePlayer in pairs(config.ignoreMoreList) do
 			if (trimmedPlayer == ignorePlayer[1]) then
 				if config.debugMode then print("Trigger: IgnoreMore Filter") end
 				filterResult = true
