@@ -23,7 +23,7 @@ local L = ecf.L -- locales.lua
 
 local config
 
-local gsub, select, ipairs, tinsert, pairs, next, strsub, format, tonumber, strmatch, tconcat, strfind, strbyte = gsub, select, ipairs, tinsert, pairs, next, strsub, format, tonumber, strmatch, table.concat, string.find, string.byte -- lua
+local gsub, select, ipairs, pairs, next, strsub, format, tonumber, strmatch, tconcat, strfind, strbyte = gsub, select, ipairs, pairs, next, strsub, format, tonumber, strmatch, table.concat, string.find, string.byte -- lua
 local GetItemInfo, GetCurrencyLink = GetItemInfo, GetCurrencyLink -- options
 local Ambiguate = Ambiguate -- main filter
 local ChatTypeInfo, GetPlayerInfoByGUID, GetGuildInfo, GetTime = ChatTypeInfo, GetPlayerInfoByGUID, GetGuildInfo, GetTime -- acievements
@@ -731,8 +731,9 @@ local function ECFfilter(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID)
 		--msgdata
 		local msgtable = {Sender = trimmedPlayer, Msg = {}, Time = GetTime()}
 		for idx=1, #msgLine do msgtable.Msg[idx] = strbyte(msgLine,idx) end
-		tinsert(chatLines, msgtable)
-		for i=1, #chatLines-1 do
+		local chatLinesSize = #chatLines
+		chatLines[chatLinesSize+1] = msgtable
+		for i=1, chatLinesSize do
 			--if there is not much difference between msgs, then filter it
 			--(optional) if someone sends msgs within 0.6s ,then filter it
 			if (chatLines[i].Sender == msgtable.Sender and ((config.multiLine and (msgtable.Time - chatLines[i].Time) < 0.600) or stringDifference(chatLines[i].Msg,msgtable.Msg) <= config.stringDifferenceLimit)) then
@@ -741,8 +742,8 @@ local function ECFfilter(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID)
 				filterResult = true
 				return true
 			end
-			if i >= config.chatLinesLimit then tremove(chatLines, 1) end
 		end
+		if chatLinesSize >= config.chatLinesLimit then tremove(chatLines, 1) end
 	end
 end
 
