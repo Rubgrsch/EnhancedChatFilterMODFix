@@ -360,7 +360,7 @@ local options = {
 					order = 32,
 					func = function()
 						local wordString, HashString = strsplit("@", stringIO)
-						if (tonumber(HashString) ~= tonumber(StringHash(wordString))) then
+						if (tonumber(HashString) ~= StringHash(wordString)) then
 							EnhancedChatFilter:Print(L["StringHashMismatch"])
 							return
 						end
@@ -542,15 +542,7 @@ LibStub("AceConfigRegistry-3.0"):RegisterOptionsTable("EnhancedChatFilter", opti
 LibStub("AceConfigDialog-3.0"):AddToBlizOptions("EnhancedChatFilter", "EnhancedChatFilter")
 
 --Disable profanityFilter
-local profanityFilter=CreateFrame("Frame")
-profanityFilter:SetScript("OnEvent", function()
-	if GetCVar("profanityFilter")~="0" then SetCVar("profanityFilter", "0") end
-end)
-profanityFilter:RegisterEvent("VARIABLES_LOADED")
-profanityFilter:RegisterEvent("CVAR_UPDATE")
-profanityFilter:RegisterEvent("PLAYER_ENTERING_WORLD")
-profanityFilter:RegisterEvent("BN_MATURE_LANGUAGE_FILTER")
-profanityFilter:RegisterEvent("BN_CONNECTED")
+if GetCVar("profanityFilter")~="0" then SetCVar("profanityFilter", "0") end
 
 -------------------------------------- Filters ------------------------------------
 --IgnoreMore
@@ -667,8 +659,7 @@ local function ECFfilter(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID)
 		if allowWisper[trimmedPlayer] or UnitIsInMyGuild(trimmedPlayer) or UnitInRaid(trimmedPlayer) or UnitInParty(trimmedPlayer) then return end
 		--And battlenet friends
 		for i = 1, select(2, BNGetNumFriends()) do
-			local GameAccount = BNGetNumFriendGameAccounts(i)
-			for j = 1, GameAccount do
+			for j = 1, BNGetNumFriendGameAccounts(i) do
 				local _, rName, rGame = BNGetFriendGameAccountInfo(i, j)
 				if (rName == trimmedPlayer and rGame == "WoW") then return end
 			end
