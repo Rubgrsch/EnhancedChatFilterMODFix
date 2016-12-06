@@ -39,6 +39,7 @@ local defaults = {
 		enableCFA = true, -- Achievement Filter
 		enableRAF = false, -- RaidAlert Filter
 		enableQRF = false, -- Quest/Group Report Filter
+		enableDSS = true, -- Spec spell Filter
 		enableIGM = false, -- IgnoreMore
 		multiLine = false, -- MultiLines, in RepeatFilter
 		blackWordList = {},
@@ -204,10 +205,16 @@ local options = {
 					desc = L["QuestReportFilterTooltip"],
 					order = 14,
 				},
+				enableDSS = {
+					type = "toggle",
+					name = L["SpecSpell"],
+					desc = L["SpecSpellFilterTooltip"],
+					order = 15,
+				},
 				enableIGM = {
 					type = "toggle",
 					name = L["IgnoreMoreList"],
-					order = 15,
+					order = 16,
 				},
 				line2 = {
 					type = "header",
@@ -751,6 +758,25 @@ ChatFrame_AddMessageEventFilter("CHAT_MSG_RAID_LEADER", ECFfilter)
 ChatFrame_AddMessageEventFilter("CHAT_MSG_RAID_WARNING", ECFfilter)
 ChatFrame_AddMessageEventFilter("CHAT_MSG_INSTANCE_CHAT", ECFfilter)
 ChatFrame_AddMessageEventFilter("CHAT_MSG_INSTANCE_CHAT_LEADER", ECFfilter)
+
+--SpecSpellFilter
+local SSFilterStrings = {
+	ERR_LEARN_ABILITY_S:gsub("%%s","(.*)"),
+	ERR_LEARN_SPELL_S:gsub("%%s","(.*)"),
+	ERR_SPELL_UNLEARNED_S:gsub("%%s","(.*)"),
+	ERR_LEARN_PASSIVE_S:gsub("%%s","(.*)"),
+	ERR_PET_SPELL_UNLEARNED_S:gsub("%%s","(.*)"),
+	ERR_PET_LEARN_ABILITY_S:gsub("%%s","(.*)"),
+	ERR_PET_LEARN_SPELL_S:gsub("%%s","(.*)")
+}
+local function SSFilter(self,_,msg)
+	if (not config.enableDSS or UnitLevel("player") < GetMaxPlayerLevel()) then return end
+
+	for _,s in ipairs(SSFilterStrings) do
+		if strfind(msg, s) then return true end
+	end
+end
+ChatFrame_AddMessageEventFilter("CHAT_MSG_SYSTEM", SSFilter)
 
 --AchievementFilter
 local function SendAchievement(event, achievementID, players)
