@@ -770,13 +770,13 @@ local SSFilterStrings = {
 	ERR_PET_LEARN_SPELL_S:gsub("%%s","(.*)")
 }
 local function SSFilter(self,_,msg)
-	if (not config.enableDSS or UnitLevel("player") < GetMaxPlayerLevel()) then return end
+	if not config.enableDSS then return end
 
 	for _,s in ipairs(SSFilterStrings) do
 		if strfind(msg, s) then return true end
 	end
 end
-ChatFrame_AddMessageEventFilter("CHAT_MSG_SYSTEM", SSFilter)
+if (UnitLevel("player") == GetMaxPlayerLevel()) then ChatFrame_AddMessageEventFilter("CHAT_MSG_SYSTEM", SSFilter) end
 
 --AchievementFilter
 local function SendAchievement(event, achievementID, players)
