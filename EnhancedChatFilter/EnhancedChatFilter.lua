@@ -761,7 +761,7 @@ ChatFrame_AddMessageEventFilter("CHAT_MSG_INSTANCE_CHAT_LEADER", ECFfilter)
 
 --SpecSpellFilter
 local function SSFilter(self,_,msg)
-	if not config.enableDSS then return end
+	if (not config.enableFilter or not config.enableDSS) then return end
 
 	local SSFilterStrings = {
 		ERR_LEARN_ABILITY_S:gsub("%%s",""),
