@@ -764,13 +764,13 @@ local function SSFilter(self,_,msg)
 	if (not config.enableFilter or not config.enableDSS) then return end
 
 	local SSFilterStrings = {
-		ERR_LEARN_ABILITY_S:gsub("%%s",""),
-		ERR_LEARN_SPELL_S:gsub("%%s",""),
-		ERR_SPELL_UNLEARNED_S:gsub("%%s",""),
-		ERR_LEARN_PASSIVE_S:gsub("%%s",""),
-		ERR_PET_SPELL_UNLEARNED_S:gsub("%%s",""),
-		ERR_PET_LEARN_ABILITY_S:gsub("%%s",""),
-		ERR_PET_LEARN_SPELL_S:gsub("%%s",""),
+		(ERR_LEARN_ABILITY_S:gsub("%%s","(.*)")),
+		(ERR_LEARN_SPELL_S:gsub("%%s","(.*)")),
+		(ERR_SPELL_UNLEARNED_S:gsub("%%s","(.*)")),
+		(ERR_LEARN_PASSIVE_S:gsub("%%s","(.*)")),
+		(ERR_PET_SPELL_UNLEARNED_S:gsub("%%s","(.*)")),
+		(ERR_PET_LEARN_ABILITY_S:gsub("%%s","(.*)")),
+		(ERR_PET_LEARN_SPELL_S:gsub("%%s","(.*)")),
 	}
 	for _,s in ipairs(SSFilterStrings) do
 		if strfind(msg, s) then return true end
