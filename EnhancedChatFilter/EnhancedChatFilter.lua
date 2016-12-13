@@ -292,10 +292,10 @@ local options = {
 					order = 1,
 					get = nil,
 					set = function(_,value)
-						if (checkBlacklist(value, regexToggle and "regex")) then
+						if (checkBlacklist(value, config.regexToggle and "regex")) then
 							EnhancedChatFilter:Printf(L["IncludeAutofilteredWord"],value)
 						else
-							config.blackWordList[value] = regexToggle or true
+							config.blackWordList[value] = config.regexToggle or true
 							scrollHighlight = {}
 						end
 					end,
