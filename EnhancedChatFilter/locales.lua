@@ -91,7 +91,7 @@ if (GetLocale() == "zhCN") then
 --AchievementFilter
 	L["GotAchievement"] = "[%s]获得了成就%s！"
 	L["And"] = "、"
-	
+
 -----------------------------------------------------------------------
 -- zhTW -- NEED HELP
 -- Contributors: 老虎007@NGA
