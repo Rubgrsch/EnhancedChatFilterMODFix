@@ -2,7 +2,7 @@
 utf8replace from @Phanx @Pastamancer
 --]]
 
-local type = type
+local strbyte, strlen, strsub, type, tinsert = strbyte, strlen, strsub, type, tinsert
 -- returns the number of bytes used by the UTF-8 character at byte i in s
 -- also doubles as a UTF-8 character validator
 
@@ -10,7 +10,7 @@ local function utf8charbytes(s, i)
 	-- argument defaults
 	i = i or 1
 
-	local c = string.byte(s, i)
+	local c = strbyte(s, i)
 
 	-- determine bytes needed for character, based on RFC 3629
 	-- validate byte 1
@@ -49,11 +49,11 @@ ecf.utf8replace = function(s, mapping)
 	local pos = 1
 	local newstrtable = {}
 
-	while pos <= string.len(s) do
+	while pos <= strlen(s) do
 		local charbytes = utf8charbytes(s, pos)
-		local c = string.sub(s, pos, pos + charbytes - 1)
+		local c = strsub(s, pos, pos + charbytes - 1)
 
-		table.insert(newstrtable, (mapping[c] or c))
+		tinsert(newstrtable, (mapping[c] or c))
 
 		pos = pos + charbytes
 	end
