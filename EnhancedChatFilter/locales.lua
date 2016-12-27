@@ -66,11 +66,6 @@ if (GetLocale() == "zhCN") then
 	L["LootFilterList"] = "拾取屏蔽列表"
 	L["LootQualityFilter"] = "拾取物品质量"
 	L["LootQualityFilterTooltips"] = "显示拾取物品所需要的最低质量，低于此质量的物品将被过滤"
-	L["Poor"] = "|cFF9D9D9D垃圾|r"
-	L["Common"] = "|cFFFFFFFF普通|r"
-	L["Uncommon"] = "|cFF1EFF00优秀|r"
-	L["Rare"] = "|cFF0070DD精良|r"
-	L["Epic"] = "|cFFA335EE史诗|r"
 --FAQ
 	L["FAQ"] = "FAQ"
 	L["FAQText"] = [[这里列出常见的几个问题
@@ -158,11 +153,6 @@ elseif (GetLocale() == "zhTW") then
 	L["LootFilterList"] = "拾取屏蔽列表"
 	L["LootQualityFilter"] = "拾取物品质量"
 	L["LootQualityFilterTooltips"] = "显示拾取物品所需要的最低质量，低于此质量的物品将被过滤"
-	L["Poor"] = "|cFF9D9D9D垃圾|r"
-	L["Common"] = "|cFFFFFFFF普通|r"
-	L["Uncommon"] = "|cFF1EFF00优秀|r"
-	L["Rare"] = "|cFF0070DD精良|r"
-	L["Epic"] = "|cFFA335EE史诗|r"
 --FAQ
 	L["FAQ"] = "FAQ"
 	L["FAQText"] = [[这里列出常见的几个问题
@@ -249,11 +239,6 @@ else
 	L["LootFilterList"] = "LootFilterList"
 	L["LootQualityFilter"] = "LootItemQuality"
 	L["LootQualityFilterTooltips"] = "Filter any loot that is poorer than you choose"
-	L["Poor"] = "|cFF9D9D9DPoor|r"
-	L["Common"] = "|cFFFFFFFFCommon|r"
-	L["Uncommon"] = "|cFF1EFF00Uncommon|r"
-	L["Rare"] = "|cFF0070DDRare|r"
-	L["Epic"] = "|cFFA335EEEpic|r"
 --FAQ
 	L["FAQ"] = "FAQ"
 	L["FAQText"] = [[这里列出常见的几个问题

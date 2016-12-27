@@ -146,6 +146,11 @@ local ignoreHighlight = {}
 local stringIO = "" -- blackWord input
 local lootType = "Item" -- loot filter type
 
+local colorT = {} -- used in lootFilter
+for i=0, 4 do
+	colorT[i]=format("|c%s%s|r",select(4,GetItemQualityColor(i)),_G["ITEM_QUALITY"..i.."_DESC"])
+end
+
 local options = {
 	type = "group",
 	name = "EnhancedChatFilter",
@@ -527,7 +532,7 @@ local options = {
 					name = L["LootQualityFilter"],
 					desc = L["LootQualityFilterTooltips"],
 					order = 11,
-					values = {[0]=L["Poor"], [1]=L["Common"], [2]=L["Uncommon"], [3]=L["Rare"], [4]=L["Epic"]}
+					values = colorT,
 				},
 			},
 		},
