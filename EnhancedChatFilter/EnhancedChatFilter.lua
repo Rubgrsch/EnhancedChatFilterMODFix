@@ -22,7 +22,7 @@ local L = ecf.L -- locales.lua
 
 local config
 
-local gsub, select, ipairs, pairs, next, strsub, format, tonumber, strmatch, tconcat, strfind, strbyte = gsub, select, ipairs, pairs, next, strsub, format, tonumber, strmatch, table.concat, string.find, string.byte -- lua
+local gsub, select, ipairs, pairs, next, strsub, format, tonumber, strmatch, tconcat, strfind, strbyte, fmod = gsub, select, ipairs, pairs, next, strsub, format, tonumber, strmatch, table.concat, string.find, string.byte, math.fmod -- lua
 local GetItemInfo, GetCurrencyLink = GetItemInfo, GetCurrencyLink -- options
 local Ambiguate = Ambiguate -- main filter
 local ChatTypeInfo, GetPlayerInfoByGUID, GetGuildInfo, GetTime = ChatTypeInfo, GetPlayerInfoByGUID, GetGuildInfo, GetTime -- acievements
@@ -79,15 +79,14 @@ end
 
 --http://www.wowwiki.com/USERAPI_StringHash
 local function StringHash(text)
-	local counter = 1
-	local len = #text
+	local counter, len = 1, #text
 	for i = 1, len, 3 do
-	counter = math.fmod(counter*8161, 4294967279) +  -- 2^32 - 17: Prime!
+	counter = fmod(counter*8161, 4294967279) +  -- 2^32 - 17: Prime!
 		(strbyte(text,i)*16776193) +
 		((strbyte(text,i+1) or (len-i+256))*8372226) +
 		((strbyte(text,i+2) or (len-i+256))*3932164)
 	end
-	return math.fmod(counter, 4294967291) -- 2^32 - 5: Prime (and different from the prime in the loop)
+	return fmod(counter, 4294967291) -- 2^32 - 5: Prime (and different from the prime in the loop)
 end
 
 --Convert old config to new one
@@ -785,19 +784,9 @@ if (UnitLevel("player") == GetMaxPlayerLevel()) then ChatFrame_AddMessageEventFi
 --AchievementFilter
 local function SendAchievement(event, achievementID, players)
 	local list = {}
-	for name,guid in pairs(players) do
-		local class, color, r, g, b
-		if (strfind(guid,"Player")) then
-			class = select(2, GetPlayerInfoByGUID(guid))
-			color = (CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS)[class]
-		end
-		if (not color) then
-			local info = ChatTypeInfo[strsub(event, 10)]
-			r, g, b = info.r, info.g, info.b
-		else
-			r, g, b = color.r, color.g, color.b
-		end
-		list[#list+1] = format("|cff%02x%02x%02x|Hplayer:%s|h%s|h|r", r*255, g*255, b*255, name, name)
+	for name,class in pairs(players) do
+		local color = (CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS)[class]
+		list[#list+1] = format("|cff%02x%02x%02x|Hplayer:%s|h%s|h|r", color.r*255, color.g*255, color.b*255, name, name)
 	end
 	SendMessage(event, format(L["GotAchievement"], tconcat(list, L["And"]), GetAchievementLink(achievementID)))
 end
@@ -823,7 +812,7 @@ local achievements = {}
 local achievementFrame = CreateFrame("Frame")
 achievementFrame:Hide()
 achievementFrame:SetScript("OnUpdate", function(self)
-	local found
+	local found = false
 	for id, achievement in pairs(achievements) do
 		if (achievement.timeout <= GetTime()) then
 			achievementReady(id, achievement)
@@ -834,10 +823,10 @@ achievementFrame:SetScript("OnUpdate", function(self)
 	if (not found) then self:Hide() end
 end)
 
-local function queueAchievementSpam(event, achievementID, name, guid)
+local function queueAchievementSpam(event, achievementID, name, class)
 	achievements[achievementID] = achievements[achievementID] or {timeout = GetTime() + 0.5}
 	achievements[achievementID][event] = achievements[achievementID][event] or {}
-	achievements[achievementID][event][name] = guid or true
+	achievements[achievementID][event][name] = class
 	achievementFrame:Show()
 end
 
@@ -847,10 +836,10 @@ local function achievementFilter(self, event, msg, _, _, _, _, _, _, _, _, _, _,
 	local achievementID = strmatch(msg, "achievement:(%d+)")
 	if (not achievementID) then return end
 	achievementID = tonumber(achievementID)
-	local Name,Server = select(6,GetPlayerInfoByGUID(guid))
-	if (not Name) then return end -- GetPlayerInfoByGUID rarely returns nil for valid guid
-	if (Server ~= "" and Server ~= GetRealmName()) then Name = Name.."-"..Server end
-	queueAchievementSpam((event == "CHAT_MSG_GUILD_ACHIEVEMENT" and "guild" or "area"), achievementID, Name, guid)
+	local _,class,_,_,_,name,server = GetPlayerInfoByGUID(guid)
+	if (not name) then return end -- GetPlayerInfoByGUID rarely returns nil for valid guid
+	if (server ~= "" and server ~= GetRealmName()) then name = name.."-"..server end
+	queueAchievementSpam((event == "CHAT_MSG_GUILD_ACHIEVEMENT" and "guild" or "area"), achievementID, name, class)
 	return true
 end
 
