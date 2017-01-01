@@ -792,20 +792,16 @@ local function SendAchievement(event, achievementID, players)
 end
 
 local function achievementReady(id, achievement)
-	if (achievement.area and achievement.guild) then
+	local area, guild = achievement.CHAT_MSG_ACHIEVEMENT, achievement.CHAT_MSG_GUILD_ACHIEVEMENT
+	if (area and guild) then
 		local playerGuild = GetGuildInfo("player")
-		for name in pairs(achievement.area) do
+		for name in pairs(area) do
 			if (UnitExists(name) and playerGuild and playerGuild == GetGuildInfo(name)) then
-				achievement.guild[name], achievement.area[name] = achievement.area[name], nil
+				guild[name], area[name] = area[name], nil
 			end
 		end
 	end
-	if (achievement.area and next(achievement.area) ~= nil) then
-		SendAchievement("CHAT_MSG_ACHIEVEMENT", id, achievement.area)
-	end
-	if (achievement.guild and next(achievement.guild) ~= nil) then
-		SendAchievement("CHAT_MSG_GUILD_ACHIEVEMENT", id, achievement.guild)
-	end
+	for event,players in pairs(achievement) do SendAchievement(event, id, players) end
 end
 
 local achievements = {}
@@ -823,13 +819,6 @@ achievementFrame:SetScript("OnUpdate", function(self)
 	if (not found) then self:Hide() end
 end)
 
-local function queueAchievementSpam(event, achievementID, name, class)
-	achievements[achievementID] = achievements[achievementID] or {timeout = GetTime() + 0.5}
-	achievements[achievementID][event] = achievements[achievementID][event] or {}
-	achievements[achievementID][event][name] = class
-	achievementFrame:Show()
-end
-
 local function achievementFilter(self, event, msg, _, _, _, _, _, _, _, _, _, _, guid)
 	if (not config.enableCFA or not config.enableFilter) then return end
 	if (not guid or not strfind(guid,"Player")) then return end
@@ -839,7 +828,10 @@ local function achievementFilter(self, event, msg, _, _, _, _, _, _, _, _, _, _,
 	local _,class,_,_,_,name,server = GetPlayerInfoByGUID(guid)
 	if (not name) then return end -- GetPlayerInfoByGUID rarely returns nil for valid guid
 	if (server ~= "" and server ~= GetRealmName()) then name = name.."-"..server end
-	queueAchievementSpam((event == "CHAT_MSG_GUILD_ACHIEVEMENT" and "guild" or "area"), achievementID, name, class)
+	achievements[achievementID] = achievements[achievementID] or {timeout = GetTime() + 0.5}
+	achievements[achievementID][event] = achievements[achievementID][event] or {}
+	achievements[achievementID][event][name] = class
+	achievementFrame:Show()
 	return true
 end
 
