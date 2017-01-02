@@ -801,7 +801,11 @@ local function achievementReady(id, achievement)
 			end
 		end
 	end
-	for event,players in pairs(achievement) do SendAchievement(event, id, players) end
+	for event,players in pairs(achievement) do
+		if type(players) == "table" and next(player) ~= nil then
+			SendAchievement(event, id, players)
+		end
+	end
 end
 
 local achievements = {}
