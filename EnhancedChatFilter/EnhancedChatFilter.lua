@@ -802,7 +802,7 @@ local function achievementReady(id, achievement)
 		end
 	end
 	for event,players in pairs(achievement) do
-		if type(players) == "table" and next(player) ~= nil then
+		if type(players) == "table" and next(players) ~= nil then
 			SendAchievement(event, id, players)
 		end
 	end
