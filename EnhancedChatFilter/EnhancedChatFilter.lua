@@ -311,7 +311,7 @@ local options = {
 				},
 				DeleteButton = {
 					type = "execute",
-					name = L["Remove"],
+					name = REMOVE,
 					order = 3,
 					func = function()
 						for key in pairs(scrollHighlight) do config.blackWordList[key] = nil end
@@ -342,7 +342,7 @@ local options = {
 				},
 				line1 = {
 					type = "header",
-					name = L["Options"],
+					name = OPTIONS,
 					order = 20,
 				},
 				blackWordFilterGroup = {
@@ -417,7 +417,7 @@ local options = {
 			args = {
 				DeleteButton = {
 					type = "execute",
-					name = L["Remove"],
+					name = REMOVE,
 					order = 1,
 					func = function()
 						for key in pairs(ignoreHighlight) do config.ignoreMoreList[key] = nil end
@@ -477,15 +477,15 @@ local options = {
 				},
 				typedropdown = {
 					type = "select",
-					name = L["Type"],
+					name = TYPE,
 					order = 2,
-					values = {["Item"] = L["Item"], ["Currency"] = L["Currency"]},
+					values = {["Item"] = ITEMS, ["Currency"] = CURRENCY},
 					get = function() return lootType end,
 					set = function(_,value) lootType = value end,
 				},
 				DeleteButton = {
 					type = "execute",
-					name = L["Remove"],
+					name = REMOVE,
 					order = 3,
 					func = function()
 						for key in pairs(lootHighlight) do

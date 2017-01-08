@@ -11,10 +11,8 @@ if (GetLocale() == "zhCN") then
 --Minimap Tooltips
 	L["ClickToOpenConfig"] = "点击打开配置界面"
 --Common in tab
-	L["Remove"] = "移除"
 	L["ClearUp"] = "清空"
 	L["DoYouWantToClear"] = "你确定要清空%s么？"
-	L["Options"] = "选项"
 --General
 	L["General"] = "常规"
 	L["Filters"] = "过滤器"
@@ -60,9 +58,6 @@ if (GetLocale() == "zhCN") then
 	L["LootFilter"] = "拾取过滤器"
 	L["AddItemWithID"] = "添加ID"
 	L["NotExists"] = "不存在"
-	L["Item"] = "物品"
-	L["Currency"] = "货币"
-	L["Type"] = "类型"
 	L["LootFilterList"] = "拾取屏蔽列表"
 	L["LootQualityFilter"] = "拾取物品质量"
 	L["LootQualityFilterTooltips"] = "显示拾取物品所需要的最低质量，低于此质量的物品将被过滤"
@@ -98,10 +93,8 @@ elseif (GetLocale() == "zhTW") then
 --Minimap Tooltips
 	L["ClickToOpenConfig"] = "點擊打開配置介面"
 --Common in tab
-	L["Remove"] = "移除"
 	L["ClearUp"] = "清空"
 	L["DoYouWantToClear"] = "你确定要清空%s么？"
-	L["Options"] = "选项"
 --General
 	L["General"] = "常规"
 	L["Filters"] = "過濾器"
@@ -147,9 +140,6 @@ elseif (GetLocale() == "zhTW") then
 	L["LootFilter"] = "拾取过滤器"
 	L["AddItemWithID"] = "添加ID"
 	L["NotExists"] = "不存在"
-	L["Item"] = "物品"
-	L["Currency"] = "货币"
-	L["Type"] = "类型"
 	L["LootFilterList"] = "拾取屏蔽列表"
 	L["LootQualityFilter"] = "拾取物品质量"
 	L["LootQualityFilterTooltips"] = "显示拾取物品所需要的最低质量，低于此质量的物品将被过滤"
@@ -184,10 +174,8 @@ else
 --Minimap Tooltips
 	L["ClickToOpenConfig"] = "Click To Open Config"
 --Common in tab
-	L["Remove"] = "Remove"
 	L["ClearUp"] = "ClearUp"
 	L["DoYouWantToClear"] = "Do you want to clear %s?"
-	L["Options"] = "Options"
 --General
 	L["General"] = "General"
 	L["Filters"] = "Filters"
@@ -233,9 +221,6 @@ else
 	L["LootFilter"] = "LootFilter"
 	L["AddItemWithID"] = "Add With ID"
 	L["NotExists"] = "Do not Exists"
-	L["Item"] = "Item"
-	L["Currency"] = "Currency"
-	L["Type"] = "Type"
 	L["LootFilterList"] = "LootFilterList"
 	L["LootQualityFilter"] = "LootItemQuality"
 	L["LootQualityFilterTooltips"] = "Filter any loot that is poorer than you choose"
