@@ -181,7 +181,7 @@ local options = {
 			args = {
 				line1 = {
 					type = "header",
-					name = L["Filters"],
+					name = FILTERS,
 					order = 10,
 				},
 				enableDND = {

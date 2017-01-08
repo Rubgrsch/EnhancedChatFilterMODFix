@@ -15,7 +15,6 @@ if (GetLocale() == "zhCN") then
 	L["DoYouWantToClear"] = "你确定要清空%s么？"
 --General
 	L["General"] = "常规"
-	L["Filters"] = "过滤器"
 	L["DND"] = "'忙碌'玩家"
 	L["DNDfilterTooltip"] = "过滤'忙碌'玩家及其自动回复"
 	L["Achievement"] = "成就刷屏"
@@ -97,7 +96,6 @@ elseif (GetLocale() == "zhTW") then
 	L["DoYouWantToClear"] = "你确定要清空%s么？"
 --General
 	L["General"] = "常规"
-	L["Filters"] = "過濾器"
 	L["DND"] = "'忙碌'玩家"
 	L["DNDfilterTooltip"] = "过滤'忙碌'玩家及其自动回复"
 	L["Achievement"] = "成就刷屏"
@@ -178,7 +176,6 @@ else
 	L["DoYouWantToClear"] = "Do you want to clear %s?"
 --General
 	L["General"] = "General"
-	L["Filters"] = "Filters"
 	L["DND"] = "DND"
 	L["DNDfilterTooltip"] = "Filter all DND players and their auto reply"
 	L["Achievement"] = "Achievement"
