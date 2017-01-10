@@ -44,6 +44,7 @@ local defaults = {
 		regexToggle = false,
 		blackWordFilterGroup = false, -- blackWord enabled in group and raid
 		ignoreMoreList = {},
+		lootType = "ITEMS", -- loot filter type
 		lootItemFilterList = {[118043] = true, [71096] = true}, -- item list, [id] = true
 		lootCurrencyFilterList = {[944] = true}, -- Currency list, [id] = true
 		lootQualityMin = 0, -- loot quality filter, 0..4 = poor..epic
@@ -141,7 +142,6 @@ end
 local scrollHighlight = {}
 local lootHighlight = {}
 local stringIO = "" -- blackWord input
-local lootType = "Item" -- loot filter type
 
 local colorT = {} -- used in lootFilter
 for i=0, 4 do
@@ -414,7 +414,7 @@ local options = {
 					get = nil,
 					set = function(_,value)
 						local Id = tonumber(value)
-						if(lootType == "Item") then
+						if(config.lootType == "ITEMS") then
 							if (Id == nil or GetItemInfo(Id) == nil) then -- TODO: If an item doesn't exist in cache, it reports as 'NotExists'(nil)
 								EnhancedChatFilter:Print(format("%s: ID=%d%s",L[lootType],Id,L["NotExists"]))
 							else
@@ -433,9 +433,9 @@ local options = {
 					type = "select",
 					name = TYPE,
 					order = 2,
-					values = {["Item"] = ITEMS, ["Currency"] = CURRENCY},
-					get = function() return lootType end,
-					set = function(_,value) lootType = value end,
+					values = {["ITEMS"] = ITEMS, ["CURRENCY"] = CURRENCY},
+					get = function() return config.lootType end,
+					set = function(_,value) config.lootType = value end,
 				},
 				DeleteButton = {
 					type = "execute",
