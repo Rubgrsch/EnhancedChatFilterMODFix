@@ -510,7 +510,6 @@ if GetCVar("profanityFilter")~="0" then SetCVar("profanityFilter", "0") end
 
 -------------------------------------- Filters ------------------------------------
 --Update allowWisper list whenever login/friendlist updates
-local login = nil
 local allowWisper = {}
 local ecfFrame = CreateFrame("Frame")
 ecfFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
@@ -519,13 +518,10 @@ ecfFrame:SetScript("OnEvent", function(self, event)
 	if event == "PLAYER_ENTERING_WORLD" then
 		ShowFriends() --friend list
 	else
-		if not login then --once per login
-			login = true
-			for i = 1, GetNumFriends() do
-				local n = GetFriendInfo(i)
-				if n then allowWisper[n] = true end -- added to allowWisper list
-			end
-			return
+		self:Hide()
+		for i = 1, GetNumFriends() do
+			local n = GetFriendInfo(i)
+			if n then allowWisper[n] = true end -- added to allowWisper list
 		end
 	end
 	if config.debugMode then for k in pairs(allowWisper) do print("ECF allowed: "..k) end end
@@ -536,6 +532,7 @@ local function addToAllowWisper(self,_,_,player)
 	local trimmedPlayer = Ambiguate(player, "none")
 	allowWisper[trimmedPlayer] = true
 end
+ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER_INFORM", addToAllowWisper)
 
 --stringDifference for repeatFilter, ranged from 0 to 1, while 0 is absolutely the same
 local function stringDifference(sA, sB)
@@ -669,7 +666,6 @@ local function ECFfilter(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID)
 	end
 end
 
-ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER_INFORM", addToAllowWisper)
 ChatFrame_AddMessageEventFilter("CHAT_MSG_DND", ECFfilter)
 ChatFrame_AddMessageEventFilter("CHAT_MSG_SAY", ECFfilter)
 ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER", ECFfilter)
