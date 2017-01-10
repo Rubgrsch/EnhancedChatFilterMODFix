@@ -416,13 +416,13 @@ local options = {
 						local Id = tonumber(value)
 						if(config.lootType == "ITEMS") then
 							if (Id == nil or GetItemInfo(Id) == nil) then -- TODO: If an item doesn't exist in cache, it reports as 'NotExists'(nil)
-								EnhancedChatFilter:Print(format("%s: ID=%d%s",L[lootType],Id,L["NotExists"]))
+								EnhancedChatFilter:Print(format("%s: ID=%d%s",_G[config.lootType],Id,L["NotExists"]))
 							else
 								config.lootItemFilterList[Id] = true
 							end
 						else
 							if (Id == nil or GetCurrencyLink(Id) == nil) then
-								EnhancedChatFilter:Print(L[lootType]..L["NotExists"])
+								EnhancedChatFilter:Print(_G[config.lootType]..L["NotExists"])
 							else
 								config.lootCurrencyFilterList[Id] = true
 							end
