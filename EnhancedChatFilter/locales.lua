@@ -25,7 +25,6 @@ if (GetLocale() == "zhCN") then
 	L["QuestReportFilterTooltip"] = "过滤各类组队任务喊话提醒"
 	L["SpecSpell"] = "天赋技能"
 	L["SpecSpellFilterTooltip"] = "过滤满级玩家及其宠物的技能/天赋学习信息"
-	L["IgnoreMoreList"] = "扩展屏蔽名单"
 	L["RepeatOptions"] = "重复信息设置"
 	L["chatLinesLimit"] = "重复信息缓存行数"
 	L["chatLinesLimitTooltips"] = "重复信息的行数设定。请根据聊天频道的聊天量调整数值。增加数值会提高内存占用。设为0以关闭重复过滤。默认值20。"
@@ -52,7 +51,6 @@ if (GetLocale() == "zhCN") then
 	L["StringHashMismatch"] = "字符串校验错误"
 	L["ImportSucceeded"] = "导入成功"
 	L["Export"] = "导出"
---IgnoreMore
 --LootFilter
 	L["LootFilter"] = "拾取过滤器"
 	L["AddItemWithID"] = "添加ID"
@@ -104,7 +102,6 @@ elseif (GetLocale() == "zhTW") then
 	L["RaidAlertFilterTooltip"] = "过滤各类技能/打断喊话提示"
 	L["QuestReport"] = "任務組隊"
 	L["QuestReportFilterTooltip"] = "过滤各类组队任务喊话提醒"
-	L["IgnoreMoreList"] = "擴展屏蔽名單"
 	L["SpecSpell"] = "天赋技能"
 	L["SpecSpellFilterTooltip"] = "过滤满级玩家及其宠物的技能/天赋学习信息"
 	L["RepeatOptions"] = "重复信息设置"
@@ -133,7 +130,6 @@ elseif (GetLocale() == "zhTW") then
 	L["StringHashMismatch"] = "字符串校驗錯誤"
 	L["ImportSucceeded"] = "導入成功"
 	L["Export"] = "導出"
---IgnoreMore
 --LootFilter
 	L["LootFilter"] = "拾取过滤器"
 	L["AddItemWithID"] = "添加ID"
@@ -186,7 +182,6 @@ else
 	L["QuestReportFilterTooltip"] = "Filter many kind of grouping messages"
 	L["SpecSpell"] = "SpecSpell"
 	L["SpecSpellFilterTooltip"] = "Filter spell/talent learning of player/pet at max level"
-	L["IgnoreMoreList"] = "IgnoreMore List"
 	L["RepeatOptions"] = "Repeat Options"
 	L["chatLinesLimit"] = "Repeat message cache lines"
 	L["chatLinesLimitTooltips"] = "Repeat message lines. Please change it to suit your message amount. Increase it will consume more memory. Set 0 to disable Repeat Filter. Default 20."
@@ -213,7 +208,6 @@ else
 	L["StringHashMismatch"] = "String Hash Mismatch"
 	L["ImportSucceeded"] = "Import Succeeded"
 	L["Export"] = "Export"
---IgnoreMore
 --LootFilter
 	L["LootFilter"] = "LootFilter"
 	L["AddItemWithID"] = "Add With ID"

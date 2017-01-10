@@ -39,7 +39,6 @@ local defaults = {
 		enableRAF = false, -- RaidAlert Filter
 		enableQRF = false, -- Quest/Group Report Filter
 		enableDSS = true, -- Spec spell Filter
-		enableIGM = false, -- IgnoreMore
 		multiLine = false, -- MultiLines, in RepeatFilter
 		blackWordList = {},
 		regexToggle = false,
@@ -141,7 +140,6 @@ end
 --These settings won't be saved
 local scrollHighlight = {}
 local lootHighlight = {}
-local ignoreHighlight = {}
 local stringIO = "" -- blackWord input
 local lootType = "Item" -- loot filter type
 
@@ -213,11 +211,6 @@ local options = {
 					name = L["SpecSpell"],
 					desc = L["SpecSpellFilterTooltip"],
 					order = 15,
-				},
-				enableIGM = {
-					type = "toggle",
-					name = L["IgnoreMoreList"],
-					order = 16,
 				},
 				line2 = {
 					type = "header",
@@ -409,49 +402,10 @@ local options = {
 				},
 			},
 		},
-		igoreMoreFilter = {
-			type = "group",
-			name = L["IgnoreMoreList"],
-			order = 5,
-			disabled = function() return not config.enableFilter or not config.enableIGM end,
-			args = {
-				DeleteButton = {
-					type = "execute",
-					name = REMOVE,
-					order = 1,
-					func = function()
-						for key in pairs(ignoreHighlight) do config.ignoreMoreList[key] = nil end
-						ignoreHighlight = {}
-					end,
-					disabled = function() return next(ignoreHighlight) == nil end,
-				},
-				ClearUpButton = {
-					type = "execute",
-					name = L["ClearUp"],
-					order = 2,
-					func = function() config.ignoreMoreList, ignoreHighlight = {}, {} end,
-					confirm = true,
-					confirmText = format(L["DoYouWantToClear"],L["IgnoreMoreList"]),
-					disabled = function() return next(config.ignoreMoreList) == nil end,
-				},
-				ignoreMoreList = {
-					type = "multiselect",
-					name = L["IgnoreMoreList"],
-					order = 10,
-					get = function(_,key) return ignoreHighlight[key] end,
-					set = function(_,key,value) ignoreHighlight[key] = value or nil end,
-					values = function()
-						local ignoreNameList = {}
-						for name in pairs(config.ignoreMoreList) do ignoreNameList[name] = name end
-						return ignoreNameList
-					end,
-				},
-			},
-		},
 		lootFilter = {
 			type = "group",
 			name = L["LootFilter"],
-			order = 6,
+			order = 5,
 			args = {
 				addItem = {
 					type = "input",
@@ -538,7 +492,7 @@ local options = {
 		FAQTab = {
 			type = "group",
 			name = L["FAQ"],
-			order = 7,
+			order = 6,
 			args = {
 				FAQText = {
 					type = "description",
@@ -555,29 +509,6 @@ LibStub("AceConfigDialog-3.0"):AddToBlizOptions("EnhancedChatFilter", "EnhancedC
 if GetCVar("profanityFilter")~="0" then SetCVar("profanityFilter", "0") end
 
 -------------------------------------- Filters ------------------------------------
---IgnoreMore
-local function ignoreMore(player)
-	if (not config.enableIGM or not player) then return end
-	local IgnoresNum = GetNumIgnores()
-	if IgnoresNum < 50 then return end
-	local ignore = nil
-	for i = 1, IgnoresNum do
-		if (player == GetIgnoreName(i)) then
-			ignore = true
-			break
-		end
-	end
-	if (not ignore) then
-		local trimmedPlayer = Ambiguate(player, "none")
-		config.ignoreMoreList[trimmedPlayer] = true
-		if config.debugMode then print("Added to ECF ignoreMoreList!") end
-		SendMessage("CHAT_MSG_SYSTEM", format(ERR_IGNORE_ADDED_S, trimmedPlayer))
-	end
-end
-
-hooksecurefunc("AddIgnore", ignoreMore)
-hooksecurefunc("AddOrDelIgnore", ignoreMore)
-
 --Update allowWisper list whenever login/friendlist updates
 local login = nil
 local allowWisper = {}
@@ -652,16 +583,6 @@ local function ECFfilter(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID)
 	-- remove color/hypelink/space/symbols
 	filterString = filterString:upper():gsub("|C[0-9A-F]+",""):gsub("|H[^|]+|H",""):gsub("|H|R",""):gsub("%s", ""):gsub(filterCharList, "")
 	local newfilterString = filterString:gsub(filterCharListRegex, "")
-
-	if(config.enableIGM and chatChannel[event] <= 1) then -- IgnoreMore, only whisper
-		for ignorePlayer in pairs(config.ignoreMoreList) do
-			if (trimmedPlayer == ignorePlayer[1]) then
-				if config.debugMode then print("Trigger: IgnoreMore Filter") end
-				filterResult = true
-				return true
-			end
-		end
-	end
 
 	if(config.enableWisper and chatChannel[event] <= 1) then --Whisper Whitelist Mode, only whisper
 		ShowFriends()
