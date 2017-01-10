@@ -150,7 +150,7 @@ end
 
 local options = {
 	type = "group",
-	name = "EnhancedChatFilter",
+	name = "EnhancedChatFilter "..GetAddOnMetadata("EnhancedChatFilter", "Version"),
 	get = function(info) return config[info[#info]] end,
 	set = function(info, value) config[info[#info]] = value end,
 	disabled = function() return not config.enableFilter end,
