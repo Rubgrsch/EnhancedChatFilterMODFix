@@ -22,6 +22,7 @@ local L = ecf.L -- locales.lua
 
 local config
 
+local _G = _G
 local gsub, select, ipairs, pairs, next, strsub, format, tonumber, strmatch, tconcat, strfind, strbyte, fmod = gsub, select, ipairs, pairs, next, strsub, format, tonumber, strmatch, table.concat, string.find, string.byte, math.fmod -- lua
 local GetItemInfo, GetCurrencyLink = GetItemInfo, GetCurrencyLink -- options
 local Ambiguate = Ambiguate -- main filter
@@ -179,7 +180,7 @@ local options = {
 			args = {
 				line1 = {
 					type = "header",
-					name = FILTERS,
+					name = _G[FILTERS],
 					order = 10,
 				},
 				enableDND = {
@@ -304,7 +305,7 @@ local options = {
 				},
 				DeleteButton = {
 					type = "execute",
-					name = REMOVE,
+					name = _G[REMOVE],
 					order = 3,
 					func = function()
 						for key in pairs(scrollHighlight) do config.blackWordList[key] = nil end
@@ -335,7 +336,7 @@ local options = {
 				},
 				line1 = {
 					type = "header",
-					name = OPTIONS,
+					name = _G[OPTIONS],
 					order = 20,
 				},
 				blackWordFilterGroup = {
@@ -431,7 +432,7 @@ local options = {
 				},
 				typedropdown = {
 					type = "select",
-					name = TYPE,
+					name = _G[TYPE],
 					order = 2,
 					values = {["ITEMS"] = ITEMS, ["CURRENCY"] = CURRENCY},
 					get = function() return config.lootType end,
@@ -439,7 +440,7 @@ local options = {
 				},
 				DeleteButton = {
 					type = "execute",
-					name = REMOVE,
+					name = _G[REMOVE],
 					order = 3,
 					func = function()
 						for key in pairs(lootHighlight) do
