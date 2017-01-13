@@ -557,7 +557,7 @@ local function ECFfilter(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID)
 	-- don't filter player himself
 	if UnitIsUnit(trimmedPlayer,"player") then return end
 
-	-- if it's GM or DEV then exit
+	-- don't filter GM or DEV
 	if type(flags) == "string" and (flags == "GM" or flags == "DEV") then return end
 
 	-- if it has been worked then use the worked result
@@ -640,7 +640,7 @@ local function ECFfilter(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID)
 
 	if(config.chatLinesLimit > 0 and chatChannel[event] <= 4) then --Repeat Filter
 		local msgLine = newfilterString
-		if(msgLine == "") then msgLine = msg end --If it has only symbols, then don't filter it
+		if(msgLine == "") then msgLine = msg end --If it has only symbols, don't filter it
 
 		--msgdata
 		local msgtable = {Sender = trimmedPlayer, Msg = {}, Time = GetTime()}
@@ -648,8 +648,8 @@ local function ECFfilter(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID)
 		local chatLinesSize = #chatLines
 		chatLines[chatLinesSize+1] = msgtable
 		for i=1, chatLinesSize do
-			--if there is not much difference between msgs, then filter it
-			--(optional) if someone sends msgs within 0.6s ,then filter it
+			--if there is not much difference between msgs, filter it
+			--(optional) if someone sends msgs within 0.6s, filter it
 			if (chatLines[i].Sender == msgtable.Sender and ((config.multiLine and (msgtable.Time - chatLines[i].Time) < 0.600) or stringDifference(chatLines[i].Msg,msgtable.Msg) <= config.stringDifferenceLimit)) then
 				tremove(chatLines, i)
 				if config.debugMode then print("Trigger: Repeat Filter") end
@@ -742,7 +742,7 @@ local function achievementFilter(self, event, msg, _, _, _, _, _, _, _, _, _, _,
 	if (not achievementID) then return end
 	achievementID = tonumber(achievementID)
 	local _,class,_,_,_,name,server = GetPlayerInfoByGUID(guid)
-	if (not name) then return end -- GetPlayerInfoByGUID rarely returns nil for valid guid
+	if (not name) then return end -- GetPlayerInfoByGUID sometimes returns nil for valid guid
 	if (server ~= "" and server ~= GetRealmName()) then name = name.."-"..server end
 	achievements[achievementID] = achievements[achievementID] or {timeout = GetTime() + 0.5}
 	achievements[achievementID][event] = achievements[achievementID][event] or {}
@@ -760,7 +760,7 @@ local function lootitemfilter(self,_,msg)
 	local itemID = tonumber(strmatch(msg, "|Hitem:(%d+)"))
 	if(not itemID) then return end
 	if(config.lootItemFilterList[itemID]) then return true end
-	if(select(3,GetItemInfo(itemID)) < config.lootQualityMin) then return true end -- HACK: ItemQuality is in ascending order
+	if(select(3,GetItemInfo(itemID)) < config.lootQualityMin) then return true end -- ItemQuality is in ascending order
 end
 
 ChatFrame_AddMessageEventFilter("CHAT_MSG_LOOT", lootitemfilter)
