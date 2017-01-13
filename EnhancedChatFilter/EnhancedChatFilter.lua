@@ -92,14 +92,9 @@ end
 
 --Convert old config to new one
 local function convert()
-	if(config.blackList) then
-		for _,v in ipairs(config.blackList) do config.blackWordList[v[1]] = v[2] or true end
-		config.blackList = nil
-	end
 	for key,v in pairs(config.blackWordList) do
 		if(checkBlacklist(key,v)) then config.blackWordList[key] = nil end
 	end
-	for idx,v in ipairs(config.ignoreMoreList) do config.ignoreMoreList[v], config.ignoreMoreList[idx] = true, nil end
 end
 
 --MinimapData
