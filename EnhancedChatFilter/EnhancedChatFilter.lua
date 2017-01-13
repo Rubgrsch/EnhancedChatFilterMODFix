@@ -44,7 +44,6 @@ local defaults = {
 		blackWordList = {},
 		regexToggle = false,
 		blackWordFilterGroup = false, -- blackWord enabled in group and raid
-		ignoreMoreList = {},
 		lootType = "ITEMS", -- loot filter type
 		lootItemFilterList = {[118043] = true, [71096] = true}, -- item list, [id] = true
 		lootCurrencyFilterList = {[944] = true}, -- Currency list, [id] = true
