@@ -92,6 +92,9 @@ end
 --Convert old config to new one
 local function convert()
 	for key,v in pairs(config.blackWordList) do
+		for key2 in pairs(config.blackWordList) do
+			if key ~= key2 and strfind(key,key2) then config.blackWordList[key] = nil;break end
+		end
 		if(checkBlacklist(key,v)) then config.blackWordList[key] = nil end
 	end
 end
