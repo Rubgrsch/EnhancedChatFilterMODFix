@@ -177,7 +177,7 @@ local options = {
 			args = {
 				line1 = {
 					type = "header",
-					name = _G.FILTERS,
+					name = _G["FILTERS"],
 					order = 10,
 				},
 				enableDND = {
@@ -302,7 +302,7 @@ local options = {
 				},
 				DeleteButton = {
 					type = "execute",
-					name = _G.REMOVE,
+					name = _G["REMOVE"],
 					order = 3,
 					func = function()
 						for key in pairs(scrollHighlight) do config.blackWordList[key] = nil end
@@ -333,7 +333,7 @@ local options = {
 				},
 				line1 = {
 					type = "header",
-					name = _G.OPTIONS,
+					name = _G["OPTIONS"],
 					order = 20,
 				},
 				blackWordFilterGroup = {
@@ -429,7 +429,7 @@ local options = {
 				},
 				typedropdown = {
 					type = "select",
-					name = _G.TYPE,
+					name = _G["TYPE"],
 					order = 2,
 					values = {["ITEMS"] = ITEMS, ["CURRENCY"] = CURRENCY},
 					get = function() return config.lootType end,
@@ -437,7 +437,7 @@ local options = {
 				},
 				DeleteButton = {
 					type = "execute",
-					name = _G.REMOVE,
+					name = _G["REMOVE"],
 					order = 3,
 					func = function()
 						for key in pairs(lootHighlight) do
