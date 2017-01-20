@@ -41,7 +41,7 @@ if (GetLocale() == "zhCN") then
 	L["WhisperWhitelistModeTooltip"] = "除了工会、团队、小队、战网好友发送的密语外，只允许你发送过密语的对方才能对你发起密语|n|cffE2252D慎用！"
 --BlackwordList
 	L["BlackwordList"] = "黑名单关键词"
-	L["AddBlackWordTitle"] = "添加新黑名单关键字"
+	L["AddBlackWordTitle"] = "添加新黑名单关键词"
 	L["IncludeAutofilteredWord"] = "%s包含会被自动过滤的字符，将忽略该关键词！"
 	L["Regex"] = "正则"
 	L["RegexTooltip"] = "标记添加的关键词为正则表达式|n仅对该次添加的关键词有效"

@@ -40,6 +40,8 @@ local defaults = {
 		enableRAF = false, -- RaidAlert Filter
 		enableQRF = false, -- Quest/Group Report Filter
 		enableDSS = true, -- Spec spell Filter
+		chatLinesLimit = 20, -- also enable repeatFilter
+		stringDifferenceLimit = 0.1, -- in repeatFilter
 		multiLine = false, -- MultiLines, in RepeatFilter
 		repeatFilterGroup = true, -- repeatFilter enabled in group and raid
 		blackWordList = {},
@@ -53,8 +55,6 @@ local defaults = {
 			hide = false, -- minimap
 		},
 		advancedConfig = false, -- show advancedConfig
-		chatLinesLimit = 20, -- also enable repeatFilter
-		stringDifferenceLimit = 0.1, -- in repeatFilter
 		debugMode = false,
 	}
 }
