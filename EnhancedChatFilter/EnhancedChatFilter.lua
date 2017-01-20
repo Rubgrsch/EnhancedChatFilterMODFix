@@ -41,6 +41,7 @@ local defaults = {
 		enableQRF = false, -- Quest/Group Report Filter
 		enableDSS = true, -- Spec spell Filter
 		multiLine = false, -- MultiLines, in RepeatFilter
+		repeatFilterGroup = true, -- repeatFilter enabled in group and raid
 		blackWordList = {},
 		regexToggle = false,
 		blackWordFilterGroup = false, -- blackWord enabled in group and raid
@@ -243,6 +244,13 @@ local options = {
 					name = L["MultiLines"],
 					desc = L["MultiLinesTooltip"],
 					order = 23,
+					disabled = function() return config.chatLinesLimit == 0 end,
+				},
+				repeatFilterGroup = {
+					type = "toggle",
+					name = L["AlsoFilterGroup"],
+					desc = L["AlsoFilterGroupTooltips"],
+					order = 24,
 					disabled = function() return config.chatLinesLimit == 0 end,
 				},
 				line3 = {
@@ -641,7 +649,7 @@ local function ECFfilter(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID)
 		end
 	end
 
-	if(config.chatLinesLimit > 0 and chatChannel[event] <= 4) then --Repeat Filter
+	if(config.chatLinesLimit > 0 and chatChannel[event] <= (config.repeatFilterGroup and 4 or 3)) then --Repeat Filter
 		local msgLine = newfilterString
 		if(msgLine == "") then msgLine = msg end --If it has only symbols, don't filter it
 
