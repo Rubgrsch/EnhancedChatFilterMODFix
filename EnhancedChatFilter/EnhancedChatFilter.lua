@@ -552,7 +552,7 @@ local function stringDifference(sA, sB)
 		end
 		for j=0, len_b do templast[j+1]=temp[j+1] end
 	end
-	return temp[len_b+1]/(len_a+len_b)
+	return temp[len_b+1]/max(len_a,len_b)
 end
 
 local chatLines = {}
