@@ -583,8 +583,8 @@ local function ECFfilter(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID)
 
 	-- remove utf-8 chars
 	local filterString = utf8replace(msg, UTF8Symbols)
-	-- remove color/hypelink/space/symbols
-	filterString = filterString:upper():gsub("|C[0-9A-F]+",""):gsub("|H[^|]+|H",""):gsub("|H|R",""):gsub("%s", ""):gsub(filterCharList, "")
+	-- remove color/hypelink/raidicon/space/symbols
+	filterString = filterString:upper():gsub("|C[0-9A-F]+",""):gsub("|H[^|]+|H",""):gsub("|H|R",""):gsub("{RT%d}",""):gsub("%s", ""):gsub(filterCharList, "")
 	local newfilterString = filterString:gsub(filterCharListRegex, "")
 
 	if(config.enableWisper and chatChannel[event] <= 1) then --Whisper Whitelist Mode, only whisper
