@@ -2,7 +2,7 @@
 utf8replace from @Phanx @Pastamancer
 --]]
 
-local strbyte, strlen, strsub, type, tinsert = strbyte, strlen, strsub, type, tinsert
+local strbyte, strlen, strsub, tinsert = strbyte, strlen, strsub, tinsert
 -- returns the number of bytes used by the UTF-8 character at byte i in s
 -- also doubles as a UTF-8 character validator
 
