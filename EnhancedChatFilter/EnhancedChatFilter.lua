@@ -40,6 +40,7 @@ local defaults = {
 		enableRAF = false, -- RaidAlert Filter
 		enableQRF = false, -- Quest/Group Report Filter
 		enableDSS = true, -- Spec spell Filter
+		enableMSF = true, -- Monster Say Filter
 		chatLinesLimit = 20, -- also enable repeatFilter
 		stringDifferenceLimit = 0.1, -- in repeatFilter
 		multiLine = false, -- MultiLines, in RepeatFilter
@@ -210,6 +211,12 @@ local options = {
 					name = L["SpecSpell"],
 					desc = L["SpecSpellFilterTooltip"],
 					order = 15,
+				},
+				enableMSF = {
+					type = "toggle",
+					name = L["MonsterSay"],
+					desc = L["MonsterSayFilterTooltip"],
+					order = 16,
 				},
 				line2 = {
 					type = "header",
@@ -684,6 +691,26 @@ ChatFrame_AddMessageEventFilter("CHAT_MSG_RAID_LEADER", ECFfilter)
 ChatFrame_AddMessageEventFilter("CHAT_MSG_RAID_WARNING", ECFfilter)
 ChatFrame_AddMessageEventFilter("CHAT_MSG_INSTANCE_CHAT", ECFfilter)
 ChatFrame_AddMessageEventFilter("CHAT_MSG_INSTANCE_CHAT_LEADER", ECFfilter)
+
+--MonsterSayFilter
+local monsterLines = {}
+
+local function monsterFilter(self,_,msg)
+	if (not config.enableFilter or not config.enableMSF) then return end
+
+	local monsterLinesSize = #monsterLines
+	monsterLines[monsterLinesSize+1] = msg
+	for i=1, monsterLinesSize do
+		if (monsterLines[i] == msg) then
+			tremove(monsterLines, i)
+			if config.debugMode then print("Trigger: Monster Say Filter") end
+			return true
+		end
+	end
+	if monsterLinesSize >= 7 then tremove(monsterLines, 1) end
+end
+
+ChatFrame_AddMessageEventFilter("CHAT_MSG_MONSTER_SAY", monsterFilter)
 
 --SpecSpellFilter
 local function SSFilter(self,_,msg)
