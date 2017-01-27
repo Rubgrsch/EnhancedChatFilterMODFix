@@ -678,7 +678,6 @@ local function ECFfilter(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID)
 		if chatLinesSize >= config.chatLinesLimit then tremove(chatLines, 1) end
 	end
 end
-
 ChatFrame_AddMessageEventFilter("CHAT_MSG_DND", ECFfilter)
 ChatFrame_AddMessageEventFilter("CHAT_MSG_SAY", ECFfilter)
 ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER", ECFfilter)
@@ -709,22 +708,21 @@ local function monsterFilter(self,_,msg)
 	end
 	if monsterLinesSize >= 7 then tremove(monsterLines, 1) end
 end
-
 ChatFrame_AddMessageEventFilter("CHAT_MSG_MONSTER_SAY", monsterFilter)
 
 --SpecSpellFilter
+local SSFilterStrings = {
+	(ERR_LEARN_ABILITY_S:gsub("%%s","(.*)")),
+	(ERR_LEARN_SPELL_S:gsub("%%s","(.*)")),
+	(ERR_SPELL_UNLEARNED_S:gsub("%%s","(.*)")),
+	(ERR_LEARN_PASSIVE_S:gsub("%%s","(.*)")),
+	(ERR_PET_SPELL_UNLEARNED_S:gsub("%%s","(.*)")),
+	(ERR_PET_LEARN_ABILITY_S:gsub("%%s","(.*)")),
+	(ERR_PET_LEARN_SPELL_S:gsub("%%s","(.*)")),
+}
 local function SSFilter(self,_,msg)
 	if (not config.enableFilter or not config.enableDSS) then return end
 
-	local SSFilterStrings = {
-		(ERR_LEARN_ABILITY_S:gsub("%%s","(.*)")),
-		(ERR_LEARN_SPELL_S:gsub("%%s","(.*)")),
-		(ERR_SPELL_UNLEARNED_S:gsub("%%s","(.*)")),
-		(ERR_LEARN_PASSIVE_S:gsub("%%s","(.*)")),
-		(ERR_PET_SPELL_UNLEARNED_S:gsub("%%s","(.*)")),
-		(ERR_PET_LEARN_ABILITY_S:gsub("%%s","(.*)")),
-		(ERR_PET_LEARN_SPELL_S:gsub("%%s","(.*)")),
-	}
 	for _,s in ipairs(SSFilterStrings) do
 		if strfind(msg, s) then return true end
 	end
@@ -788,7 +786,6 @@ local function achievementFilter(self, event, msg, _, _, _, _, _, _, _, _, _, _,
 	achievementFrame:Show()
 	return true
 end
-
 ChatFrame_AddMessageEventFilter("CHAT_MSG_ACHIEVEMENT", achievementFilter)
 ChatFrame_AddMessageEventFilter("CHAT_MSG_GUILD_ACHIEVEMENT", achievementFilter)
 
@@ -800,7 +797,6 @@ local function lootitemfilter(self,_,msg)
 	if(config.lootItemFilterList[itemID]) then return true end
 	if(select(3,GetItemInfo(itemID)) < config.lootQualityMin) then return true end -- ItemQuality is in ascending order
 end
-
 ChatFrame_AddMessageEventFilter("CHAT_MSG_LOOT", lootitemfilter)
 
 local function lootcurrecyfilter(self,_,msg)
@@ -808,5 +804,4 @@ local function lootcurrecyfilter(self,_,msg)
 	local currencyID = tonumber(strmatch(msg, "|Hcurrency:(%d+)"))
 	if(config.lootCurrencyFilterList[currencyID]) then return true end
 end
-
 ChatFrame_AddMessageEventFilter("CHAT_MSG_CURRENCY", lootcurrecyfilter)
