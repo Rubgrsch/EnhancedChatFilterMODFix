@@ -122,6 +122,7 @@ function EnhancedChatFilter:OnInitialize()
 	config = LibStub("AceDB-3.0"):New("ecfDB", defaults, "Default").profile
 	icon:Register("Enhanced Chat Filter", ecfLDB, config.minimap)
 	convert()
+	ShowFriends()
 end
 
 --------------- Slash Command ---------------
@@ -523,21 +524,24 @@ if GetCVar("profanityFilter")~="0" then SetCVar("profanityFilter", "0") end
 
 -------------------------------------- Filters ------------------------------------
 --Update allowWisper list whenever login/friendlist updates
-local allowWisper = {}
-local ecfFrame = CreateFrame("Frame")
-ecfFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
-ecfFrame:RegisterEvent("FRIENDLIST_UPDATE")
-ecfFrame:SetScript("OnEvent", function(self, event)
-	if event == "PLAYER_ENTERING_WORLD" then
-		ShowFriends() --friend list
-	else
-		self:Hide()
-		for i = 1, GetNumFriends() do
-			local n = GetFriendInfo(i)
-			if n then allowWisper[n] = true end -- added to allowWisper list
+local friends, allowWisper = {}, {}
+local friendFrame = CreateFrame("Frame")
+friendFrame:RegisterEvent("FRIENDLIST_UPDATE")
+friendFrame:RegisterEvent("BN_FRIEND_INFO_CHANGED")
+friendFrame:SetScript("OnEvent", function(self)
+	friends = {}
+	for i = 1, GetNumFriends() do
+		local n = GetFriendInfo(i)
+		if n then friends[n] = true end -- added to allowWisper list
+	end
+	--And battlenet friends
+	for i = 1, select(2, BNGetNumFriends()) do
+		for j = 1, BNGetNumFriendGameAccounts(i) do
+			local _, rName, rGame = BNGetFriendGameAccountInfo(i, j)
+			if (rGame == "WoW") then friends[rName] = true end
 		end
 	end
-	if config.debugMode then for k in pairs(allowWisper) do print("ECF allowed: "..k) end end
+	--if config.debugMode then for k in pairs(friends) do print("friend: "..k) end end
 end)
 
 --Add players you wispered into allowWisper list
@@ -572,8 +576,8 @@ local function ECFfilter(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID)
 	if(not config.enableFilter) then return end
 
 	local trimmedPlayer = Ambiguate(player, "none")
-	-- don't filter player himself
-	if UnitIsUnit(trimmedPlayer,"player") then return end
+	-- don't filter player himself and friends/BNfriends
+	if UnitIsUnit(trimmedPlayer,"player") or friends[trimmedPlayer] then return end
 
 	-- don't filter GM or DEV
 	if type(flags) == "string" and (flags == "GM" or flags == "DEV") then return end
@@ -595,19 +599,12 @@ local function ECFfilter(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID)
 	local newfilterString = filterString:gsub(filterCharListRegex, "")
 
 	if(config.enableWisper and chatChannel[event] <= 1) then --Whisper Whitelist Mode, only whisper
-		ShowFriends()
-		--Don't filter players that are from same guild/raid/party or friends
-		if allowWisper[trimmedPlayer] or UnitIsInMyGuild(trimmedPlayer) or UnitInRaid(trimmedPlayer) or UnitInParty(trimmedPlayer) then return end
-		--And battlenet friends
-		for i = 1, select(2, BNGetNumFriends()) do
-			for j = 1, BNGetNumFriendGameAccounts(i) do
-				local _, rName, rGame = BNGetFriendGameAccountInfo(i, j)
-				if (rName == trimmedPlayer and rGame == "WoW") then return end
-			end
+		--Don't filter players that are from same guild/raid/party or who you have whispered
+		if not(allowWisper[trimmedPlayer] or UnitIsInMyGuild(trimmedPlayer) or UnitInRaid(trimmedPlayer) or UnitInParty(trimmedPlayer)) then
+			if config.debugMode then print("Trigger: WhiteListMode") end
+			filterResult = true
+			return true
 		end
-		if config.debugMode then print("Trigger: WhiteListMode") end
-		filterResult = true
-		return true
 	end
 
 	if(config.enableDND and (chatChannel[event] <= 3 or chatChannel[event] == 101)) then -- DND, whisper/yell/say/channel and auto-reply
