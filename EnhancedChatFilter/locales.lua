@@ -40,7 +40,7 @@ if (GetLocale() == "zhCN") then
 	L["EnableAdvancedConfig"] = "启用高级选项"
 	L["AdvancedWarningText"] = "不要随意更改任何你不清楚的设置，不然你很有可能会把ECF玩坏！如果你已经知道危险性，请继续..."
 	L["WhisperWhitelistMode"] = "密语白名单模式"
-	L["WhisperWhitelistModeTooltip"] = "除了工会、团队、小队、战网好友发送的密语外，只允许你发送过密语的对方才能对你发起密语|n|cffE2252D慎用！"
+	L["WhisperWhitelistModeTooltip"] = "除了工会、团队、小队、好友发送的密语外，只允许你发送过密语的对方才能对你发起密语|n|cffE2252D慎用！"
 --BlackwordList
 	L["BlackwordList"] = "黑名单关键词"
 	L["AddBlackWordTitle"] = "添加新黑名单关键词"
@@ -121,7 +121,7 @@ elseif (GetLocale() == "zhTW") then
 	L["EnableAdvancedConfig"] = "启用高级选项"
 	L["AdvancedWarningText"] = "不要随意更改任何你不清楚的设置，不然你很有可能会把ECF玩坏！如果你已经知道危险性，请继续..."
 	L["WhisperWhitelistMode"] = "密語白名單模式"
-	L["WhisperWhitelistModeTooltip"] = "除了工会、团队、小队、战网好友发送的密语外，只允许你发送过密语的对方才能对你发起密语|n|cffE2252D慎用！"
+	L["WhisperWhitelistModeTooltip"] = "除了工会、团队、小队、好友发送的密语外，只允许你发送过密语的对方才能对你发起密语|n|cffE2252D慎用！"
 --BlackwordList
 	L["BlackwordList"] = "黑名单關鍵詞"
 	L["AddBlackWordTitle"] = "添加新黑名單關鍵詞"
@@ -163,7 +163,7 @@ elseif (GetLocale() == "zhTW") then
 	L["And"] = "、"
 
 -----------------------------------------------------------------------
--- Default: 07.29.16 -- NEED HELP
+-- Default -- NEED HELP
 -----------------------------------------------------------------------
 else
 --Titles
@@ -201,7 +201,7 @@ else
 	L["EnableAdvancedConfig"] = "Enable Advanced Config"
 	L["AdvancedWarningText"] = "Please do NOT change any options that you don't understand, or you may mess ECF up. If you DO know the risk, you may continue..."
 	L["WhisperWhitelistMode"] = "Whisper Whitelist Mode"
-	L["WhisperWhitelistModeTooltip"] = "Filter all whisper unless it's from guild/group/raid/battlenet friend or you have just whisper them|n|cffE2252DUse with care!"
+	L["WhisperWhitelistModeTooltip"] = "Filter all whisper unless it's from guild/group/raid/friends or you have just whisper them|n|cffE2252DUse with care!"
 --BlackwordList
 	L["BlackwordList"] = "BlackWordList"
 	L["AddBlackWordTitle"] = "Add Blackword"
