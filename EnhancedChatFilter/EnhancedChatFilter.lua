@@ -24,7 +24,7 @@ local config
 
 local _G = _G
 local gsub, select, ipairs, pairs, next, strsub, format, tonumber, strmatch, tconcat, strfind, strbyte, fmod = gsub, select, ipairs, pairs, next, strsub, format, tonumber, strmatch, table.concat, string.find, string.byte, math.fmod -- lua
-local Ambiguate, ChatTypeInfo, GetPlayerInfoByGUID, GetGuildInfo, GetTime, GetItemInfo, GetCurrencyLink = Ambiguate, ChatTypeInfo, GetPlayerInfoByGUID, GetGuildInfo, GetTime, GetItemInfo, GetCurrencyLink -- BLZ
+local ChatTypeInfo, GetPlayerInfoByGUID, GetGuildInfo, GetTime, GetItemInfo, GetCurrencyLink = ChatTypeInfo, GetPlayerInfoByGUID, GetGuildInfo, GetTime, GetItemInfo, GetCurrencyLink -- BLZ
 
 local EnhancedChatFilter = LibStub("AceAddon-3.0"):NewAddon("EnhancedChatFilter", "AceConsole-3.0")
 local version = GetAddOnMetadata("EnhancedChatFilter", "Version")
@@ -34,7 +34,8 @@ local versionMsg = {}
 versionMsg["7.1.5-2"] = "此版本更新了好友相关的代码，如果遇到有关问题请反馈:)"
 
 --Player info
-local myRealm, myGuild = GetRealmName(), GetGuildInfo("player")
+local myName, myRealm, myGuild = UnitName("player"), GetRealmName(), GetGuildInfo("player")
+local myFullName = myName.."-"..myRealm
 
 --Default Options
 local defaults = {
@@ -561,8 +562,7 @@ end)
 
 --Add players you wispered into allowWisper list
 local function addToAllowWisper(self,_,_,player)
-	local playerFullName = Ambiguate(player, "mail")
-	allowWisper[playerFullName] = true
+	allowWisper[player] = true
 end
 ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER_INFORM", addToAllowWisper)
 
@@ -598,9 +598,8 @@ local function ECFfilter(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID)
 		filterResult = false
 	end
 
-	local playerFullName = Ambiguate(player, "mail")
 	-- don't filter player or his friends/BNfriends
-	if UnitIsUnit(playerFullName,"player") or friends[playerFullName] then return end
+	if player == myFullName or friends[player] then return end
 
 	-- don't filter GM or DEV
 	if type(flags) == "string" and (flags == "GM" or flags == "DEV") then return end
@@ -615,7 +614,7 @@ local function ECFfilter(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID)
 
 	if(config.enableWisper and chatChannel[event] == 1) then --Whisper Whitelist Mode, only whisper
 		--Don't filter players that are from same guild/raid/party or who you have whispered
-		if not(allowWisper[playerFullName] or myGuild == GetGuildInfo(playerFullName) or UnitInRaid(playerFullName) or UnitInParty(playerFullName)) then
+		if not(allowWisper[player] or myGuild == GetGuildInfo(player) or UnitInRaid(player) or UnitInParty(player)) then
 			if config.debugMode then print("Trigger: WhiteListMode") end
 			filterResult = true
 			return true
@@ -671,7 +670,7 @@ local function ECFfilter(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID)
 		if(msgLine == "") then msgLine = msg end --If it has only symbols, don't filter it
 
 		--msgdata
-		local msgtable = {Sender = playerFullName, Msg = {}, Time = GetTime()}
+		local msgtable = {Sender = player, Msg = {}, Time = GetTime()}
 		for idx=1, #msgLine do msgtable.Msg[idx] = strbyte(msgLine,idx) end
 		local chatLinesSize = #chatLines
 		chatLines[chatLinesSize+1] = msgtable
