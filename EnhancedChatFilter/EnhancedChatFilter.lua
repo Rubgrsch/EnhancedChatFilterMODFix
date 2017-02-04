@@ -24,11 +24,12 @@ local config
 
 local _G = _G
 local gsub, select, ipairs, pairs, next, strsub, format, tonumber, strmatch, tconcat, strfind, strbyte, fmod = gsub, select, ipairs, pairs, next, strsub, format, tonumber, strmatch, table.concat, string.find, string.byte, math.fmod -- lua
-local GetItemInfo, GetCurrencyLink = GetItemInfo, GetCurrencyLink -- options
-local Ambiguate = Ambiguate -- main filter
-local ChatTypeInfo, GetPlayerInfoByGUID, GetGuildInfo, GetTime = ChatTypeInfo, GetPlayerInfoByGUID, GetGuildInfo, GetTime -- acievements
+local Ambiguate, ChatTypeInfo, GetPlayerInfoByGUID, GetGuildInfo, GetTime, GetItemInfo, GetCurrencyLink = Ambiguate, ChatTypeInfo, GetPlayerInfoByGUID, GetGuildInfo, GetTime, GetItemInfo, GetCurrencyLink -- BLZ
 
 local EnhancedChatFilter = LibStub("AceAddon-3.0"):NewAddon("EnhancedChatFilter", "AceConsole-3.0")
+
+--Player info
+local playerRealm, playerGuild = GetRealmName(), GetGuildInfo("player")
 
 --Default Options
 local defaults = {
@@ -530,9 +531,10 @@ friendFrame:RegisterEvent("FRIENDLIST_UPDATE")
 friendFrame:RegisterEvent("BN_FRIEND_INFO_CHANGED")
 friendFrame:SetScript("OnEvent", function(self)
 	friends = {}
+	--Add WoW friends
 	for i = 1, GetNumFriends() do
 		local n = GetFriendInfo(i)
-		if n then friends[n] = true end -- added to allowWisper list
+		if n then friends[n] = true end
 	end
 	--And battlenet friends
 	for i = 1, select(2, BNGetNumFriends()) do
@@ -541,13 +543,12 @@ friendFrame:SetScript("OnEvent", function(self)
 			if (client == "WoW") then friends[characterName.."-"..realmName] = true end
 		end
 	end
-	--if config.debugMode then for k in pairs(friends) do print("friend: "..k) end end
 end)
 
 --Add players you wispered into allowWisper list
 local function addToAllowWisper(self,_,_,player)
-	local trimmedPlayer = Ambiguate(player, "mail")
-	allowWisper[trimmedPlayer] = true
+	local playerFullName = Ambiguate(player, "mail")
+	allowWisper[playerFullName] = true
 end
 ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER_INFORM", addToAllowWisper)
 
@@ -568,27 +569,27 @@ end
 
 local chatLines = {}
 local prevLineID = 0
-local filterResult = nil
-local chatChannel = {["CHAT_MSG_WHISPER"] = 1, ["CHAT_MSG_SAY"] = 2, ["CHAT_MSG_CHANNEL"] = 3, ["CHAT_MSG_YELL"] = 3, ["CHAT_MSG_PARTY"] = 4, ["CHAT_MSG_PARTY_LEADER"] = 4, ["CHAT_MSG_RAID"] = 4, ["CHAT_MSG_RAID_LEADER"] = 4, ["CHAT_MSG_RAID_WARNING"] = 4, ["CHAT_MSG_INSTANCE_CHAT"] = 4,["CHAT_MSG_INSTANCE_CHAT_LEADER"] = 4, ["CHAT_MSG_DND"] = 101}
+local filterResult = false
+local chatChannel = {["CHAT_MSG_WHISPER"] = 1, ["CHAT_MSG_SAY"] = 2, ["CHAT_MSG_CHANNEL"] = 3, ["CHAT_MSG_YELL"] = 3, ["CHAT_MSG_PARTY"] = 4, ["CHAT_MSG_PARTY_LEADER"] = 4, ["CHAT_MSG_RAID"] = 4, ["CHAT_MSG_RAID_LEADER"] = 4, ["CHAT_MSG_RAID_WARNING"] = 4, ["CHAT_MSG_INSTANCE_CHAT"] = 4, ["CHAT_MSG_INSTANCE_CHAT_LEADER"] = 4, ["CHAT_MSG_DND"] = 101}
 
 local function ECFfilter(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID)
 	-- exit when main filter is off
 	if(not config.enableFilter) then return end
-
-	local trimmedPlayer = Ambiguate(player, "mail")
-	-- don't filter player himself and friends/BNfriends
-	if UnitIsUnit(trimmedPlayer,"player") or friends[trimmedPlayer] then return end
-
-	-- don't filter GM or DEV
-	if type(flags) == "string" and (flags == "GM" or flags == "DEV") then return end
 
 	-- if it has been worked then use the worked result
 	if(lineID == prevLineID) then
 		return filterResult
 	else
 		prevLineID = lineID
-		filterResult = nil
+		filterResult = false
 	end
+
+	local playerFullName = Ambiguate(player, "mail")
+	-- don't filter player or his friends/BNfriends
+	if UnitIsUnit(playerFullName,"player") or friends[playerFullName] then return end
+
+	-- don't filter GM or DEV
+	if type(flags) == "string" and (flags == "GM" or flags == "DEV") then return end
 
 	if config.debugMode then print("RAWMsg: "..msg) end
 
@@ -598,21 +599,19 @@ local function ECFfilter(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID)
 	filterString = filterString:upper():gsub("|C[0-9A-F]+",""):gsub("|H[^|]+|H",""):gsub("|H|R",""):gsub("{RT%d}",""):gsub("%s", ""):gsub(filterCharList, "")
 	local newfilterString = filterString:gsub(filterCharListRegex, "")
 
-	if(config.enableWisper and chatChannel[event] <= 1) then --Whisper Whitelist Mode, only whisper
+	if(config.enableWisper and chatChannel[event] == 1) then --Whisper Whitelist Mode, only whisper
 		--Don't filter players that are from same guild/raid/party or who you have whispered
-		if not(allowWisper[trimmedPlayer] or UnitIsInMyGuild(trimmedPlayer) or UnitInRaid(trimmedPlayer) or UnitInParty(trimmedPlayer)) then
+		if not(allowWisper[playerFullName] or playerGuild == GetGuildInfo(playerFullName) or UnitInRaid(playerFullName) or UnitInParty(playerFullName)) then
 			if config.debugMode then print("Trigger: WhiteListMode") end
 			filterResult = true
 			return true
 		end
 	end
 
-	if(config.enableDND and (chatChannel[event] <= 3 or chatChannel[event] == 101)) then -- DND, whisper/yell/say/channel and auto-reply
-		if ((type(flags) == "string" and flags == "DND") or chatChannel[event] == 101) then
-			if config.debugMode then print("Trigger: DND Filter") end
-			filterResult = true
-			return true
-		end
+	if(config.enableDND and ((chatChannel[event] <= 3 and type(flags) == "string" and flags == "DND") or chatChannel[event] == 101)) then -- DND, whisper/yell/say/channel and auto-reply
+		if config.debugMode then print("Trigger: DND Filter") end
+		filterResult = true
+		return true
 	end
 
 	if(chatChannel[event] <= (config.blackWordFilterGroup and 4 or 3)) then --blackWord Filter, whisper/yell/say/channel and party/raid(optional)
@@ -658,7 +657,7 @@ local function ECFfilter(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID)
 		if(msgLine == "") then msgLine = msg end --If it has only symbols, don't filter it
 
 		--msgdata
-		local msgtable = {Sender = trimmedPlayer, Msg = {}, Time = GetTime()}
+		local msgtable = {Sender = playerFullName, Msg = {}, Time = GetTime()}
 		for idx=1, #msgLine do msgtable.Msg[idx] = strbyte(msgLine,idx) end
 		local chatLinesSize = #chatLines
 		chatLines[chatLinesSize+1] = msgtable
@@ -739,7 +738,6 @@ end
 local function achievementReady(id, achievement)
 	local area, guild = achievement.CHAT_MSG_ACHIEVEMENT, achievement.CHAT_MSG_GUILD_ACHIEVEMENT
 	if (area and guild) then
-		local playerGuild = GetGuildInfo("player")
 		for name in pairs(area) do
 			if (UnitExists(name) and playerGuild and playerGuild == GetGuildInfo(name)) then
 				guild[name], area[name] = area[name], nil
@@ -776,7 +774,7 @@ local function achievementFilter(self, event, msg, _, _, _, _, _, _, _, _, _, _,
 	achievementID = tonumber(achievementID)
 	local _,class,_,_,_,name,server = GetPlayerInfoByGUID(guid)
 	if (not name) then return end -- GetPlayerInfoByGUID sometimes returns nil for valid guid
-	if (server ~= "" and server ~= GetRealmName()) then name = name.."-"..server end
+	if (server ~= "" and server ~= playerRealm) then name = name.."-"..server end
 	achievements[achievementID] = achievements[achievementID] or {timeout = GetTime() + 0.5}
 	achievements[achievementID][event] = achievements[achievementID][event] or {}
 	achievements[achievementID][event][name] = class
