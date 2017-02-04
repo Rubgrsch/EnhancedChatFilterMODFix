@@ -29,7 +29,7 @@ local Ambiguate, ChatTypeInfo, GetPlayerInfoByGUID, GetGuildInfo, GetTime, GetIt
 local EnhancedChatFilter = LibStub("AceAddon-3.0"):NewAddon("EnhancedChatFilter", "AceConsole-3.0")
 
 --Player info
-local playerRealm, playerGuild = GetRealmName(), GetGuildInfo("player")
+local myRealm, myGuild = GetRealmName(), GetGuildInfo("player")
 
 --Default Options
 local defaults = {
@@ -601,7 +601,7 @@ local function ECFfilter(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID)
 
 	if(config.enableWisper and chatChannel[event] == 1) then --Whisper Whitelist Mode, only whisper
 		--Don't filter players that are from same guild/raid/party or who you have whispered
-		if not(allowWisper[playerFullName] or playerGuild == GetGuildInfo(playerFullName) or UnitInRaid(playerFullName) or UnitInParty(playerFullName)) then
+		if not(allowWisper[playerFullName] or myGuild == GetGuildInfo(playerFullName) or UnitInRaid(playerFullName) or UnitInParty(playerFullName)) then
 			if config.debugMode then print("Trigger: WhiteListMode") end
 			filterResult = true
 			return true
@@ -739,7 +739,7 @@ local function achievementReady(id, achievement)
 	local area, guild = achievement.CHAT_MSG_ACHIEVEMENT, achievement.CHAT_MSG_GUILD_ACHIEVEMENT
 	if (area and guild) then
 		for name in pairs(area) do
-			if (UnitExists(name) and playerGuild and playerGuild == GetGuildInfo(name)) then
+			if (UnitExists(name) and myGuild and myGuild == GetGuildInfo(name)) then
 				guild[name], area[name] = area[name], nil
 			end
 		end
@@ -774,7 +774,7 @@ local function achievementFilter(self, event, msg, _, _, _, _, _, _, _, _, _, _,
 	achievementID = tonumber(achievementID)
 	local _,class,_,_,_,name,server = GetPlayerInfoByGUID(guid)
 	if (not name) then return end -- GetPlayerInfoByGUID sometimes returns nil for valid guid
-	if (server ~= "" and server ~= playerRealm) then name = name.."-"..server end
+	if (server ~= "" and server ~= myRealm) then name = name.."-"..server end
 	achievements[achievementID] = achievements[achievementID] or {timeout = GetTime() + 0.5}
 	achievements[achievementID][event] = achievements[achievementID][event] or {}
 	achievements[achievementID][event][name] = class
