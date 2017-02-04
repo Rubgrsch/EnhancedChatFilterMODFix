@@ -27,6 +27,11 @@ local gsub, select, ipairs, pairs, next, strsub, format, tonumber, strmatch, tco
 local Ambiguate, ChatTypeInfo, GetPlayerInfoByGUID, GetGuildInfo, GetTime, GetItemInfo, GetCurrencyLink = Ambiguate, ChatTypeInfo, GetPlayerInfoByGUID, GetGuildInfo, GetTime, GetItemInfo, GetCurrencyLink -- BLZ
 
 local EnhancedChatFilter = LibStub("AceAddon-3.0"):NewAddon("EnhancedChatFilter", "AceConsole-3.0")
+local version = GetAddOnMetadata("EnhancedChatFilter", "Version")
+local versionParent = strmatch(version,"^([%d%.%-]+)")
+local versionType = strmatch(version,"([ab])%d*$") or "r"
+local versionMsg = {}
+versionMsg["7.1.5-2"] = "此版本更新了好友相关的代码，如果遇到有关问题请反馈:)"
 
 --Player info
 local myRealm, myGuild = GetRealmName(), GetGuildInfo("player")
@@ -58,6 +63,7 @@ local defaults = {
 		},
 		advancedConfig = false, -- show advancedConfig
 		debugMode = false,
+		lastVersion = "",
 	}
 }
 
@@ -124,6 +130,14 @@ function EnhancedChatFilter:OnInitialize()
 	icon:Register("Enhanced Chat Filter", ecfLDB, config.minimap)
 	convert()
 	ShowFriends()
+	if config.lastVersion ~= versionParent then
+		config.lastVersion = versionParent
+		local msg = versionMsg[versionParent]
+		if msg then
+			if (versionType ~= "r") then msg = L["ThisIsATestVersion"]..msg end
+			EnhancedChatFilter:Print(msg)
+		end
+	end
 end
 
 --------------- Slash Command ---------------
@@ -152,7 +166,7 @@ end
 
 local options = {
 	type = "group",
-	name = "EnhancedChatFilter "..GetAddOnMetadata("EnhancedChatFilter", "Version"),
+	name = "EnhancedChatFilter "..version,
 	get = function(info) return config[info[#info]] end,
 	set = function(info, value) config[info[#info]] = value end,
 	disabled = function() return not config.enableFilter end,
