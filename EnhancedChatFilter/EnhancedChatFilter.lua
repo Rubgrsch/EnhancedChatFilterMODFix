@@ -537,8 +537,8 @@ friendFrame:SetScript("OnEvent", function(self)
 	--And battlenet friends
 	for i = 1, select(2, BNGetNumFriends()) do
 		for j = 1, BNGetNumFriendGameAccounts(i) do
-			local _, rName, rGame = BNGetFriendGameAccountInfo(i, j)
-			if (rGame == "WoW") then friends[rName] = true end
+			local _, characterName, client, realmName = BNGetFriendGameAccountInfo(i, j)
+			if (client == "WoW") then friends[characterName.."-"..realmName] = true end
 		end
 	end
 	--if config.debugMode then for k in pairs(friends) do print("friend: "..k) end end
@@ -546,7 +546,7 @@ end)
 
 --Add players you wispered into allowWisper list
 local function addToAllowWisper(self,_,_,player)
-	local trimmedPlayer = Ambiguate(player, "none")
+	local trimmedPlayer = Ambiguate(player, "mail")
 	allowWisper[trimmedPlayer] = true
 end
 ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER_INFORM", addToAllowWisper)
@@ -575,7 +575,7 @@ local function ECFfilter(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID)
 	-- exit when main filter is off
 	if(not config.enableFilter) then return end
 
-	local trimmedPlayer = Ambiguate(player, "none")
+	local trimmedPlayer = Ambiguate(player, "mail")
 	-- don't filter player himself and friends/BNfriends
 	if UnitIsUnit(trimmedPlayer,"player") or friends[trimmedPlayer] then return end
 
