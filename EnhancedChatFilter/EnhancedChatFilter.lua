@@ -24,7 +24,7 @@ local config
 
 local _G = _G
 local gsub, select, ipairs, pairs, next, strsub, format, tonumber, strmatch, tconcat, strfind, strbyte, fmod = gsub, select, ipairs, pairs, next, strsub, format, tonumber, strmatch, table.concat, string.find, string.byte, math.fmod -- lua
-local ChatTypeInfo, GetPlayerInfoByGUID, GetGuildInfo, GetTime, GetItemInfo, GetCurrencyLink = ChatTypeInfo, GetPlayerInfoByGUID, GetGuildInfo, GetTime, GetItemInfo, GetCurrencyLink -- BLZ
+local Ambiguate, ChatTypeInfo, GetPlayerInfoByGUID, GetGuildInfo, GetTime, GetItemInfo, GetCurrencyLink = Ambiguate, ChatTypeInfo, GetPlayerInfoByGUID, GetGuildInfo, GetTime, GetItemInfo, GetCurrencyLink -- BLZ
 
 local EnhancedChatFilter = LibStub("AceAddon-3.0"):NewAddon("EnhancedChatFilter", "AceConsole-3.0")
 local version = GetAddOnMetadata("EnhancedChatFilter", "Version")
@@ -34,8 +34,7 @@ local versionMsg = {}
 versionMsg["7.1.5-2"] = "此版本更新了好友相关的代码，如果遇到有关问题请反馈:)"
 
 --Player info
-local myName, myRealm, myGuild = UnitName("player"), GetRealmName(), GetGuildInfo("player")
-local myFullName = myName.."-"..myRealm
+local myRealm, myGuild = GetRealmName(), GetGuildInfo("player")
 
 --Default Options
 local defaults = {
@@ -549,20 +548,20 @@ friendFrame:SetScript("OnEvent", function(self)
 	--Add WoW friends
 	for i = 1, GetNumFriends() do
 		local n = GetFriendInfo(i)
-		if n then friends[n] = true end
+		if n then friends[Ambiguate(n, "none")] = true end
 	end
 	--And battlenet friends
 	for i = 1, select(2, BNGetNumFriends()) do
 		for j = 1, BNGetNumFriendGameAccounts(i) do
 			local _, characterName, client, realmName = BNGetFriendGameAccountInfo(i, j)
-			if (client == "WoW") then friends[characterName.."-"..realmName] = true end
+			if (client == "WoW") then friends[Ambiguate(characterName.."-"..realmName, "none")] = true end
 		end
 	end
 end)
 
 --Add players you wispered into allowWisper list
 local function addToAllowWisper(self,_,_,player)
-	allowWisper[player] = true
+	allowWisper[Ambiguate(player, "none")] = true
 end
 ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER_INFORM", addToAllowWisper)
 
@@ -598,13 +597,14 @@ local function ECFfilter(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID)
 		filterResult = false
 	end
 
+	local trimmedPlayer = Ambiguate(player, "none")
 	-- don't filter player or his friends/BNfriends
-	if player == myFullName or friends[player] then return end
+	if UnitIsUnit(trimmedPlayer,"player") or friends[trimmedPlayer] then return end
 
 	-- don't filter GM or DEV
 	if type(flags) == "string" and (flags == "GM" or flags == "DEV") then return end
 
-	if config.debugMode then print("RAWMsg: "..msg) end
+	if config.debugMode then print("RAWMsg: "..trimmedPlayer..": "..msg) end
 
 	-- remove utf-8 chars
 	local filterString = utf8replace(msg, UTF8Symbols)
@@ -614,7 +614,7 @@ local function ECFfilter(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID)
 
 	if(config.enableWisper and chatChannel[event] == 1) then --Whisper Whitelist Mode, only whisper
 		--Don't filter players that are from same guild/raid/party or who you have whispered
-		if not(allowWisper[player] or myGuild == GetGuildInfo(player) or UnitInRaid(player) or UnitInParty(player)) then
+		if not(allowWisper[trimmedPlayer] or myGuild == GetGuildInfo(trimmedPlayer) or UnitInRaid(trimmedPlayer) or UnitInParty(trimmedPlayer)) then
 			if config.debugMode then print("Trigger: WhiteListMode") end
 			filterResult = true
 			return true
@@ -670,7 +670,7 @@ local function ECFfilter(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID)
 		if(msgLine == "") then msgLine = msg end --If it has only symbols, don't filter it
 
 		--msgdata
-		local msgtable = {Sender = player, Msg = {}, Time = GetTime()}
+		local msgtable = {Sender = trimmedPlayer, Msg = {}, Time = GetTime()}
 		for idx=1, #msgLine do msgtable.Msg[idx] = strbyte(msgLine,idx) end
 		local chatLinesSize = #chatLines
 		chatLines[chatLinesSize+1] = msgtable
