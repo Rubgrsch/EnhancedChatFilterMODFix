@@ -6,7 +6,6 @@
 ## Version: 7.1.5-2
 ## SavedVariables: ecfDB
 
-#@no-lib-strip@
 libs\LibStub\LibStub.lua
 libs\CallbackHandler-1.0\CallbackHandler-1.0.lua
 libs\LibDataBroker-1.1\LibDataBroker-1.1.lua
@@ -16,7 +15,6 @@ Libs\AceDB-3.0\AceDB-3.0.xml
 Libs\AceConsole-3.0\AceConsole-3.0.xml
 Libs\AceGUI-3.0\AceGUI-3.0.xml
 Libs\AceConfig-3.0\AceConfig-3.0.xml
-#@end-no-lib-strip@
 
 ## UTF-8字符串处理模块
 Libs\utf8.lua

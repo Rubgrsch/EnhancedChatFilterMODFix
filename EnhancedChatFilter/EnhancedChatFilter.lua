@@ -687,18 +687,7 @@ local function ECFfilter(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID)
 		if chatLinesSize >= config.chatLinesLimit then tremove(chatLines, 1) end
 	end
 end
-ChatFrame_AddMessageEventFilter("CHAT_MSG_DND", ECFfilter)
-ChatFrame_AddMessageEventFilter("CHAT_MSG_SAY", ECFfilter)
-ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER", ECFfilter)
-ChatFrame_AddMessageEventFilter("CHAT_MSG_CHANNEL", ECFfilter)
-ChatFrame_AddMessageEventFilter("CHAT_MSG_YELL", ECFfilter)
-ChatFrame_AddMessageEventFilter("CHAT_MSG_PARTY", ECFfilter)
-ChatFrame_AddMessageEventFilter("CHAT_MSG_PARTY_LEADER", ECFfilter)
-ChatFrame_AddMessageEventFilter("CHAT_MSG_RAID", ECFfilter)
-ChatFrame_AddMessageEventFilter("CHAT_MSG_RAID_LEADER", ECFfilter)
-ChatFrame_AddMessageEventFilter("CHAT_MSG_RAID_WARNING", ECFfilter)
-ChatFrame_AddMessageEventFilter("CHAT_MSG_INSTANCE_CHAT", ECFfilter)
-ChatFrame_AddMessageEventFilter("CHAT_MSG_INSTANCE_CHAT_LEADER", ECFfilter)
+for event in pairs(chatChannel) do ChatFrame_AddMessageEventFilter(event, ECFfilter) end
 
 --MonsterSayFilter
 local monsterLines = {}
