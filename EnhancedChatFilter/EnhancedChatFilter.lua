@@ -10,7 +10,7 @@ local UTF8Symbols = {['·']='',['＠']='',['＃']='',['％']='',['／']='',['＆
 	['Ｆ']='F',['Ｇ']='G',['Ｈ']='H',['Ｉ']='I',['Ｊ']='J',['Ｋ']='K',['Ｌ']='L',['Ｍ']='M',
 	['Ｎ']='N',['Ｏ']='O',['Ｐ']='P',['Ｑ']='Q',['Ｒ']='R',['Ｓ']='S',['Ｔ']='T',['Ｕ']='U',
 	['Ｖ']='V',['Ｗ']='W',['Ｘ']='X',['Ｙ']='Y',['Ｚ']='Z'}
-local RaidAlertTagList = {"%*%*.+%*%*", "EUI:.+施放了", "EUI:.+中断", "EUI:.+就绪", "EUI_RaidCD", "PS 死亡: .+>", "|Hspell.+ => ", "受伤源自 |Hspell.+ %(总计%): ", "Fatality:.+> %d"}  -- RaidAlert Tag
+local RaidAlertTagList = {"%*%*.+%*%*", "EUI:.+施放了", "EUI:.+中断", "EUI:.+就绪", "EUI_RaidCD", "PS 死亡: .+>", "|Hspell.+ => ", "受伤源自 |Hspell.+ %(总计%): ", "Fatality:.+> %d", "已打断.*|Hspell"}  -- RaidAlert Tag
 local QuestReportTagList = {"任务进度提示%s?[:：]", "%(任务完成%)", "<大脚组队提示>", "%[接受任务%]", "<大脚团队提示>", "进度:.+: %d+/%d+", "接受任务: ?%[%d+%]", "【网%.易%.有%.爱】", "任务%[%d+%]%[.+%] 已完成!"} -- QuestReport Tag
 local filterCharList = "[|@!/<>\"`'_#&;:~\\]" -- work on any blackWord
 local filterCharListRegex = "[%(%)%.%%%+%-%*%?%[%]%$%^={}]" -- won't work on regex blackWord, but works on others
@@ -55,7 +55,7 @@ local defaults = {
 		regexToggle = false,
 		blackWordFilterGroup = false, -- blackWord enabled in group and raid
 		lootType = "ITEMS", -- loot filter type
-		lootItemFilterList = {[118043] = true, [71096] = true}, -- item list, [id] = true
+		lootItemFilterList = {[118043] = true, [71096] = true, [49655] = true}, -- item list, [id] = true
 		lootCurrencyFilterList = {[944] = true, [1268] = true}, -- Currency list, [id] = true
 		lootQualityMin = 0, -- loot quality filter, 0..4 = poor..epic
 		minimap = {
