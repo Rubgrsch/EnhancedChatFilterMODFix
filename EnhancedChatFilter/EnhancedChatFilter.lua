@@ -458,13 +458,11 @@ local options = {
 						end
 					end,
 				},
-				typedropdown = {
+				lootType = {
 					type = "select",
 					name = _G["TYPE"],
 					order = 2,
 					values = {["ITEMS"] = ITEMS, ["CURRENCY"] = CURRENCY},
-					get = function() return config.lootType end,
-					set = function(_,value) config.lootType = value end,
 				},
 				DeleteButton = {
 					type = "execute",
