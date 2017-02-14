@@ -614,7 +614,7 @@ local function ECFfilter(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID)
 
 	if(config.enableWisper and chatChannel[event] == 1) then --Whisper Whitelist Mode, only whisper
 		--Don't filter players that are from same guild/raid/party or who you have whispered
-		if not(allowWisper[trimmedPlayer] or myGuild == GetGuildInfo(trimmedPlayer) or UnitInRaid(trimmedPlayer) or UnitInParty(trimmedPlayer)) then
+		if not(allowWisper[trimmedPlayer] or (myGuild and myGuild == GetGuildInfo(trimmedPlayer)) or UnitInRaid(trimmedPlayer) or UnitInParty(trimmedPlayer)) then
 			if config.debugMode then print("Trigger: WhiteListMode") end
 			filterResult = true
 			return true
