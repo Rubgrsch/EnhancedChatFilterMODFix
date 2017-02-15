@@ -26,12 +26,12 @@ local _G = _G
 local gsub, select, ipairs, pairs, next, strsub, format, tonumber, strmatch, tconcat, strfind, strbyte, fmod = gsub, select, ipairs, pairs, next, strsub, format, tonumber, strmatch, table.concat, string.find, string.byte, math.fmod -- lua
 local Ambiguate, ChatTypeInfo, GetPlayerInfoByGUID, GetGuildInfo, GetTime, GetItemInfo, GetCurrencyLink = Ambiguate, ChatTypeInfo, GetPlayerInfoByGUID, GetGuildInfo, GetTime, GetItemInfo, GetCurrencyLink -- BLZ
 
-local EnhancedChatFilter = LibStub("AceAddon-3.0"):NewAddon("EnhancedChatFilter", "AceConsole-3.0")
+local ECF = LibStub("AceAddon-3.0"):NewAddon("EnhancedChatFilter", "AceConsole-3.0")
 local version = GetAddOnMetadata("EnhancedChatFilter", "Version")
 local versionParent = strmatch(version,"^([%d%.%-]+)")
 local versionType = strmatch(version,"([ab])%d*$") or "r"
 local versionMsg = {}
-versionMsg["7.1.5-2"] = "此版本更新了好友相关的代码，如果遇到有关问题请反馈:)"
+--versionMsg["7.1.5-3"] = ""
 
 --Player info
 local myRealm, myGuild = GetRealmName(), GetGuildInfo("player")
@@ -99,7 +99,7 @@ local function StringHash(text)
 end
 
 --Convert old config to new one
-local function convert()
+function ECF:convert()
 	for key,v in pairs(config.blackWordList) do
 		for key2 in pairs(config.blackWordList) do
 			if key ~= key2 and strfind(key,key2) then config.blackWordList[key] = nil;break end
@@ -108,12 +108,23 @@ local function convert()
 	end
 end
 
+function ECF:VersionMsg()
+	if config.lastVersion ~= versionParent then
+		config.lastVersion = versionParent
+		local msg = versionMsg[versionParent]
+		if msg and msg ~= "" then
+			if (versionType ~= "r") then msg = L["ThisIsATestVersion"]..msg end
+			ECF:Print(msg)
+		end
+	end
+end
+
 --MinimapData
 local ecfLDB = LibStub("LibDataBroker-1.1"):NewDataObject("Enhanced Chat Filter", {
 	type = "data source",
 	text = "Enhanced Chat Filter",
 	icon = "Interface\\Icons\\Trade_Archaeology_Orc_BloodText",
-	OnClick = function() EnhancedChatFilter:EnhancedChatFilterOpen() end,
+	OnClick = function() ECF:EnhancedChatFilterOpen() end,
 	OnTooltipShow = function(tooltip)
 		tooltip:AddLine("|cffecf0f1Enhanced Chat Filter|r\n"..L["ClickToOpenConfig"])
 	end
@@ -122,34 +133,27 @@ local ecfLDB = LibStub("LibDataBroker-1.1"):NewDataObject("Enhanced Chat Filter"
 local icon = LibStub("LibDBIcon-1.0")
 
 --Initialize
-function EnhancedChatFilter:OnInitialize()
-	EnhancedChatFilter:RegisterChatCommand("ecf", "EnhancedChatFilterOpen")
-	EnhancedChatFilter:RegisterChatCommand("ecf-debug", "EnhancedChatFilterDebug")
+function ECF:OnInitialize()
+	ECF:RegisterChatCommand("ecf", "EnhancedChatFilterOpen")
+	ECF:RegisterChatCommand("ecf-debug", "EnhancedChatFilterDebug")
 
 	config = LibStub("AceDB-3.0"):New("ecfDB", defaults, "Default").profile
 	icon:Register("Enhanced Chat Filter", ecfLDB, config.minimap)
-	convert()
+	ECF:convert()
 	ShowFriends()
-	if config.lastVersion ~= versionParent then
-		config.lastVersion = versionParent
-		local msg = versionMsg[versionParent]
-		if msg then
-			if (versionType ~= "r") then msg = L["ThisIsATestVersion"]..msg end
-			EnhancedChatFilter:Print(msg)
-		end
-	end
+	ECF:VersionMsg()
 end
 
 --------------- Slash Command ---------------
 --method run on /ecf
-function EnhancedChatFilter:EnhancedChatFilterOpen()
+function ECF:EnhancedChatFilterOpen()
 	if(InCombatLockdown()) then return end
 	InterfaceOptionsFrame_OpenToCategory("EnhancedChatFilter")
 end
 
 --method run on /ecf-debug
-function EnhancedChatFilter:EnhancedChatFilterDebug()
-	EnhancedChatFilter:Print(config.debugMode and "Debug Mode Off!" or "Debug Mode On!")
+function ECF:EnhancedChatFilterDebug()
+	ECF:Print(config.debugMode and "Debug Mode Off!" or "Debug Mode On!")
 	config.debugMode = not config.debugMode
 end
 
@@ -318,7 +322,7 @@ local options = {
 					get = nil,
 					set = function(_,value)
 						if (checkBlacklist(value, config.regexToggle and "regex")) then
-							EnhancedChatFilter:Printf(L["IncludeAutofilteredWord"],value)
+							ECF:Printf(L["IncludeAutofilteredWord"],value)
 						else
 							config.blackWordList[value] = config.regexToggle and "regex" or true
 							scrollHighlight = {}
@@ -393,7 +397,7 @@ local options = {
 					func = function()
 						local wordString, HashString = strsplit("@", stringIO)
 						if (tonumber(HashString) ~= StringHash(wordString)) then
-							EnhancedChatFilter:Print(L["StringHashMismatch"])
+							ECF:Print(L["StringHashMismatch"])
 							return
 						end
 						local newBlackList = {strsplit(";", wordString)}
@@ -401,14 +405,14 @@ local options = {
 							if (blacklist ~= nil) then
 								local imNewWord, imTypeWord = strsplit(",",blacklist)
 								if (checkBlacklist(imNewWord, imTypeWord)) then
-									EnhancedChatFilter:Printf(L["IncludeAutofilteredWord"],imNewWord)
+									ECF:Printf(L["IncludeAutofilteredWord"],imNewWord)
 								else
 									config.blackWordList[imNewWord] = imTypeWord or true
 								end
 							end
 						end
 						stringIO = ""
-						EnhancedChatFilter:Print(L["ImportSucceeded"])
+						ECF:Print(L["ImportSucceeded"])
 					end,
 					disabled = function() return stringIO == "" end,
 				},
@@ -420,7 +424,7 @@ local options = {
 						local blackStringList = {}
 						for key,v in pairs(config.blackWordList) do
 							if (checkBlacklist(key, v)) then
-								EnhancedChatFilter:Printf(L["IncludeAutofilteredWord"],key)
+								ECF:Printf(L["IncludeAutofilteredWord"],key)
 							else
 								blackStringList[#blackStringList+1] = (v == true) and key or key..","..v
 							end
@@ -445,13 +449,13 @@ local options = {
 						local Id = tonumber(value)
 						if(config.lootType == "ITEMS") then
 							if (Id == nil or GetItemInfo(Id) == nil) then -- TODO: If an item doesn't exist in cache, it reports as 'NotExists'(nil)
-								EnhancedChatFilter:Print(format("%s: ID=%d%s",_G[config.lootType],Id,L["NotExists"]))
+								ECF:Print(format("%s: ID=%d%s",_G[config.lootType],Id,L["NotExists"]))
 							else
 								config.lootItemFilterList[Id] = true
 							end
 						else
 							if (Id == nil or GetCurrencyLink(Id) == nil) then
-								EnhancedChatFilter:Print(_G[config.lootType]..L["NotExists"])
+								ECF:Print(_G[config.lootType]..L["NotExists"])
 							else
 								config.lootCurrencyFilterList[Id] = true
 							end
@@ -564,6 +568,7 @@ end
 ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER_INFORM", addToAllowWisper)
 
 --stringDifference for repeatFilter, ranged from 0 to 1, while 0 is absolutely the same
+--This function is not utf8 awared, currently not nessesary
 local function stringDifference(sA, sB)
 	local len_a, len_b = #sA, #sB
 	local templast, temp = {}, {}
@@ -665,7 +670,7 @@ local function ECFfilter(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID)
 
 	if(config.chatLinesLimit > 0 and chatChannel[event] <= (config.repeatFilterGroup and 4 or 3)) then --Repeat Filter
 		local msgLine = newfilterString
-		if(msgLine == "") then msgLine = msg end --If it has only symbols, don't filter it
+		if(msgLine == "") then msgLine = msg end --If it has only symbols, don't change it
 
 		--msgdata
 		local msgtable = {Sender = trimmedPlayer, Msg = {}, Time = GetTime()}
