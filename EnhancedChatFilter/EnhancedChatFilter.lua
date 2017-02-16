@@ -67,7 +67,6 @@ local defaults = {
 		multiLine = false, -- MultiLines, in RepeatFilter
 		repeatFilterGroup = true, -- repeatFilter enabled in group and raid
 		blackWordList = {},
-		lesserblackWordList = {},
 		regexToggle = false,
 		lesserToggle = false,
 		lesserblackWordCount = 3,
@@ -453,7 +452,7 @@ local options = {
 					set = function(_,value) highlightIsLesser, blackWordHighlight = false, value end,
 					values = function()
 						local blacklistname = {}
-						for key in pairs(config.blackWordList) do blacklistname[key] = key end
+						for key,v in pairs(config.blackWordList) do if not select(2,ECF:UnMaskType(v)) then blacklistname[key] = key end end
 						return blacklistname
 					end,
 				},
@@ -465,7 +464,7 @@ local options = {
 					set = function(_,value) highlightIsLesser, blackWordHighlight = true, value	end,
 					values = function()
 						local blacklistname = {}
-						for key in pairs(config.lesserblackWordList) do blacklistname[key] = key end
+						for key,v in pairs(config.blackWordList) do if select(2,ECF:UnMaskType(v)) then blacklistname[key] = key end end
 						return blacklistname
 					end,
 				},
@@ -474,7 +473,7 @@ local options = {
 					name = _G["REMOVE"],
 					order = 53,
 					func = function()
-						if highlightIsLesser then config.lesserblackWordList[blackWordHighlight] = nil else config.blackWordList[blackWordHighlight] = nil end
+						config.blackWordList[blackWordHighlight] = nil
 						blackWordHighlight = ""
 					end,
 					disabled = function() return blackWordHighlight == "" end,
@@ -483,10 +482,10 @@ local options = {
 					type = "execute",
 					name = L["ClearUp"],
 					order = 54,
-					func = function() config.blackWordList, config.lesserblackWordList, blackWordHighlight = {}, {}, "" end,
+					func = function() config.blackWordList, blackWordHighlight = {}, "" end,
 					confirm = true,
 					confirmText = format(L["DoYouWantToClear"],L["BlackList"]),
-					disabled = function() return next(config.blackWordList) == nil and next(config.lesserblackWordList) == nil end,
+					disabled = function() return next(config.blackWordList) == nil end,
 				},
 			},
 		},
@@ -686,27 +685,8 @@ local function ECFfilter(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID)
 	end
 
 	if(chatChannel[event] <= (config.blackWordFilterGroup and 4 or 3)) then --blackWord Filter, whisper/yell/say/channel and party/raid(optional)
-		for keyWord,v in pairs(config.blackWordList) do
-			local r = ECF:UnMaskType(v)
-			local currentString
-			if (not r) then -- if it is not regex, filter most symbols
-				keyWord = keyWord:upper()
-				currentString = newfilterString
-			else
-				currentString = filterString
-			end
-			--Check blackList
-			if (strfind(currentString,keyWord)) then
-				if config.debugMode then print("Trigger: Keyword: "..keyWord) end
-				filterResult = true
-				return true
-			end
-		end
-	end
-	
-	if(chatChannel[event] <= (config.blackWordFilterGroup and 4 or 3)) then --blackWord Filter, whisper/yell/say/channel and party/raid(optional)
 		local count = 0
-		for keyWord,v in pairs(config.lesserblackWordList) do
+		for keyWord,v in pairs(config.blackWordList) do
 			local r, l = ECF:UnMaskType(v)
 			local currentString
 			if (not r) then -- if it is not regex, filter most symbols
@@ -717,7 +697,12 @@ local function ECFfilter(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID)
 			end
 			--Check blackList
 			if (strfind(currentString,keyWord)) then
-				count = count + 1
+				if (l) then count = count + 1
+				else
+					if config.debugMode then print("Trigger: Keyword: "..keyWord) end
+					filterResult = true
+					return true
+				end
 			end
 		end
 		if count >= config.lesserblackWordCount then
