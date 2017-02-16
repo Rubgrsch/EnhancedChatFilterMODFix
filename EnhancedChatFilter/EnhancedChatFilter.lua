@@ -180,7 +180,7 @@ end
 
 --------------- Options ---------------
 --These settings won't be saved
-local blackWordHighlight, lesserblackWordHighlight = "", ""
+local highlightIsLesser, blackWordHighlight = false, ""
 local lootHighlight = {}
 local stringIO = "" -- blackWord input
 
@@ -335,7 +335,6 @@ local options = {
 			type = "group",
 			name = L["BlackwordList"],
 			order = 4,
-			childGroups = "tab",
 			args = {
 				blackword = {
 					type = "input",
@@ -441,81 +440,53 @@ local options = {
 						stringIO = blackString.."@"..StringHash(blackString)
 					end,
 				},
-				blackList = {
-					type = "group",
+				line3 = {
+					type = "header",
+					name = L["FilterList"],
+					order = 50,
+				},
+				blackWordList = {
+					type = "select",
 					name = L["BlackwordList"],
 					order = 51,
-					args = {
-						blackWordList = {
-							type = "select",
-							name = L["BlackwordList"],
-							order = 1,
-							get = function() return blackWordHighlight end,
-							set = function(_,value) blackWordHighlight = value end,
-							values = function()
-								local blacklistname = {}
-								for key in pairs(config.blackWordList) do blacklistname[key] = key end
-								return blacklistname
-							end,
-						},
-						DeleteButton = {
-							type = "execute",
-							name = _G["REMOVE"],
-							order = 2,
-							func = function()
-								config.blackWordList[blackWordHighlight] = nil
-								blackWordHighlight = ""
-							end,
-							disabled = function() return blackWordHighlight == "" end,
-						},
-						ClearUpButton = {
-							type = "execute",
-							name = L["ClearUp"],
-							order = 3,
-							func = function() config.blackWordList, blackWordHighlight = {}, "" end,
-							confirm = true,
-							confirmText = format(L["DoYouWantToClear"],L["BlackList"]),
-							disabled = function() return next(config.blackWordList) == nil end,
-						},
-					},
+					get = function() return highlightIsLesser and "" or blackWordHighlight end,
+					set = function(_,value) highlightIsLesser, blackWordHighlight = false, value end,
+					values = function()
+						local blacklistname = {}
+						for key in pairs(config.blackWordList) do blacklistname[key] = key end
+						return blacklistname
+					end,
 				},
-				lesserblackList = {
-					type = "group",
+				lesserBlackWordList = {
+					type = "select",
 					name = L["LesserBlackwordList"],
 					order = 52,
-					args = {
-						lesserBlackWordList = {
-							type = "select",
-							name = L["LesserBlackwordList"],
-							order = 1,
-							get = function() return lesserblackWordHighlight end,
-							set = function(_,value) lesserblackWordHighlight = value end,
-							values = function()
-								local blacklistname = {}
-								for key in pairs(config.lesserblackWordList) do blacklistname[key] = key end
-								return blacklistname
-							end,
-						},
-						DeleteButton = {
-							type = "execute",
-							name = _G["REMOVE"],
-							order = 2,
-							func = function()
-								config.lesserblackWordList[lesserblackWordHighlight] = nil
-								lesserblackWordHighlight = ""
-							end,
-							disabled = function() return lesserblackWordHighlight == "" end,
-						},
-						ClearUpButton = {
-							type = "execute",
-							name = L["ClearUp"],
-							order = 3,
-							func = function() config.lesserblackWordList, lesserblackWordHighlight = {}, "" end,
-							confirm = true,
-							confirmText = format(L["DoYouWantToClear"],L["BlackList"]),
-							disabled = function() return next(config.lesserblackWordList) == nil end,
-						},
-					},
+					get = function() return highlightIsLesser and blackWordHighlight or "" end,
+					set = function(_,value) highlightIsLesser, blackWordHighlight = true, value	end,
+					values = function()
+						local blacklistname = {}
+						for key in pairs(config.lesserblackWordList) do blacklistname[key] = key end
+						return blacklistname
+					end,
+				},
+				DeleteButton = {
+					type = "execute",
+					name = _G["REMOVE"],
+					order = 53,
+					func = function()
+						if highlightIsLesser then config.lesserblackWordList[blackWordHighlight] = nil else config.blackWordList[blackWordHighlight] = nil end
+						blackWordHighlight = ""
+					end,
+					disabled = function() return blackWordHighlight == "" end,
+				},
+				ClearUpButton = {
+					type = "execute",
+					name = L["ClearUp"],
+					order = 54,
+					func = function() config.blackWordList, config.lesserblackWordList, blackWordHighlight = {}, {}, "" end,
+					confirm = true,
+					confirmText = format(L["DoYouWantToClear"],L["BlackList"]),
+					disabled = function() return next(config.blackWordList) == nil and next(config.lesserblackWordList) == nil end,
 				},
 			},
 		},
