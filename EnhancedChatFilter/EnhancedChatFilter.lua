@@ -24,7 +24,7 @@ local config
 
 local _G = _G
 local gsub, select, ipairs, pairs, next, strsub, format, tonumber, strmatch, tconcat, strfind, strbyte, fmod = gsub, select, ipairs, pairs, next, strsub, format, tonumber, strmatch, table.concat, string.find, string.byte, math.fmod -- lua
-local Ambiguate, ChatTypeInfo, GetPlayerInfoByGUID, GetGuildInfo, GetTime, GetItemInfo, GetCurrencyLink = Ambiguate, ChatTypeInfo, GetPlayerInfoByGUID, GetGuildInfo, GetTime, GetItemInfo, GetCurrencyLink -- BLZ
+local Ambiguate, band, ChatTypeInfo, GetPlayerInfoByGUID, GetGuildInfo, GetTime, GetItemInfo, GetCurrencyLink = Ambiguate, bit.band, ChatTypeInfo, GetPlayerInfoByGUID, GetGuildInfo, GetTime, GetItemInfo, GetCurrencyLink -- BLZ
 
 local ECF = LibStub("AceAddon-3.0"):NewAddon("EnhancedChatFilter", "AceConsole-3.0")
 local version = GetAddOnMetadata("EnhancedChatFilter", "Version")
@@ -48,7 +48,7 @@ function ECF:MaskType(...)
 end
 
 function ECF:UnMaskType(ty) -- return true/false
-	return bit.band(ty,regexBit) ~= 0, bit.band(ty,lesserBit) ~= 0
+	return band(ty,regexBit) ~= 0, band(ty,lesserBit) ~= 0
 end
 
 --Default Options
