@@ -69,7 +69,7 @@ local defaults = {
 		blackWordList = {},
 		regexToggle = false,
 		lesserToggle = false,
-		lesserblackWordCount = 3,
+		LesserBlackWordThreshold = 3, -- in lesserBlackWord
 		blackWordFilterGroup = false, -- blackWord enabled in group and raid
 		lootType = "ITEMS", -- loot filter type
 		lootItemFilterList = {[118043] = true, [71096] = true, [49655] = true}, -- item list, [id] = true
@@ -374,10 +374,10 @@ local options = {
 					desc = L["AlsoFilterGroupTooltips"],
 					order = 11,
 				},
-				lesserblackWordCount = {
+				LesserBlackWordThreshold = {
 					type = "range",
-					name = L["LesserBlackWordCount"],
-					desc = L["LesserBlackWordCountTooltips"],
+					name = L["LesserBlackWordThreshold"],
+					desc = L["LesserBlackWordThresholdTooltips"],
 					order = 12,
 					min = 2,
 					max = 5,
@@ -441,7 +441,7 @@ local options = {
 				},
 				line3 = {
 					type = "header",
-					name = L["FilterList"],
+					name = "",
 					order = 50,
 				},
 				blackWordList = {
@@ -661,7 +661,7 @@ local function ECFfilter(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID)
 	-- don't filter GM or DEV
 	if type(flags) == "string" and (flags == "GM" or flags == "DEV") then return end
 
-	if config.debugMode then print("RAWMsg: "..trimmedPlayer..": "..msg) end
+	if config.debugMode then print(format("RAWMsg: %s: %s",trimmedPlayer,msg)) end
 
 	-- remove utf-8 chars
 	local filterString = utf8replace(msg, UTF8Symbols)
