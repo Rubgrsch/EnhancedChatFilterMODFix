@@ -346,7 +346,6 @@ local options = {
 							ECF:Printf(L["IncludeAutofilteredWord"],value)
 						else
 							config.blackWordList[value] = ty
-							scrollHighlight = {}
 						end
 					end,
 					width = "full",
@@ -705,7 +704,7 @@ local function ECFfilter(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID)
 				end
 			end
 		end
-		if count >= config.lesserblackWordCount then
+		if count >= config.LesserBlackWordThreshold then
 			if config.debugMode then print("Trigger: LesserKeywords x"..count) end
 			filterResult = true
 			return true
