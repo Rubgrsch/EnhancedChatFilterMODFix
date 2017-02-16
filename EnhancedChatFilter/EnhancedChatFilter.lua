@@ -36,6 +36,21 @@ local versionMsg = {}
 --Player info
 local myRealm, myGuild = GetRealmName(), GetGuildInfo("player")
 
+--Bit Mask for blackword type
+local regexBit, lesserBit = 1, 2
+
+function ECF:MaskType(...)
+	local ty = 0
+	for idx, v in ipairs({...}) do
+		if(v) then ty = ty + 2^(idx-1) end
+	end
+	return ty
+end
+
+function ECF:UnMaskType(ty) -- return true/false
+	return bit.band(ty,regexBit) ~= 0, bit.band(ty,lesserBit) ~= 0
+end
+
 --Default Options
 local defaults = {
 	profile = {
@@ -52,7 +67,10 @@ local defaults = {
 		multiLine = false, -- MultiLines, in RepeatFilter
 		repeatFilterGroup = true, -- repeatFilter enabled in group and raid
 		blackWordList = {},
+		lesserblackWordList = {},
 		regexToggle = false,
+		lesserToggle = false,
+		lesserblackWordCount = 3,
 		blackWordFilterGroup = false, -- blackWord enabled in group and raid
 		lootType = "ITEMS", -- loot filter type
 		lootItemFilterList = {[118043] = true, [71096] = true, [49655] = true}, -- item list, [id] = true
@@ -71,7 +89,7 @@ local defaults = {
 --Make sure that blackWord won't be filtered by filterCharList and utf-8 list
 local function checkBlacklist(blackWord, typeModus)
 	local newWord = blackWord:gsub("%s", ""):gsub(filterCharList, "")
-	if (typeModus ~= "regex") then newWord=newWord:gsub(filterCharListRegex, "") end
+	if (not ECF:UnMaskType(typeModus)) then newWord=newWord:gsub(filterCharListRegex, "") end
 	newWord = utf8replace(newWord, UTF8Symbols)
 	if(newWord ~= blackWord or blackWord == "") then return true end -- Also report "" as invalid
 end
@@ -100,6 +118,9 @@ end
 
 --Convert old config to new one
 function ECF:convert()
+	for key,v in pairs(config.blackWordList) do
+		if(type(v) ~= "number") then config.blackWordList[key] = v == "regex" and 1 or 0 end
+	end
 	for key,v in pairs(config.blackWordList) do
 		for key2 in pairs(config.blackWordList) do
 			if key ~= key2 and strfind(key,key2) then config.blackWordList[key] = nil;break end
@@ -159,7 +180,7 @@ end
 
 --------------- Options ---------------
 --These settings won't be saved
-local scrollHighlight = {}
+local blackWordHighlight, lesserblackWordHighlight = "", ""
 local lootHighlight = {}
 local stringIO = "" -- blackWord input
 
@@ -314,6 +335,7 @@ local options = {
 			type = "group",
 			name = L["BlackwordList"],
 			order = 4,
+			childGroups = "tab",
 			args = {
 				blackword = {
 					type = "input",
@@ -321,13 +343,15 @@ local options = {
 					order = 1,
 					get = nil,
 					set = function(_,value)
-						if (checkBlacklist(value, config.regexToggle and "regex")) then
+						local ty = ECF:MaskType(config.regexToggle, config.lesserToggle)
+						if (checkBlacklist(value, ty)) then
 							ECF:Printf(L["IncludeAutofilteredWord"],value)
 						else
-							config.blackWordList[value] = config.regexToggle and "regex" or true
+							config.blackWordList[value] = ty
 							scrollHighlight = {}
 						end
 					end,
+					width = "full",
 				},
 				regexToggle = {
 					type = "toggle",
@@ -335,57 +359,41 @@ local options = {
 					desc = L["RegexTooltip"],
 					order = 2,
 				},
-				DeleteButton = {
-					type = "execute",
-					name = _G["REMOVE"],
+				lesserToggle = {
+					type = "toggle",
+					name = L["Lesser"],
+					desc = L["LesserTooltip"],
 					order = 3,
-					func = function()
-						for key in pairs(scrollHighlight) do config.blackWordList[key] = nil end
-						scrollHighlight = {}
-					end,
-					disabled = function() return next(scrollHighlight) == nil end,
-				},
-				ClearUpButton = {
-					type = "execute",
-					name = L["ClearUp"],
-					order = 4,
-					func = function() config.blackWordList, scrollHighlight = {}, {} end,
-					confirm = true,
-					confirmText = format(L["DoYouWantToClear"],L["BlackList"]),
-					disabled = function() return next(config.blackWordList) == nil end,
-				},
-				blackWordList = {
-					type = "multiselect",
-					name = L["BlackwordList"],
-					order = 10,
-					get = function(_,key) return scrollHighlight[key] end,
-					set = function(_,key,value) scrollHighlight[key] = value or nil end,
-					values = function()
-						local blacklistname = {}
-						for key in pairs(config.blackWordList) do blacklistname[key] = key end
-						return blacklistname
-					end,
 				},
 				line1 = {
 					type = "header",
 					name = _G["OPTIONS"],
-					order = 20,
+					order = 10,
 				},
 				blackWordFilterGroup = {
 					type = "toggle",
 					name = L["AlsoFilterGroup"],
 					desc = L["AlsoFilterGroupTooltips"],
-					order = 21,
+					order = 11,
+				},
+				lesserblackWordCount = {
+					type = "range",
+					name = L["LesserBlackWordCount"],
+					desc = L["LesserBlackWordCountTooltips"],
+					order = 12,
+					min = 2,
+					max = 5,
+					step = 1,
 				},
 				line2 = {
 					type = "header",
 					name = L["StringIO"],
-					order = 30,
+					order = 20,
 				},
 				stringconfig = {
 					type = "input",
 					name = "",
-					order = 31,
+					order = 21,
 					get = function() return stringIO end,
 					set = function(_,value) stringIO = value end,
 					width = "double",
@@ -393,7 +401,7 @@ local options = {
 				import = {
 					type = "execute",
 					name = L["Import"],
-					order = 32,
+					order = 22,
 					func = function()
 						local wordString, HashString = strsplit("@", stringIO)
 						if (tonumber(HashString) ~= StringHash(wordString)) then
@@ -407,7 +415,7 @@ local options = {
 								if (checkBlacklist(imNewWord, imTypeWord)) then
 									ECF:Printf(L["IncludeAutofilteredWord"],imNewWord)
 								else
-									config.blackWordList[imNewWord] = imTypeWord or true
+									config.blackWordList[imNewWord] = tonumber(imTypeWord)
 								end
 							end
 						end
@@ -419,19 +427,95 @@ local options = {
 				export = {
 					type = "execute",
 					name = L["Export"],
-					order = 33,
+					order = 23,
 					func = function()
 						local blackStringList = {}
 						for key,v in pairs(config.blackWordList) do
 							if (checkBlacklist(key, v)) then
 								ECF:Printf(L["IncludeAutofilteredWord"],key)
 							else
-								blackStringList[#blackStringList+1] = (v == true) and key or key..","..v
+								blackStringList[#blackStringList+1] = key..","..tostring(v)
 							end
 						end
 						local blackString = tconcat(blackStringList,";")
 						stringIO = blackString.."@"..StringHash(blackString)
 					end,
+				},
+				blackList = {
+					type = "group",
+					name = L["BlackwordList"],
+					order = 51,
+					args = {
+						blackWordList = {
+							type = "select",
+							name = L["BlackwordList"],
+							order = 1,
+							get = function() return blackWordHighlight end,
+							set = function(_,value) blackWordHighlight = value end,
+							values = function()
+								local blacklistname = {}
+								for key in pairs(config.blackWordList) do blacklistname[key] = key end
+								return blacklistname
+							end,
+						},
+						DeleteButton = {
+							type = "execute",
+							name = _G["REMOVE"],
+							order = 2,
+							func = function()
+								config.blackWordList[blackWordHighlight] = nil
+								blackWordHighlight = ""
+							end,
+							disabled = function() return blackWordHighlight == "" end,
+						},
+						ClearUpButton = {
+							type = "execute",
+							name = L["ClearUp"],
+							order = 3,
+							func = function() config.blackWordList, blackWordHighlight = {}, "" end,
+							confirm = true,
+							confirmText = format(L["DoYouWantToClear"],L["BlackList"]),
+							disabled = function() return next(config.blackWordList) == nil end,
+						},
+					},
+				},
+				lesserblackList = {
+					type = "group",
+					name = L["LesserBlackwordList"],
+					order = 52,
+					args = {
+						lesserBlackWordList = {
+							type = "select",
+							name = L["LesserBlackwordList"],
+							order = 1,
+							get = function() return lesserblackWordHighlight end,
+							set = function(_,value) lesserblackWordHighlight = value end,
+							values = function()
+								local blacklistname = {}
+								for key in pairs(config.lesserblackWordList) do blacklistname[key] = key end
+								return blacklistname
+							end,
+						},
+						DeleteButton = {
+							type = "execute",
+							name = _G["REMOVE"],
+							order = 2,
+							func = function()
+								config.lesserblackWordList[lesserblackWordHighlight] = nil
+								lesserblackWordHighlight = ""
+							end,
+							disabled = function() return lesserblackWordHighlight == "" end,
+						},
+						ClearUpButton = {
+							type = "execute",
+							name = L["ClearUp"],
+							order = 3,
+							func = function() config.lesserblackWordList, lesserblackWordHighlight = {}, "" end,
+							confirm = true,
+							confirmText = format(L["DoYouWantToClear"],L["BlackList"]),
+							disabled = function() return next(config.lesserblackWordList) == nil end,
+						},
+					},
 				},
 			},
 		},
@@ -632,8 +716,9 @@ local function ECFfilter(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID)
 
 	if(chatChannel[event] <= (config.blackWordFilterGroup and 4 or 3)) then --blackWord Filter, whisper/yell/say/channel and party/raid(optional)
 		for keyWord,v in pairs(config.blackWordList) do
+			local r = ECF:UnMaskType(v)
 			local currentString
-			if (v ~= "regex") then -- if it is not regex, filter most symbols
+			if (not r) then -- if it is not regex, filter most symbols
 				keyWord = keyWord:upper()
 				currentString = newfilterString
 			else
@@ -645,6 +730,29 @@ local function ECFfilter(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID)
 				filterResult = true
 				return true
 			end
+		end
+	end
+	
+	if(chatChannel[event] <= (config.blackWordFilterGroup and 4 or 3)) then --blackWord Filter, whisper/yell/say/channel and party/raid(optional)
+		local count = 0
+		for keyWord,v in pairs(config.lesserblackWordList) do
+			local r, l = ECF:UnMaskType(v)
+			local currentString
+			if (not r) then -- if it is not regex, filter most symbols
+				keyWord = keyWord:upper()
+				currentString = newfilterString
+			else
+				currentString = filterString
+			end
+			--Check blackList
+			if (strfind(currentString,keyWord)) then
+				count = count + 1
+			end
+		end
+		if count >= config.lesserblackWordCount then
+			if config.debugMode then print("Trigger: LesserKeywords x"..count) end
+			filterResult = true
+			return true
 		end
 	end
 
