@@ -50,7 +50,7 @@ if (GetLocale() == "zhCN") then
 	L["LesserBlackWord"] = "次级关键词"
 	L["LesserBlackWordTooltip"] = "标记添加的关键词为次级关键词，仅对该次添加的关键词有效|n当一个信息匹配多个次级关键词时才会被屏蔽。|n|n你应该只在添加那些日常交流会用到，但你希望屏蔽的对方会大量同时使用的词汇时勾选。|n下列情况不建议勾选：各种利用异体字/同音字防屏蔽的词汇、单个汉字。"
 	L["LesserBlackwordList"] = "次级黑名单关键词"
-	L["LesserBlackWordThreshold"] = "次级关键词判断阈值"
+	L["LesserBlackWordThreshold"] = "次级关键词阈值"
 	L["LesserBlackWordThresholdTooltips"] = "过滤包含至少阈值数目的次级关键词的信息"
 	L["BlackList"] = "关键词列表"
 	L["StringIO"] = "字符串导入导出"
@@ -78,10 +78,7 @@ if (GetLocale() == "zhCN") then
 
 3. 正则是什么？
     不知道的请不要用。不知道的请不要用。不知道的请不要用。
-    如果你想学习请自行百度/谷歌。
-
-4. 为什么我的关键词都没勾上？每次勾上/rl之后又复原了？
-    这些勾只是用来删除的，不是代表关键词启用与否。任何加入的关键词都已启用。]]
+    如果你想学习请自行百度/谷歌。]]
 --AchievementFilter
 	L["GotAchievement"] = "[%s]获得了成就%s！"
 	L["And"] = "、"
@@ -138,7 +135,7 @@ elseif (GetLocale() == "zhTW") then
 	L["LesserBlackWord"] = "次级关键词"
 	L["LesserBlackWordTooltip"] = "标记添加的关键词为次级关键词，仅对该次添加的关键词有效|n当一个信息匹配多个次级关键词时才会被屏蔽。|n|n你应该只在添加那些日常交流会用到，但你希望屏蔽的对方会大量同时使用的词汇时勾选。|n下列情况不建议勾选：各种利用异体字/同音字防屏蔽的词汇、单个汉字。"
 	L["LesserBlackwordList"] = "次级黑名单关键词"
-	L["LesserBlackWordThreshold"] = "次级关键词判断阈值"
+	L["LesserBlackWordThreshold"] = "次级关键词阈值"
 	L["LesserBlackWordThresholdTooltips"] = "过滤包含至少阈值数目的次级关键词的信息"
 	L["BlackList"] = "关键词列表"
 	L["StringIO"] = "字符串導入導出"
@@ -166,10 +163,7 @@ elseif (GetLocale() == "zhTW") then
 
 3. 正则是什么？
     不知道的请不要用。不知道的请不要用。不知道的请不要用。
-    如果你想学习请自行百度/谷歌。
-
-4. 为什么我的关键词都没勾上？每次勾上/rl之后又复原了？
-    这些勾只是用来删除的，不是代表关键词启用与否。任何加入的关键词都已启用。]]
+    如果你想学习请自行百度/谷歌。]]
 --AchievementFilter
 	L["GotAchievement"] = "[%s]獲得了成就%s！"
 	L["And"] = "、"
@@ -253,10 +247,7 @@ else
 
 3. 正则是什么？
     不知道的请不要用。不知道的请不要用。不知道的请不要用。
-    如果你想学习请自行百度/谷歌。
-
-4. 为什么我的关键词都没勾上？每次勾上/rl之后又复原了？
-    这些勾只是用来删除的，不是代表关键词启用与否。任何加入的关键词都已启用。]]
+    如果你想学习请自行百度/谷歌。]]
 --AchievementFilter
 	L["GotAchievement"] = "[%s]have earned the achievement%s!"
 	L["And"] = ", "
