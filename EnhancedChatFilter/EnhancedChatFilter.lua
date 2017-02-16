@@ -359,8 +359,8 @@ local options = {
 				},
 				lesserToggle = {
 					type = "toggle",
-					name = L["Lesser"],
-					desc = L["LesserTooltip"],
+					name = L["LesserBlackWord"],
+					desc = L["LesserBlackWordTooltip"],
 					order = 3,
 				},
 				line1 = {
