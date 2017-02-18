@@ -24,7 +24,7 @@ local config
 
 local _G = _G
 local gsub, select, ipairs, pairs, next, strsub, format, tonumber, strmatch, tconcat, strfind, strbyte, fmod = gsub, select, ipairs, pairs, next, strsub, format, tonumber, strmatch, table.concat, string.find, string.byte, math.fmod -- lua
-local Ambiguate, band, ChatTypeInfo, GetPlayerInfoByGUID, GetGuildInfo, GetTime, GetItemInfo, GetCurrencyLink = Ambiguate, bit.band, ChatTypeInfo, GetPlayerInfoByGUID, GetGuildInfo, GetTime, GetItemInfo, GetCurrencyLink -- BLZ
+local Ambiguate, band, BNGetNumFriends, BNGetNumFriendGameAccounts, BNGetFriendGameAccountInfo, ChatTypeInfo, GetCurrencyLink, GetFriendInfo, GetGuildInfo, GetItemInfo, GetNumFriends, GetPlayerInfoByGUID, GetTime = Ambiguate, bit.band, BNGetNumFriends, BNGetNumFriendGameAccounts, BNGetFriendGameAccountInfo, ChatTypeInfo, GetCurrencyLink, GetFriendInfo, GetGuildInfo, GetItemInfo, GetNumFriends, GetPlayerInfoByGUID, GetTime -- BLZ
 
 local ECF = LibStub("AceAddon-3.0"):NewAddon("EnhancedChatFilter", "AceConsole-3.0")
 local version = GetAddOnMetadata("EnhancedChatFilter", "Version")
