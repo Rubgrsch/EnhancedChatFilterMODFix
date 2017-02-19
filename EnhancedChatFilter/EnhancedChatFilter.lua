@@ -639,7 +639,7 @@ end
 local chatLines = {}
 local prevLineID = 0
 local filterResult = false
-local chatChannel = {["CHAT_MSG_WHISPER"] = 1, ["CHAT_MSG_SAY"] = 2, ["CHAT_MSG_CHANNEL"] = 3, ["CHAT_MSG_YELL"] = 3, ["CHAT_MSG_PARTY"] = 4, ["CHAT_MSG_PARTY_LEADER"] = 4, ["CHAT_MSG_RAID"] = 4, ["CHAT_MSG_RAID_LEADER"] = 4, ["CHAT_MSG_RAID_WARNING"] = 4, ["CHAT_MSG_INSTANCE_CHAT"] = 4, ["CHAT_MSG_INSTANCE_CHAT_LEADER"] = 4, ["CHAT_MSG_DND"] = 101}
+local chatChannel = {["CHAT_MSG_WHISPER"] = 1, ["CHAT_MSG_SAY"] = 2, ["CHAT_MSG_YELL"] = 2, ["CHAT_MSG_CHANNEL"] = 3, ["CHAT_MSG_PARTY"] = 4, ["CHAT_MSG_PARTY_LEADER"] = 4, ["CHAT_MSG_RAID"] = 4, ["CHAT_MSG_RAID_LEADER"] = 4, ["CHAT_MSG_RAID_WARNING"] = 4, ["CHAT_MSG_INSTANCE_CHAT"] = 4, ["CHAT_MSG_INSTANCE_CHAT_LEADER"] = 4, ["CHAT_MSG_DND"] = 101}
 
 local function ECFfilter(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID)
 	-- exit when main filter is off
@@ -711,7 +711,7 @@ local function ECFfilter(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID)
 		end
 	end
 
-	if (config.enableRAF and (chatChannel[event] == 4 or chatChannel[event] == 2)) then -- raid
+	if (config.enableRAF and (chatChannel[event] <= 2 or chatChannel[event] == 4)) then -- raid
 		for _,RaidAlertTag in ipairs(RaidAlertTagList) do
 			if(strfind(msg,RaidAlertTag)) then
 				if config.debugMode then print("Trigger: "..RaidAlertTag.." in RaidAlertTag") end
@@ -721,7 +721,7 @@ local function ECFfilter(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID)
 		end
 	end
 
-	if (config.enableQRF and (chatChannel[event] == 4 or chatChannel[event] == 2)) then -- quest/party
+	if (config.enableQRF and (chatChannel[event] <= 2 or chatChannel[event] == 4)) then -- quest/party
 		for _,QuestReportTag in ipairs(QuestReportTagList) do
 			if(strfind(msg,QuestReportTag)) then
 				if config.debugMode then print("Trigger: "..QuestReportTag.." in QuestReportTag") end
