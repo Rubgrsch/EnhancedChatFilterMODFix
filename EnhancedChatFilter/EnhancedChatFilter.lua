@@ -69,7 +69,7 @@ local defaults = {
 		blackWordList = {},
 		regexToggle = false,
 		lesserToggle = false,
-		LesserBlackWordThreshold = 3, -- in lesserBlackWord
+		lesserBlackWordThreshold = 3, -- in lesserBlackWord
 		blackWordFilterGroup = false, -- blackWord enabled in group and raid
 		lootType = "ITEMS", -- loot filter type
 		lootItemFilterList = {[118043] = true, [71096] = true, [49655] = true}, -- item list, [id] = true
@@ -373,7 +373,7 @@ local options = {
 					desc = L["AlsoFilterGroupTooltips"],
 					order = 11,
 				},
-				LesserBlackWordThreshold = {
+				lesserBlackWordThreshold = {
 					type = "range",
 					name = L["LesserBlackWordThreshold"],
 					desc = L["LesserBlackWordThresholdTooltips"],
@@ -704,7 +704,7 @@ local function ECFfilter(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID)
 				end
 			end
 		end
-		if count >= config.LesserBlackWordThreshold then
+		if count >= config.lesserBlackWordThreshold then
 			if config.debugMode then print("Trigger: LesserKeywords x"..count) end
 			filterResult = true
 			return true
