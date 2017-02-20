@@ -31,7 +31,7 @@ local version = GetAddOnMetadata("EnhancedChatFilter", "Version")
 local versionParent = strmatch(version,"^([%d%.%-]+)")
 local versionType = strmatch(version,"([ab])%d*$") or "r"
 local versionMsg = {}
---versionMsg["7.1.5-3"] = ""
+versionMsg["7.1.5-3"] = "添加了次级关键词功能，欢迎测试./."
 
 --Bit Mask for blackword type
 local regexBit, lesserBit = 1, 2
