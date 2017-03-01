@@ -83,9 +83,9 @@ local defaults = {
 
 --------------- Common Functions in ECF ---------------
 --Make sure that blackWord won't be filtered by filterCharList and utf-8 list
-local function checkBlacklist(blackWord, typeModus)
+local function checkBlacklist(blackWord, r)
 	local newWord = blackWord:gsub("%s", ""):gsub(filterCharList, "")
-	if (not ECF:UnMaskType(typeModus)) then newWord=newWord:gsub(filterCharListRegex, "") end
+	if (not r) then newWord=newWord:gsub(filterCharListRegex, "") end
 	newWord = utf8replace(newWord, UTF8Symbols)
 	if(newWord ~= blackWord or blackWord == "") then return true end -- Also report "" as invalid
 end
@@ -115,13 +115,23 @@ end
 --Convert old config to new one
 function ECF:convert()
 	for key,v in pairs(config.blackWordList) do
-		if(type(v) ~= "number") then config.blackWordList[key] = v == "regex" and 1 or 0 end
+		if(type(v) == "number") then -- remove next release
+			config.blackWordList[key] = {
+				regex = bit.band(v,1),
+				lesser = bit.band(v,2),
+			}
+		elseif(type(v) ~= "table") then 
+			config.blackWordList[key] = {
+				regex = v == "regex",
+				lesser = false,
+			}
+		end
 	end
 	for key,v in pairs(config.blackWordList) do
 		for key2 in pairs(config.blackWordList) do
 			if key ~= key2 and strfind(key,key2) then config.blackWordList[key] = nil;break end
 		end
-		if(checkBlacklist(key,v)) then config.blackWordList[key] = nil end
+		if(checkBlacklist(key,v.regex)) then config.blackWordList[key] = nil end
 	end
 end
 
@@ -183,6 +193,14 @@ local stringIO = "" -- blackWord input
 local colorT = {} -- used in lootFilter
 for i=0, 4 do
 	colorT[i]=format("|c%s%s|r",select(4,GetItemQualityColor(i)),_G["ITEM_QUALITY"..i.."_DESC"])
+end
+
+function ECF:AddBlackWord(word, r, l)
+	if (checkBlacklist(value, r)) then
+		ECF:Printf(L["IncludeAutofilteredWord"],value)
+	else
+		config.blackWordList[value] = {regex = r, lesser = l,}
+	end
 end
 
 local options = {
@@ -338,12 +356,7 @@ local options = {
 					order = 1,
 					get = nil,
 					set = function(_,value)
-						local ty = ECF:MaskType(config.regexToggle, config.lesserToggle)
-						if (checkBlacklist(value, ty)) then
-							ECF:Printf(L["IncludeAutofilteredWord"],value)
-						else
-							config.blackWordList[value] = ty
-						end
+						ECF:AddBlackWord(value, config.regexToggle, config.lesserToggle)
 					end,
 					width = "full",
 				},
@@ -406,11 +419,7 @@ local options = {
 						for _, blacklist in ipairs(newBlackList) do
 							if (blacklist ~= nil) then
 								local imNewWord, imTypeWord = strsplit(",",blacklist)
-								if (checkBlacklist(imNewWord, imTypeWord)) then
-									ECF:Printf(L["IncludeAutofilteredWord"],imNewWord)
-								else
-									config.blackWordList[imNewWord] = tonumber(imTypeWord)
-								end
+								ECF:AddBlackWord(imNewWord, ECF:UnMaskType(imTypeWord))
 							end
 						end
 						stringIO = ""
@@ -425,10 +434,11 @@ local options = {
 					func = function()
 						local blackStringList = {}
 						for key,v in pairs(config.blackWordList) do
-							if (checkBlacklist(key, v)) then
+							local num = ECF:MaskType(v.regex, v.lesser)
+							if (checkBlacklist(key, v.regex)) then
 								ECF:Printf(L["IncludeAutofilteredWord"],key)
 							else
-								blackStringList[#blackStringList+1] = key..","..tostring(v)
+								blackStringList[#blackStringList+1] = key..","..tostring(num)
 							end
 						end
 						local blackString = tconcat(blackStringList,";")
@@ -448,7 +458,7 @@ local options = {
 					set = function(_,value) highlightIsLesser, blackWordHighlight = false, value end,
 					values = function()
 						local blacklistname = {}
-						for key,v in pairs(config.blackWordList) do if not select(2,ECF:UnMaskType(v)) then blacklistname[key] = key end end
+						for key,v in pairs(config.blackWordList) do if not v.lesser then blacklistname[key] = key end end
 						return blacklistname
 					end,
 				},
@@ -460,7 +470,7 @@ local options = {
 					set = function(_,value) highlightIsLesser, blackWordHighlight = true, value	end,
 					values = function()
 						local blacklistname = {}
-						for key,v in pairs(config.blackWordList) do if select(2,ECF:UnMaskType(v)) then blacklistname[key] = key end end
+						for key,v in pairs(config.blackWordList) do if v.lesser then blacklistname[key] = key end end
 						return blacklistname
 					end,
 				},
@@ -683,9 +693,8 @@ local function ECFfilter(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID)
 	if(chatChannel[event] <= (config.blackWordFilterGroup and 4 or 3)) then --blackWord Filter, whisper/yell/say/channel and party/raid(optional)
 		local count = 0
 		for keyWord,v in pairs(config.blackWordList) do
-			local r, l = ECF:UnMaskType(v)
 			local currentString
-			if (not r) then -- if it is not regex, filter most symbols
+			if (not v.regex) then -- if it is not regex, filter most symbols
 				keyWord = keyWord:upper()
 				currentString = newfilterString
 			else
@@ -693,7 +702,7 @@ local function ECFfilter(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID)
 			end
 			--Check blackList
 			if (strfind(currentString,keyWord)) then
-				if (l) then count = count + 1
+				if (v.lesser) then count = count + 1
 				else
 					if config.debugMode then print("Trigger: Keyword: "..keyWord) end
 					filterResult = true
