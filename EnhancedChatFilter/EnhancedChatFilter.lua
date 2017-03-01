@@ -115,12 +115,12 @@ end
 --Convert old config to new one
 function ECF:convert()
 	for key,v in pairs(config.blackWordList) do
-		if(type(v) == "number") then -- remove next release
+		if(type(v) == "number") then -- remove in next release
 			config.blackWordList[key] = {
-				regex = bit.band(v,1),
-				lesser = bit.band(v,2),
+				regex = band(v,1) ~= 0,
+				lesser = band(v,2) ~= 0,
 			}
-		elseif(type(v) ~= "table") then 
+		elseif(type(v) ~= "table") then
 			config.blackWordList[key] = {
 				regex = v == "regex",
 				lesser = false,
@@ -196,10 +196,10 @@ for i=0, 4 do
 end
 
 function ECF:AddBlackWord(word, r, l)
-	if (checkBlacklist(value, r)) then
-		ECF:Printf(L["IncludeAutofilteredWord"],value)
+	if (checkBlacklist(word, r)) then
+		ECF:Printf(L["IncludeAutofilteredWord"],word)
 	else
-		config.blackWordList[value] = {regex = r, lesser = l,}
+		config.blackWordList[word] = {regex = r, lesser = l,}
 	end
 end
 
