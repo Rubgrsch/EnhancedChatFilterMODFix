@@ -27,16 +27,16 @@ local gsub, select, ipairs, pairs, next, strsub, format, tonumber, strmatch, tco
 local Ambiguate, band, BNGetNumFriends, BNGetNumFriendGameAccounts, BNGetFriendGameAccountInfo, ChatTypeInfo, GetCurrencyLink, GetFriendInfo, GetGuildInfo, GetItemInfo, GetNumFriends, GetPlayerInfoByGUID, GetTime = Ambiguate, bit.band, BNGetNumFriends, BNGetNumFriendGameAccounts, BNGetFriendGameAccountInfo, ChatTypeInfo, GetCurrencyLink, GetFriendInfo, GetGuildInfo, GetItemInfo, GetNumFriends, GetPlayerInfoByGUID, GetTime -- BLZ
 
 local ECF = LibStub("AceAddon-3.0"):NewAddon("EnhancedChatFilter", "AceConsole-3.0")
-local version = GetAddOnMetadata("EnhancedChatFilter", "Version")
-local versionParent = strmatch(version,"^([%d%.%-]+)")
-local versionType = strmatch(version,"([ab])%d*$") or "r"
+local version = GetAddOnMetadata("EnhancedChatFilter", "Version") -- "7.1.5-2b"
+local versionParent = strmatch(version,"^([%d%.%-]+)") -- "7.1.5-2"
+local versionType = strmatch(version,"([ab])%d*$") or "r" -- "b"
 local versionMsg = {}
-versionMsg["7.1.5-3"] = "添加了次级关键词功能，欢迎测试./."
+versionMsg["7.1.5-3"] = "添加了次级关键词功能，欢迎测试./." -- Use actual number in case I forgot to change msg when release
 
 --Bit Mask for blackword type
 local regexBit, lesserBit = 1, 2
 
-function ECF:MaskType(...)
+function ECF:MaskType(...) -- ... are boolean
 	local ty = 0
 	for idx, v in ipairs({...}) do
 		if(v) then ty = ty + 2^(idx-1) end
@@ -44,7 +44,7 @@ function ECF:MaskType(...)
 	return ty
 end
 
-function ECF:UnMaskType(ty) -- return true/false
+function ECF:UnMaskType(ty) -- return boolean
 	return band(ty,regexBit) ~= 0, band(ty,lesserBit) ~= 0
 end
 
@@ -660,6 +660,7 @@ local function ECFfilter(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID)
 		filterResult = false
 	end
 
+	local Event = chatChannel[event]
 	local trimmedPlayer = Ambiguate(player, "none")
 	-- don't filter player or his friends/BNfriends
 	if UnitIsUnit(trimmedPlayer,"player") or friends[trimmedPlayer] then return end
@@ -675,7 +676,7 @@ local function ECFfilter(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID)
 	filterString = filterString:upper():gsub("|C[0-9A-F]+",""):gsub("|H[^|]+|H",""):gsub("|H|R",""):gsub("{RT%d}",""):gsub("%s", ""):gsub(filterCharList, "")
 	local newfilterString = filterString:gsub(filterCharListRegex, "")
 
-	if(config.enableWisper and chatChannel[event] == 1) then --Whisper Whitelist Mode, only whisper
+	if(config.enableWisper and Event == 1) then --Whisper Whitelist Mode, only whisper
 		--Don't filter players that are from same guild/raid/party or who you have whispered
 		if not(allowWisper[trimmedPlayer] or (GetGuildInfo("player") == GetGuildInfo(trimmedPlayer)) or UnitInRaid(trimmedPlayer) or UnitInParty(trimmedPlayer)) then
 			if config.debugMode then print("Trigger: WhiteListMode") end
@@ -684,13 +685,13 @@ local function ECFfilter(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID)
 		end
 	end
 
-	if(config.enableDND and ((chatChannel[event] <= 3 and type(flags) == "string" and flags == "DND") or chatChannel[event] == 101)) then -- DND, whisper/yell/say/channel and auto-reply
+	if(config.enableDND and ((Event <= 3 and type(flags) == "string" and flags == "DND") or Event == 101)) then -- DND, whisper/yell/say/channel and auto-reply
 		if config.debugMode then print("Trigger: DND Filter") end
 		filterResult = true
 		return true
 	end
 
-	if(chatChannel[event] <= (config.blackWordFilterGroup and 4 or 3)) then --blackWord Filter, whisper/yell/say/channel and party/raid(optional)
+	if(Event <= (config.blackWordFilterGroup and 4 or 3)) then --blackWord Filter, whisper/yell/say/channel and party/raid(optional)
 		local count = 0
 		for keyWord,v in pairs(config.blackWordList) do
 			local currentString
@@ -717,7 +718,7 @@ local function ECFfilter(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID)
 		end
 	end
 
-	if (config.enableRAF and (chatChannel[event] <= 2 or chatChannel[event] == 4)) then -- raid
+	if (config.enableRAF and (Event <= 2 or Event == 4)) then -- raid
 		for _,RaidAlertTag in ipairs(RaidAlertTagList) do
 			if(strfind(msg,RaidAlertTag)) then
 				if config.debugMode then print("Trigger: "..RaidAlertTag.." in RaidAlertTag") end
@@ -727,7 +728,7 @@ local function ECFfilter(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID)
 		end
 	end
 
-	if (config.enableQRF and (chatChannel[event] <= 2 or chatChannel[event] == 4)) then -- quest/party
+	if (config.enableQRF and (Event <= 2 or Event == 4)) then -- quest/party
 		for _,QuestReportTag in ipairs(QuestReportTagList) do
 			if(strfind(msg,QuestReportTag)) then
 				if config.debugMode then print("Trigger: "..QuestReportTag.." in QuestReportTag") end
@@ -737,7 +738,7 @@ local function ECFfilter(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID)
 		end
 	end
 
-	if(config.chatLinesLimit > 0 and chatChannel[event] <= (config.repeatFilterGroup and 4 or 3)) then --Repeat Filter
+	if(config.chatLinesLimit > 0 and Event <= (config.repeatFilterGroup and 4 or 3)) then --Repeat Filter
 		local msgLine = newfilterString
 		if(msgLine == "") then msgLine = msg end --If it has only symbols, don't change it
 

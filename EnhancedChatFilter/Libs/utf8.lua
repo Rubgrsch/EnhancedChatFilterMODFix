@@ -3,16 +3,11 @@ utf8replace from @Phanx @Pastamancer
 --]]
 
 local strbyte, strlen, strsub, tinsert = strbyte, strlen, strsub, tinsert
+
 -- returns the number of bytes used by the UTF-8 character at byte i in s
--- also doubles as a UTF-8 character validator
-
 local function utf8charbytes(s, i)
-	-- argument defaults
-	i = i or 1
-
-	local c = strbyte(s, i)
+	local c = strbyte(s, i or 1)
 	-- determine bytes needed for character, based on RFC 3629
-	-- validate byte 1
 	if c > 0 and c <= 127 then
 		-- UTF8-1
 		return 1
