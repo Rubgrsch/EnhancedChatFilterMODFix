@@ -59,6 +59,7 @@ local defaults = {
 		enableQRF = false, -- Quest/Group Report Filter
 		enableDSS = true, -- Spec spell Filter
 		enableMSF = false, -- Monster Say Filter
+		enableAggressive = false, -- Aggressive Filter
 		chatLinesLimit = 20, -- also enable repeatFilter
 		stringDifferenceLimit = 0.1, -- in repeatFilter
 		multiLine = false, -- MultiLines, in RepeatFilter
@@ -336,11 +337,18 @@ local options = {
 					order = 31,
 					hidden = function() return not config.advancedConfig end,
 				},
+				enableAggressive = {
+					type = "toggle",
+					name = L["Aggressive"],
+					desc = L["AggressiveTooltip"],
+					order = 32,
+					hidden = function() return not config.advancedConfig end,
+				},
 				debugMode = {
 					type = "toggle",
 					name = "DebugMode",
 					desc = "For test only",
-					order = 32,
+					order = 33,
 					hidden = function() return not config.advancedConfig end,
 				},
 			},
@@ -670,11 +678,17 @@ local function ECFfilter(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID)
 
 	if config.debugMode then print(format("RAWMsg: %s: %s",trimmedPlayer,msg)) end
 
+	local totNum1,totNum2
 	-- remove utf-8 chars
 	local filterString = utf8replace(msg, UTF8Symbols)
 	-- remove color/hypelink/raidicon/space/symbols
-	filterString = filterString:upper():gsub("|C[0-9A-F]+",""):gsub("|H[^|]+|H",""):gsub("|H|R",""):gsub("{RT%d}",""):gsub("%s", ""):gsub(filterCharList, "")
+	filterString = filterString:upper():gsub("|C[0-9A-F]+",""):gsub("|H[^|]+|H",""):gsub("|H|R",""):gsub("{RT%d}",""):gsub("%s", "")
+	totNum1 = #filterString
+	filterString = filterString:gsub(filterCharList, "")
 	local newfilterString = filterString:gsub(filterCharListRegex, "")
+	totNum2 = #newfilterString
+
+	local annoying = (totNum1-totNum2)/totNum1
 
 	if(config.enableWisper and Event == 1) then --Whisper Whitelist Mode, only whisper
 		--Don't filter players that are from same guild/raid/party or who you have whispered
@@ -692,6 +706,11 @@ local function ECFfilter(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID)
 	end
 
 	if(Event <= (config.blackWordFilterGroup and 4 or 3)) then --blackWord Filter, whisper/yell/say/channel and party/raid(optional)
+		if (config.enableAggressive and annoying >= 0.2 and annoying <= 0.5 and totNum1 >= 20) then
+			if config.debugMode then print("Trigger: Annoying: "..annoying) end
+			filterResult = true
+			return true
+		end
 		local count = 0
 		for keyWord,v in pairs(config.blackWordList) do
 			local currentString
