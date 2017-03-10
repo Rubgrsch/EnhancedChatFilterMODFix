@@ -705,12 +705,15 @@ local function ECFfilter(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID)
 		return true
 	end
 
-	if(Event <= (config.blackWordFilterGroup and 4 or 3)) then --blackWord Filter, whisper/yell/say/channel and party/raid(optional)
+	if(Event <= 3) then
 		if (config.enableAggressive and annoying >= 0.2 and annoying <= 0.5 and totNum1 >= 20) then
 			if config.debugMode then print("Trigger: Annoying: "..annoying) end
 			filterResult = true
 			return true
 		end
+	end
+
+	if(Event <= (config.blackWordFilterGroup and 4 or 3)) then --blackWord Filter, whisper/yell/say/channel and party/raid(optional)
 		local count = 0
 		for keyWord,v in pairs(config.blackWordList) do
 			local currentString
