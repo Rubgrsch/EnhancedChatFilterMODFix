@@ -42,7 +42,7 @@ if (GetLocale() == "zhCN") then
 	L["WhisperWhitelistMode"] = "密语白名单模式"
 	L["WhisperWhitelistModeTooltip"] = "除了工会、团队、小队、好友发送的密语外，只允许你发送过密语的对方才能对你发起密语|n|cffE2252D慎用！"
 	L["Aggressive"] = "额外过滤器"
-	L["AggressiveTooltip"] = "一些懒得起名字的过滤器集合。容易误伤所以默认不开启。|n|cffE2252D慎用！"
+	L["AggressiveTooltip"] = "一些会极大提高过滤效果和误伤机率的过滤器集合，默认不开启。"
 --BlackwordList
 	L["BlackwordList"] = "黑名单关键词"
 	L["AddBlackWordTitle"] = "添加新黑名单关键词"
@@ -129,7 +129,7 @@ elseif (GetLocale() == "zhTW") then
 	L["WhisperWhitelistMode"] = "密語白名單模式"
 	L["WhisperWhitelistModeTooltip"] = "除了工会、团队、小队、好友发送的密语外，只允许你发送过密语的对方才能对你发起密语|n|cffE2252D慎用！"
 	L["Aggressive"] = "额外过滤器"
-	L["AggressiveTooltip"] = "一些懒得起名字的过滤器集合。容易误伤所以默认不开启。|n|cffE2252D慎用！"
+	L["AggressiveTooltip"] = "一些会极大提高过滤效果和误伤机率的过滤器集合，默认不开启。"
 --BlackwordList
 	L["BlackwordList"] = "黑名单關鍵詞"
 	L["AddBlackWordTitle"] = "添加新黑名單關鍵詞"
@@ -215,7 +215,7 @@ else
 	L["WhisperWhitelistMode"] = "Whisper Whitelist Mode"
 	L["WhisperWhitelistModeTooltip"] = "Filter all whisper unless it's from guild/group/raid/friends or you have just whisper them|n|cffE2252DUse with care!"
 	L["Aggressive"] = "Aggressive Filters"
-	L["AggressiveTooltip"] = "Some Aggressive Filters. |cffE2252DUse with care"
+	L["AggressiveTooltip"] = "Some aggressive but effective Filters. Disable by default."
 --BlackwordList
 	L["BlackwordList"] = "BlackWordList"
 	L["AddBlackWordTitle"] = "Add Blackword"
