@@ -678,17 +678,15 @@ local function ECFfilter(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID)
 
 	if config.debugMode then print(format("RAWMsg: %s: %s",trimmedPlayer,msg)) end
 
-	local totNum1,totNum2
-	-- remove utf-8 chars
-	local filterString = utf8replace(msg, UTF8Symbols)
+	local totNum1, totNum2, annoying
 	-- remove color/hypelink/raidicon/space/symbols
-	filterString = filterString:upper():gsub("|C[0-9A-F]+",""):gsub("|H[^|]+|H",""):gsub("|H|R",""):gsub("{RT%d}",""):gsub("%s", "")
+	local filterString = msg:upper():gsub("|C[0-9A-F]+",""):gsub("|H[^|]+|H",""):gsub("|H|R","")
 	totNum1 = #filterString
-	filterString = filterString:gsub(filterCharList, "")
+	-- remove utf-8 chars
+	filterString = utf8replace(filterString, UTF8Symbols):gsub("{RT%d}",""):gsub("%s", ""):gsub(filterCharList, "")
 	local newfilterString = filterString:gsub(filterCharListRegex, "")
 	totNum2 = #newfilterString
-
-	local annoying = (totNum1-totNum2)/totNum1
+	annoying = (totNum1-totNum2)/totNum1
 
 	if(config.enableWisper and Event == 1) then --Whisper Whitelist Mode, only whisper
 		--Don't filter players that are from same guild/raid/party or who you have whispered
