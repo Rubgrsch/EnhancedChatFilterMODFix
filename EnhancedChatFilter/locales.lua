@@ -84,8 +84,6 @@ if (GetLocale() == "zhCN") then
 --AchievementFilter
 	L["GotAchievement"] = "[%s]获得了成就%s！"
 	L["And"] = "、"
---Version
-	L["ThisIsATestVersion"] = "您更新到一个测试版本。"
 
 -----------------------------------------------------------------------
 -- zhTW -- NEED HELP
@@ -171,9 +169,6 @@ elseif (GetLocale() == "zhTW") then
 --AchievementFilter
 	L["GotAchievement"] = "[%s]獲得了成就%s！"
 	L["And"] = "、"
---Version
-	L["ThisIsATestVersion"] = "您更新到一个测试版本。"
-
 -----------------------------------------------------------------------
 -- Default -- NEED HELP
 -----------------------------------------------------------------------
@@ -257,8 +252,6 @@ else
 --AchievementFilter
 	L["GotAchievement"] = "[%s]have earned the achievement%s!"
 	L["And"] = ", "
---Version
-	L["ThisIsATestVersion"] = "You have updated to a test version. "
 end
 
 ecf.L = L

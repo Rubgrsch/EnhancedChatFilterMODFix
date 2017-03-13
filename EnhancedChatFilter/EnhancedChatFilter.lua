@@ -27,11 +27,6 @@ local gsub, select, ipairs, pairs, next, strsub, format, tonumber, strmatch, tco
 local Ambiguate, band, BNGetNumFriends, BNGetNumFriendGameAccounts, BNGetFriendGameAccountInfo, ChatTypeInfo, GetCurrencyLink, GetFriendInfo, GetGuildInfo, GetItemInfo, GetNumFriends, GetPlayerInfoByGUID, GetTime = Ambiguate, bit.band, BNGetNumFriends, BNGetNumFriendGameAccounts, BNGetFriendGameAccountInfo, ChatTypeInfo, GetCurrencyLink, GetFriendInfo, GetGuildInfo, GetItemInfo, GetNumFriends, GetPlayerInfoByGUID, GetTime -- BLZ
 
 local ECF = LibStub("AceAddon-3.0"):NewAddon("EnhancedChatFilter", "AceConsole-3.0")
-local version = GetAddOnMetadata("EnhancedChatFilter", "Version") -- "7.1.5-2b"
-local versionParent = strmatch(version,"^([%d%.%-]+)") -- "7.1.5-2"
-local versionType = strmatch(version,"([ab])%d*$") or "r" -- "b"
-local versionMsg = {}
-versionMsg["7.1.5-3"] = "添加了次级关键词功能，欢迎测试./." -- Use actual number in case I forgot to change msg when release
 
 --Bit Mask for blackword type
 local regexBit, lesserBit = 1, 2
@@ -78,7 +73,6 @@ local defaults = {
 		},
 		advancedConfig = false, -- show advancedConfig
 		debugMode = false,
-		lastVersion = "",
 	}
 }
 
@@ -116,12 +110,7 @@ end
 --Convert old config to new one
 function ECF:convert()
 	for key,v in pairs(config.blackWordList) do
-		if(type(v) == "number") then -- remove in next release
-			config.blackWordList[key] = {
-				regex = band(v,1) ~= 0,
-				lesser = band(v,2) ~= 0,
-			}
-		elseif(type(v) ~= "table") then
+		if(type(v) ~= "table") then
 			config.blackWordList[key] = {
 				regex = v == "regex",
 				lesser = false,
@@ -133,17 +122,6 @@ function ECF:convert()
 			if key ~= key2 and strfind(key,key2) then config.blackWordList[key] = nil;break end
 		end
 		if(checkBlacklist(key,v.regex)) then config.blackWordList[key] = nil end
-	end
-end
-
-function ECF:VersionMsg()
-	if config.lastVersion ~= versionParent then
-		config.lastVersion = versionParent
-		local msg = versionMsg[versionParent]
-		if msg and msg ~= "" then
-			if (versionType ~= "r") then msg = L["ThisIsATestVersion"]..msg end
-			ECF:Print(msg)
-		end
 	end
 end
 
@@ -169,7 +147,6 @@ function ECF:OnInitialize()
 	icon:Register("Enhanced Chat Filter", ecfLDB, config.minimap)
 	ECF:convert()
 	ShowFriends()
-	ECF:VersionMsg()
 end
 
 --------------- Slash Command ---------------
@@ -206,7 +183,7 @@ end
 
 local options = {
 	type = "group",
-	name = "EnhancedChatFilter "..version,
+	name = "EnhancedChatFilter "..GetAddOnMetadata("EnhancedChatFilter", "Version"),
 	get = function(info) return config[info[#info]] end,
 	set = function(info, value) config[info[#info]] = value end,
 	disabled = function() return not config.enableFilter end,
