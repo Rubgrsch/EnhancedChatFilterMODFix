@@ -405,7 +405,7 @@ local options = {
 						for _, blacklist in ipairs(newBlackList) do
 							if (blacklist ~= nil) then
 								local imNewWord, imTypeWord = strsplit(",",blacklist)
-								ECF:AddBlackWord(imNewWord, ECF:UnMaskType(imTypeWord))
+								if imTypeWord then ECF:AddBlackWord(imNewWord, ECF:UnMaskType(imTypeWord)) end
 							end
 						end
 						stringIO = ""
