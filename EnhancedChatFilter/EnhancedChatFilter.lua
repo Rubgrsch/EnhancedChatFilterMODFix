@@ -355,6 +355,7 @@ local options = {
 					name = L["LesserBlackWord"],
 					desc = L["LesserBlackWordTooltip"],
 					order = 3,
+					hidden = function() return not config.advancedConfig end,
 				},
 				line1 = {
 					type = "header",
@@ -375,6 +376,7 @@ local options = {
 					min = 2,
 					max = 5,
 					step = 1,
+					hidden = function() return not config.advancedConfig end,
 				},
 				line2 = {
 					type = "header",
@@ -387,7 +389,7 @@ local options = {
 					order = 21,
 					get = function() return stringIO end,
 					set = function(_,value) stringIO = value end,
-					width = "double",
+					width = "full",
 				},
 				import = {
 					type = "execute",
