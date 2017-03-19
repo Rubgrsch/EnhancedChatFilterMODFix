@@ -685,7 +685,7 @@ local function ECFfilter(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID)
 	end
 
 	if(Event <= 3) then --AggressiveFilter
-		if (config.enableAggressive and annoying >= 0.22 and annoying <= 0.5 and totNum1 >= 30) then
+		if (config.enableAggressive and annoying >= 0.25 and annoying <= 0.8 and totNum1 >= 30) then
 			if config.debugMode then print("Trigger: Annoying: "..annoying) end
 			filterResult = true
 			return true
