@@ -60,8 +60,6 @@ local defaults = {
 		multiLine = false, -- MultiLines, in RepeatFilter
 		repeatFilterGroup = true, -- repeatFilter enabled in group and raid
 		blackWordList = {},
-		regexToggle = false,
-		lesserToggle = false,
 		lesserBlackWordThreshold = 3, -- in lesserBlackWord
 		blackWordFilterGroup = false, -- blackWord enabled in group and raid
 		lootType = "ITEMS", -- loot filter type
@@ -167,6 +165,7 @@ end
 local highlightIsLesser, blackWordHighlight = false, ""
 local lootHighlight = {}
 local stringIO = "" -- blackWord input
+local regexToggle, lesserToggle = false, false
 
 local colorT = {} -- used in lootFilter
 for i=0, 4 do
@@ -340,7 +339,7 @@ local options = {
 					order = 1,
 					get = nil,
 					set = function(_,value)
-						ECF:AddBlackWord(value, config.regexToggle, config.lesserToggle)
+						ECF:AddBlackWord(value, regexToggle, lesserToggle)
 					end,
 					width = "full",
 				},
@@ -348,12 +347,16 @@ local options = {
 					type = "toggle",
 					name = L["Regex"],
 					desc = L["RegexTooltip"],
+					get = function() return regexToggle end,
+					set = function(_,value) regexToggle = value end,
 					order = 2,
 				},
 				lesserToggle = {
 					type = "toggle",
 					name = L["LesserBlackWord"],
 					desc = L["LesserBlackWordTooltip"],
+					get = function() return lesserToggle end,
+					set = function(_,value) lesserToggle = value end,
 					order = 3,
 					hidden = function() return not config.advancedConfig end,
 				},
