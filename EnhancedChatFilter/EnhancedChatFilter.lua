@@ -96,10 +96,10 @@ end
 local function StringHash(text)
 	local counter, len = 1, #text
 	for i = 1, len, 3 do
-	counter = fmod(counter*8161, 4294967279) +  -- 2^32 - 17: Prime!
-		(strbyte(text,i)*16776193) +
-		((strbyte(text,i+1) or (len-i+256))*8372226) +
-		((strbyte(text,i+2) or (len-i+256))*3932164)
+		counter = fmod(counter*8161, 4294967279) +  -- 2^32 - 17: Prime!
+			(strbyte(text,i)*16776193) +
+			((strbyte(text,i+1) or (len-i+256))*8372226) +
+			((strbyte(text,i+2) or (len-i+256))*3932164)
 	end
 	return fmod(counter, 4294967291) -- 2^32 - 5: Prime (and different from the prime in the loop)
 end
@@ -575,7 +575,7 @@ LibStub("AceConfigDialog-3.0"):AddToBlizOptions("EnhancedChatFilter", "EnhancedC
 if GetCVar("profanityFilter")~="0" then SetCVar("profanityFilter", "0") end
 
 -------------------------------------- Filters ------------------------------------
---Update allowWisper list whenever login/friendlist updates
+--Update friends whenever login/friendlist updates
 local friends, allowWisper = {}, {}
 local friendFrame = CreateFrame("Frame")
 friendFrame:RegisterEvent("FRIENDLIST_UPDATE")
@@ -584,8 +584,8 @@ friendFrame:SetScript("OnEvent", function(self)
 	friends = {}
 	--Add WoW friends
 	for i = 1, GetNumFriends() do
-		local n = GetFriendInfo(i)
-		if n then friends[Ambiguate(n, "none")] = true end
+		local name = GetFriendInfo(i)
+		if name then friends[Ambiguate(name, "none")] = true end
 	end
 	--And battlenet friends
 	for i = 1, select(2, BNGetNumFriends()) do
@@ -604,18 +604,18 @@ ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER_INFORM", addToAllowWisper)
 
 --stringDifference for repeatFilter, ranged from 0 to 1, while 0 is absolutely the same
 --This function is not utf8 awared, currently not nessesary
-local function stringDifference(sA, sB)
+local function stringDifference(sA, sB) -- arrays of byte
 	local len_a, len_b = #sA, #sB
-	local templast, temp = {}, {}
-	for j=0, len_b do templast[j+1] = j end
+	local last, this = {}, {}
+	for j=0, len_b do last[j+1] = j end
 	for i=1, len_a do
-		temp[1] = i
+		this[1] = i
 		for j=1, len_b do
-			temp[j+1] = (sA[i] == sB[j]) and templast[j] or (min(templast[j+1], temp[j], templast[j]) + 1)
+			this[j+1] = (sA[i] == sB[j]) and last[j] or (min(last[j+1], this[j], last[j]) + 1)
 		end
-		for j=0, len_b do templast[j+1]=temp[j+1] end
+		for j=0, len_b do last[j+1]=this[j+1] end
 	end
-	return temp[len_b+1]/max(len_a,len_b)
+	return this[len_b+1]/max(len_a,len_b)
 end
 
 local chatLines = {}
@@ -645,15 +645,13 @@ local function ECFfilter(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID)
 
 	if config.debugMode then print(format("RAWMsg: %s: %s",trimmedPlayer,msg)) end
 
-	local totNum1, totNum2, annoying
-	-- remove color/hypelink/raidicon/space/symbols
+	-- remove color/hypelink
 	local filterString = msg:upper():gsub("|C[0-9A-F]+",""):gsub("|H[^|]+|H",""):gsub("|H|R","")
-	totNum1 = #filterString
-	-- remove utf-8 chars
+	local oriLen = #filterString
+	-- remove utf-8 chars/raidicon/space/symbols
 	filterString = utf8replace(filterString, UTF8Symbols):gsub("{RT%d}",""):gsub("%s", ""):gsub(filterCharList, "")
 	local newfilterString = filterString:gsub(filterCharListRegex, "")
-	totNum2 = #newfilterString
-	annoying = (totNum1-totNum2)/totNum1
+	local annoying = (oriLen - #newfilterString) / oriLen
 
 	if(config.enableWisper and Event == 1) then --Whisper Whitelist Mode, only whisper
 		--Don't filter players that are from same guild/raid/party or who you have whispered
@@ -671,7 +669,7 @@ local function ECFfilter(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID)
 	end
 
 	if(Event <= 3) then --AggressiveFilter
-		if (config.enableAggressive and annoying >= 0.25 and annoying <= 0.8 and totNum1 >= 30) then
+		if (config.enableAggressive and annoying >= 0.25 and annoying <= 0.8 and oriLen >= 30) then -- Annoying
 			if config.debugMode then print("Trigger: Annoying: "..annoying) end
 			filterResult = true
 			return true
@@ -680,9 +678,9 @@ local function ECFfilter(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID)
 
 	if(Event <= (config.blackWordFilterGroup and 4 or 3)) then --blackWord Filter, whisper/yell/say/channel and party/raid(optional)
 		local count = 0
-		for keyWord,v in pairs(config.blackWordList) do
+		for keyWord,ty in pairs(config.blackWordList) do
 			local currentString
-			if (not v.regex) then -- if it is not regex, filter most symbols
+			if (not ty.regex) then -- if it is not regex, filter most symbols
 				keyWord = keyWord:upper()
 				currentString = newfilterString
 			else
@@ -690,7 +688,7 @@ local function ECFfilter(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID)
 			end
 			--Check blackList
 			if (strfind(currentString,keyWord)) then
-				if (v.lesser) then count = count + 1
+				if (ty.lesser) then count = count + 1
 				else
 					if config.debugMode then print("Trigger: Keyword: "..keyWord) end
 					filterResult = true
@@ -836,7 +834,7 @@ local function achievementFilter(self, event, msg, _, _, _, _, _, _, _, _, _, _,
 	if (not achievementID) then return end
 	achievementID = tonumber(achievementID)
 	local _,class,_,_,_,name,server = GetPlayerInfoByGUID(guid)
-	if (not name) then return end -- GetPlayerInfoByGUID sometimes returns nil for valid guid
+	if (not name) then return end -- check nil
 	if (server ~= "" and server ~= GetRealmName()) then name = name.."-"..server end
 	if config.debugMode then print(format("Achievement: event:%s, name:%s, class:%s",event,name,class)) end
 	achievements[achievementID] = achievements[achievementID] or {timeout = GetTime() + 0.5}
@@ -852,7 +850,7 @@ ChatFrame_AddMessageEventFilter("CHAT_MSG_GUILD_ACHIEVEMENT", achievementFilter)
 local function lootitemfilter(self,_,msg)
 	if (not config.enableFilter) then return end
 	local itemID = tonumber(strmatch(msg, "|Hitem:(%d+)"))
-	if(not itemID) then return end
+	if(not itemID) then return end -- pet cages don't have 'item'
 	if(config.lootItemFilterList[itemID]) then return true end
 	if(select(3,GetItemInfo(itemID)) < config.lootQualityMin) then return true end -- ItemQuality is in ascending order
 end
