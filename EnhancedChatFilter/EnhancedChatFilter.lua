@@ -56,7 +56,6 @@ local defaults = {
 		enableMSF = false, -- Monster Say Filter
 		enableAggressive = false, -- Aggressive Filter
 		chatLinesLimit = 20, -- also enable repeatFilter
-		stringDifferenceLimit = 0.1, -- in repeatFilter
 		multiLine = false, -- MultiLines, in RepeatFilter
 		repeatFilterGroup = true, -- repeatFilter enabled in group and raid
 		blackWordList = {},
@@ -271,31 +270,18 @@ local options = {
 					step = 1,
 					bigStep = 5,
 				},
-				stringDifferenceLimit = {
-					type = "range",
-					name = L["stringDifferenceLimit"],
-					desc = L["stringDifferenceLimitTooltips"],
-					order = 42,
-					min = 0,
-					max = 1,
-					step = 0.01,
-					bigStep = 0.1,
-					isPercent = true,
-					disabled = function() return config.chatLinesLimit == 0 end,
-					hidden = function() return not config.advancedConfig end,
-				},
 				multiLine = {
 					type = "toggle",
 					name = L["MultiLines"],
 					desc = L["MultiLinesTooltip"],
-					order = 43,
+					order = 42,
 					disabled = function() return config.chatLinesLimit == 0 end,
 				},
 				repeatFilterGroup = {
 					type = "toggle",
 					name = L["AlsoFilterGroup"],
 					desc = L["AlsoFilterGroupTooltips"],
-					order = 44,
+					order = 43,
 					disabled = function() return config.chatLinesLimit == 0 end,
 				},
 				line3 = {
@@ -751,7 +737,7 @@ local function ECFfilter(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID)
 		for i=1, chatLinesSize do
 			--if there is not much difference between msgs, filter it
 			--(optional) if someone sends msgs within 0.6s, filter it
-			if (chatLines[i].Sender == msgtable.Sender and ((config.multiLine and (msgtable.Time - chatLines[i].Time) < 0.600) or stringDifference(chatLines[i].Msg,msgtable.Msg) <= config.stringDifferenceLimit)) then
+			if (chatLines[i].Sender == msgtable.Sender and ((config.multiLine and (msgtable.Time - chatLines[i].Time) < 0.600) or stringDifference(chatLines[i].Msg,msgtable.Msg) <= 0.1)) then
 				tremove(chatLines, i)
 				if config.debugMode then print("Trigger: Repeat Filter") end
 				filterResult = true
