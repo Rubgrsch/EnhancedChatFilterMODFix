@@ -2,7 +2,7 @@
 utf8replace from @Phanx @Pastamancer
 --]]
 
-local strbyte, strlen, strsub, tinsert = strbyte, strlen, strsub, tinsert
+local strbyte, strsub, tconcat = strbyte, strsub, table.concat
 
 -- returns the number of bytes used by the UTF-8 character at byte i in s
 local function utf8charbytes(s, i)
@@ -27,16 +27,14 @@ end
 local _, ecf = ...
 ecf.utf8replace = function(s, mapping)
 	local pos = 1
-	local newstrtable = {}
+	local t = {}
 
-	while pos <= strlen(s) do
+	while pos <= #s do
 		local charbytes = utf8charbytes(s, pos)
 		local c = strsub(s, pos, pos + charbytes - 1)
-
-		tinsert(newstrtable, (mapping[c] or c))
-
+		t[#t+1] = (mapping[c] or c)
 		pos = pos + charbytes
 	end
 
-	return table.concat(newstrtable)
+	return tconcat(t)
 end
