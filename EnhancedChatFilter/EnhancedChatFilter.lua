@@ -836,7 +836,6 @@ local function achievementFilter(self, event, msg, _, _, _, _, _, _, _, _, _, _,
 	local _,class,_,_,_,name,server = GetPlayerInfoByGUID(guid)
 	if (not name) then return end -- check nil
 	if (server ~= "" and server ~= GetRealmName()) then name = name.."-"..server end
-	if config.debugMode then print(format("Achievement: event:%s, name:%s, class:%s",event,name,class)) end
 	achievements[achievementID] = achievements[achievementID] or {timeout = GetTime() + 0.5}
 	achievements[achievementID][event] = achievements[achievementID][event] or {}
 	achievements[achievementID][event][name] = class
