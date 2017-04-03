@@ -501,7 +501,7 @@ local options = {
 					type = "select",
 					name = _G["TYPE"],
 					order = 2,
-					values = {["ITEMS"] = ITEMS, ["CURRENCY"] = CURRENCY},
+					values = {["ITEMS"] = _G["ITEMS"], ["CURRENCY"] = _G["CURRENCY"]},
 				},
 				DeleteButton = {
 					type = "execute",
@@ -847,18 +847,18 @@ ChatFrame_AddMessageEventFilter("CHAT_MSG_ACHIEVEMENT", achievementFilter)
 ChatFrame_AddMessageEventFilter("CHAT_MSG_GUILD_ACHIEVEMENT", achievementFilter)
 
 -- LootFilter
-local function lootitemfilter(self,_,msg)
+local function lootItemFilter(self,_,msg)
 	if (not config.enableFilter) then return end
 	local itemID = tonumber(strmatch(msg, "|Hitem:(%d+)"))
 	if(not itemID) then return end -- pet cages don't have 'item'
 	if(config.lootItemFilterList[itemID]) then return true end
 	if(select(3,GetItemInfo(itemID)) < config.lootQualityMin) then return true end -- ItemQuality is in ascending order
 end
-ChatFrame_AddMessageEventFilter("CHAT_MSG_LOOT", lootitemfilter)
+ChatFrame_AddMessageEventFilter("CHAT_MSG_LOOT", lootItemFilter)
 
-local function lootcurrecyfilter(self,_,msg)
+local function lootCurrecyFilter(self,_,msg)
 	if (not config.enableFilter) then return end
 	local currencyID = tonumber(strmatch(msg, "|Hcurrency:(%d+)"))
 	if(config.lootCurrencyFilterList[currencyID]) then return true end
 end
-ChatFrame_AddMessageEventFilter("CHAT_MSG_CURRENCY", lootcurrecyfilter)
+ChatFrame_AddMessageEventFilter("CHAT_MSG_CURRENCY", lootCurrecyFilter)
