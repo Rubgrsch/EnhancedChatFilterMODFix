@@ -555,17 +555,6 @@ local options = {
 				},
 			},
 		},
-		FAQTab = {
-			type = "group",
-			name = L["FAQ"],
-			order = 6,
-			args = {
-				FAQText = {
-					type = "description",
-					name = L["FAQText"],
-				},
-			},
-		},
 	},
 }
 LibStub("AceConfigRegistry-3.0"):RegisterOptionsTable("EnhancedChatFilter", options)

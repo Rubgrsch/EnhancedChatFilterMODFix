@@ -65,20 +65,6 @@ if (GetLocale() == "zhCN") then
 	L["LootFilterList"] = "拾取屏蔽列表"
 	L["LootQualityFilter"] = "拾取物品质量"
 	L["LootQualityFilterTooltips"] = "显示拾取物品所需要的最低质量，低于此质量的物品将被过滤"
---FAQ
-	L["FAQ"] = "FAQ"
-	L["FAQText"] = [[这里列出常见的几个问题
-
-1. 如何共享不同账号下的关键词列表和开关设置
-    同一账户(如wow1)下的不同角色共享设置，不同账户的无法直接共享。
-    你可以用字符串导入导出的方法复制关键词列表，然后人工进行设置。或者手动复制设置/设置硬链接。
-
-2. 为何我添加关键词时总是会有"包含会被自动过滤的字符，将忽略该关键词！"这一错误？
-    不要加入标点符号，这些字符会被自动忽略，只需要添加那些汉字。
-
-3. 正则是什么？
-    不知道的请不要用。不知道的请不要用。不知道的请不要用。
-    如果你想学习请自行百度/谷歌。]]
 --AchievementFilter
 	L["GotAchievement"] = "[%s]获得了成就%s！"
 	L["And"] = "、"
@@ -148,20 +134,6 @@ elseif (GetLocale() == "zhTW") then
 	L["LootFilterList"] = "拾取屏蔽列表"
 	L["LootQualityFilter"] = "拾取物品质量"
 	L["LootQualityFilterTooltips"] = "显示拾取物品所需要的最低质量，低于此质量的物品将被过滤"
---FAQ
-	L["FAQ"] = "FAQ"
-	L["FAQText"] = [[这里列出常见的几个问题
-
-1. 如何共享不同账号下的关键词列表和开关设置
-    同一账户(如wow1)下的不同角色共享设置，不同账户的无法直接共享。
-    你可以用字符串导入导出的方法复制关键词列表，然后人工进行设置。或者手动复制设置/设置硬链接。
-
-2. 为何我添加关键词时总是会有"包含会被自动过滤的字符，将忽略该关键词！"这一错误？
-    不要加入标点符号，这些字符会被自动忽略，只需要添加那些汉字。
-
-3. 正则是什么？
-    不知道的请不要用。不知道的请不要用。不知道的请不要用。
-    如果你想学习请自行百度/谷歌。]]
 --AchievementFilter
 	L["GotAchievement"] = "[%s]獲得了成就%s！"
 	L["And"] = "、"
@@ -229,20 +201,6 @@ else
 	L["LootFilterList"] = "LootFilterList"
 	L["LootQualityFilter"] = "LootItemQuality"
 	L["LootQualityFilterTooltips"] = "Filter any loot that is poorer than you choose"
---FAQ
-	L["FAQ"] = "FAQ"
-	L["FAQText"] = [[这里列出常见的几个问题
-
-1. 如何共享不同账号下的关键词列表和开关设置
-    同一账户(如wow1)下的不同角色共享设置，不同账户的无法直接共享。
-    你可以用字符串导入导出的方法复制关键词列表，然后人工进行设置。或者手动复制设置/设置硬链接。
-
-2. 为何我添加关键词时总是会有"包含会被自动过滤的字符，将忽略该关键词！"这一错误？
-    不要加入标点符号，这些字符会被自动忽略，只需要添加那些汉字。
-
-3. 正则是什么？
-    不知道的请不要用。不知道的请不要用。不知道的请不要用。
-    如果你想学习请自行百度/谷歌。]]
 --AchievementFilter
 	L["GotAchievement"] = "[%s]have earned the achievement%s!"
 	L["And"] = ", "
