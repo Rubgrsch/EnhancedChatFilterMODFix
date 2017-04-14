@@ -737,10 +737,25 @@ end
 for event in pairs(chatChannel) do ChatFrame_AddMessageEventFilter(event, ECFfilter) end
 
 --MonsterSayFilter
+local MSFOffQuestT = {[42880] = true}
+local MSFOffQuestFlag = false
+
+local QuestAf = CreateFrame("Frame")
+QuestAf:RegisterEvent("QUEST_ACCEPTED")
+QuestAf:SetScript("OnEvent", function(self,_,questIndex)
+	if MSFOffQuestT[select(8,GetQuestLogTitle(questIndex))] then MSFOffQuestFlag = true end
+end)
+
+local QuestRf = CreateFrame("Frame")
+QuestRf:RegisterEvent("QUEST_REMOVED") -- Fires when turn in or leave quest zone
+QuestRf:SetScript("OnEvent", function(self,_,questId)
+	if MSFOffQuestT[questId] then MSFOffQuestFlag = false end
+end)
+
 local monsterLines = {}
 
 local function monsterFilter(self,_,msg)
-	if (not config.enableFilter or not config.enableMSF) then return end
+	if (not config.enableFilter or not config.enableMSF or MSFOffQuestFlag) then return end
 
 	local monsterLinesSize = #monsterLines
 	monsterLines[monsterLinesSize+1] = msg
