@@ -17,7 +17,6 @@ local filterCharListRegex = "[%(%)%.%%%+%-%*%?%[%]%$%^={}]" -- won't work on reg
 
 -- ECF
 local _, ecf = ...
-local utf8replace = ecf.utf8replace -- utf8.lua
 local L = ecf.L -- locales.lua
 
 local config
@@ -72,6 +71,36 @@ local defaults = {
 		debugMode = false,
 	}
 }
+--------------- Common Functions from Elsewhere ---------------
+-- utf8 functions are taken from utf8replace from @Phanx @Pastamancer
+local function utf8charbytes(s, i)
+	local c = strbyte(s, i or 1)
+	-- determine bytes needed for character, based on RFC 3629
+	if c > 0 and c <= 127 then
+		return 1
+	elseif c >= 194 and c <= 223 then
+		return 2
+	elseif c >= 224 and c <= 239 then
+		return 3
+	elseif c >= 240 and c <= 244 then
+		return 4
+	end
+end
+
+-- replace UTF-8 characters based on a mapping table
+local function utf8replace(s, mapping)
+	local pos = 1
+	local t = {}
+
+	while pos <= #s do
+		local charbytes = utf8charbytes(s, pos)
+		local c = strsub(s, pos, pos + charbytes - 1)
+		t[#t+1] = (mapping[c] or c)
+		pos = pos + charbytes
+	end
+
+	return tconcat(t)
+end
 
 --------------- Common Functions in ECF ---------------
 --Make sure that blackWord won't be filtered by filterCharList and utf-8 list
