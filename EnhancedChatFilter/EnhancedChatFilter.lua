@@ -136,14 +136,6 @@ end
 --Convert old config to new one
 function ECF:convert()
 	for key,v in pairs(config.blackWordList) do
-		if(type(v) ~= "table") then
-			config.blackWordList[key] = {
-				regex = v == "regex",
-				lesser = false,
-			}
-		end
-	end
-	for key,v in pairs(config.blackWordList) do
 		for key2 in pairs(config.blackWordList) do
 			if key ~= key2 and strfind(key,key2) then config.blackWordList[key] = nil;break end
 		end
