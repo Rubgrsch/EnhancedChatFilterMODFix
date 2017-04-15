@@ -224,10 +224,26 @@ local options = {
 			order = 2,
 			disabled = false,
 		},
+		debugMode = {
+			type = "toggle",
+			name = "DebugMode",
+			desc = "For test only",
+			order = 3,
+			hidden = function() return not config.advancedConfig end,
+		},
+		AdvancedWarning = {
+			type = "execute",
+			name = L["EnableAdvancedConfig"],
+			confirm = true,
+			confirmText = L["AdvancedWarningText"],
+			func = function() config.advancedConfig = true end,
+			hidden = function() return config.advancedConfig end,
+			order = 9,
+		},
 		ToggleTab = {
 			type = "group",
 			name = L["General"],
-			order = 3,
+			order = 10,
 			args = {
 				line1 = {
 					type = "header",
@@ -276,6 +292,13 @@ local options = {
 					desc = L["AggressiveTooltip"],
 					order = 17,
 				},
+				enableWisper = {
+					type = "toggle",
+					name = L["WhisperWhitelistMode"],
+					desc = L["WhisperWhitelistModeTooltip"],
+					order = 18,
+					hidden = function() return not config.advancedConfig end,
+				},
 				line2 = {
 					type = "header",
 					name = L["RepeatOptions"],
@@ -305,40 +328,12 @@ local options = {
 					order = 43,
 					disabled = function() return config.chatLinesLimit == 0 end,
 				},
-				line3 = {
-					type = "header",
-					name = L["UseWithCare"],
-					order = 60,
-				},
-				AdvancedWarning = {
-					type = "execute",
-					name = L["EnableAdvancedConfig"],
-					confirm = true,
-					confirmText = L["AdvancedWarningText"],
-					func = function() config.advancedConfig = true end,
-					hidden = function() return config.advancedConfig end,
-					order = -1,
-				},
-				enableWisper = {
-					type = "toggle",
-					name = L["WhisperWhitelistMode"],
-					desc = L["WhisperWhitelistModeTooltip"],
-					order = 61,
-					hidden = function() return not config.advancedConfig end,
-				},
-				debugMode = {
-					type = "toggle",
-					name = "DebugMode",
-					desc = "For test only",
-					order = 62,
-					hidden = function() return not config.advancedConfig end,
-				},
 			},
 		},
 		blackListTab = {
 			type = "group",
 			name = L["BlackwordList"],
-			order = 4,
+			order = 11,
 			args = {
 				blackword = {
 					type = "input",
@@ -494,7 +489,7 @@ local options = {
 		lootFilter = {
 			type = "group",
 			name = L["LootFilter"],
-			order = 5,
+			order = 12,
 			args = {
 				addItem = {
 					type = "input",
