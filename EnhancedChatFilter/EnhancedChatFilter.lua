@@ -742,8 +742,8 @@ local MSFOffQuestFlag = false
 
 local QuestAf = CreateFrame("Frame")
 QuestAf:RegisterEvent("QUEST_ACCEPTED")
-QuestAf:SetScript("OnEvent", function(self,_,questIndex)
-	if MSFOffQuestT[select(8,GetQuestLogTitle(questIndex))] then MSFOffQuestFlag = true end
+QuestAf:SetScript("OnEvent", function(self,_,_,questID)
+	if MSFOffQuestT[questID] then MSFOffQuestFlag = true end
 end)
 
 local QuestRf = CreateFrame("Frame")
