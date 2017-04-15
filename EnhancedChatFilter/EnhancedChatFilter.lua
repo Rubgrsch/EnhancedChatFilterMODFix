@@ -102,6 +102,18 @@ local function utf8replace(s, mapping)
 	return tconcat(t)
 end
 
+--http://www.wowwiki.com/USERAPI_StringHash
+local function StringHash(text)
+	local counter, len = 1, #text
+	for i = 1, len, 3 do
+		counter = fmod(counter*8161, 4294967279) +  -- 2^32 - 17: Prime!
+			(strbyte(text,i)*16776193) +
+			((strbyte(text,i+1) or (len-i+256))*8372226) +
+			((strbyte(text,i+2) or (len-i+256))*3932164)
+	end
+	return fmod(counter, 4294967291) -- 2^32 - 5: Prime (and different from the prime in the loop)
+end
+
 --------------- Common Functions in ECF ---------------
 --Make sure that blackWord won't be filtered by filterCharList and utf-8 list
 local function checkBlacklist(blackWord, r)
@@ -119,18 +131,6 @@ local function SendMessage(event, msg)
 			ChatFrames:AddMessage(msg, info.r, info.g, info.b)
 		end
 	end
-end
-
---http://www.wowwiki.com/USERAPI_StringHash
-local function StringHash(text)
-	local counter, len = 1, #text
-	for i = 1, len, 3 do
-		counter = fmod(counter*8161, 4294967279) +  -- 2^32 - 17: Prime!
-			(strbyte(text,i)*16776193) +
-			((strbyte(text,i+1) or (len-i+256))*8372226) +
-			((strbyte(text,i+2) or (len-i+256))*3932164)
-	end
-	return fmod(counter, 4294967291) -- 2^32 - 5: Prime (and different from the prime in the loop)
 end
 
 --Convert old config to new one
@@ -592,7 +592,7 @@ LibStub("AceConfigDialog-3.0"):AddToBlizOptions("EnhancedChatFilter", "EnhancedC
 --Disable profanityFilter
 if GetCVar("profanityFilter")~="0" then SetCVar("profanityFilter", "0") end
 
--------------------------------------- Filters ------------------------------------
+--------------- Filters ---------------
 --Update friends whenever login/friendlist updates
 local friends, allowWisper = {}, {}
 local friendFrame = CreateFrame("Frame")
@@ -766,17 +766,17 @@ end
 for event in pairs(chatChannel) do ChatFrame_AddMessageEventFilter(event, ECFfilter) end
 
 --MonsterSayFilter
-local MSFOffQuestT = {[42880] = true}
+local MSFOffQuestT = {[42880] = true} -- 42880: Meeting their Quota
 local MSFOffQuestFlag = false
 
 local QuestAf = CreateFrame("Frame")
 QuestAf:RegisterEvent("QUEST_ACCEPTED")
-QuestAf:SetScript("OnEvent", function(self,_,_,questID)
-	if MSFOffQuestT[questID] then MSFOffQuestFlag = true end
+QuestAf:SetScript("OnEvent", function(self,_,_,questId)
+	if MSFOffQuestT[questId] then MSFOffQuestFlag = true end
 end)
 
 local QuestRf = CreateFrame("Frame")
-QuestRf:RegisterEvent("QUEST_REMOVED") -- Fires when turn in or leave quest zone
+QuestRf:RegisterEvent("QUEST_REMOVED") -- Fires when turn in or leave quest zone, but cant get questId when turn in
 QuestRf:SetScript("OnEvent", function(self,_,questId)
 	if MSFOffQuestT[questId] then MSFOffQuestFlag = false end
 end)
