@@ -464,6 +464,7 @@ local options = {
 						for key,v in pairs(config.blackWordList) do if v.lesser then blacklistname[key] = key end end
 						return blacklistname
 					end,
+					hidden = function() return not config.advancedConfig end,
 				},
 				DeleteButton = {
 					type = "execute",
