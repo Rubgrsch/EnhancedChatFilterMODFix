@@ -12,18 +12,33 @@ It is now supporting Legion(7.2.0).
 NGA Link: <http://bbs.nga.cn/read.php?tid=9277315>  
 Curse Link: <http://mods.curse.com/addons/wow/ecfmodfix>
 
-The original project, which is abondoned, can be found here: <http://wow.curseforge.com/addons/chat-filter/>  
-And it has already been localized: <http://bbs.ngacn.cc/read.php?tid=7527032> by szpunk.  
-However in patch 6.2.4, some APIs have been removed. so I decided to fix those errors.  
-Also many bugs were fixed and some new features have been added compared to the localized one.  
-Please delete old config folders(in WTF) if you were using the old one(before 6.2.4).  
-相比于原版更新到了6.2.4的API并修复许多错误，有新的功能。  
-如果你使用的是6.2.4之前的版本请删除配置文件(在WTF里面)再使用。  
+Main Features
+-------------
 
-English locale has been added. Test and feed back are welcome.  
-However usage is still in Chinese. You may google translate the chinese versoin for now.  
-Need some help for english version wiki.  
-General issues and pull requests are also welcome.  
+|名字|效果|
+|:---:|:---:|
+|'忙碌'玩家过滤|过滤'忙碌'状态的玩家以及其自动回复|
+|重复信息过滤|过滤内容相同的聊天信息|
+|成就刷屏过滤|合并显示多人获取同一成就|
+|任务进度刷屏过滤|过滤组队中的任务进度通告|
+|团队警报刷屏过滤|过滤团队中的技能通告、打断喊话等信息|
+|天赋技能过滤|过滤满级玩家及其宠物学习天赋、技能时的通告|
+|怪物说话|用一个重复过滤器过滤NPC的说话|
+|额外过滤器|一些没名字的过滤器(合集)，大大提高广告过滤效果|
+
+FAQ
+---
+
+1. 如何共享不同账号下的关键词列表和开关设置
+  - 同一账户(如wow1)下的不同角色共享设置，不同账户的无法直接共享。
+  - 你可以用字符串导入导出的方法复制关键词列表，然后人工进行设置。或者手动复制设置/设置硬链接。
+
+2. 为何我添加关键词时总是会有"包含会被自动过滤的字符，将忽略该关键词！"这一错误？
+  - 不要加入标点符号，这些字符会被自动忽略，只需要添加那些汉字。
+
+3. 正则是什么？
+  - 不知道的请不要用。不知道的请不要用。不知道的请不要用。
+  - 如果你想学习请自行百度/谷歌。 Lua的正则符号是%
 
 Issues
 ------
