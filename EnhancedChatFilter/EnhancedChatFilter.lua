@@ -22,7 +22,7 @@ local L = ecf.L -- locales.lua
 local config
 
 local _G = _G
-local gsub, select, ipairs, pairs, next, strsub, format, tonumber, strmatch, tconcat, strfind, strbyte, fmod = gsub, select, ipairs, pairs, next, strsub, format, tonumber, strmatch, table.concat, string.find, string.byte, math.fmod -- lua
+local select, ipairs, pairs, next, strsub, format, tonumber, strmatch, tconcat, strfind, strbyte, fmod = select, ipairs, pairs, next, strsub, format, tonumber, strmatch, table.concat, string.find, string.byte, math.fmod -- lua
 local Ambiguate, band, BNGetNumFriends, BNGetNumFriendGameAccounts, BNGetFriendGameAccountInfo, ChatTypeInfo, GetCurrencyLink, GetFriendInfo, GetGuildInfo, GetItemInfo, GetNumFriends, GetPlayerInfoByGUID, GetTime = Ambiguate, bit.band, BNGetNumFriends, BNGetNumFriendGameAccounts, BNGetFriendGameAccountInfo, ChatTypeInfo, GetCurrencyLink, GetFriendInfo, GetGuildInfo, GetItemInfo, GetNumFriends, GetPlayerInfoByGUID, GetTime -- BLZ
 
 local ECF = LibStub("AceAddon-3.0"):NewAddon("EnhancedChatFilter", "AceConsole-3.0")
@@ -143,7 +143,7 @@ function ECF:convert()
 	end
 end
 
---MinimapData
+--MinimapIcon
 local ecfLDB = LibStub("LibDataBroker-1.1"):NewDataObject("Enhanced Chat Filter", {
 	type = "data source",
 	text = "Enhanced Chat Filter",
@@ -429,7 +429,7 @@ local options = {
 							if (checkBlacklist(key, v.regex)) then
 								ECF:Printf(L["IncludeAutofilteredWord"],key)
 							else
-								blackStringList[#blackStringList+1] = key..","..tostring(num)
+								blackStringList[#blackStringList+1] = key..","..num
 							end
 						end
 						local blackString = tconcat(blackStringList,";")
@@ -610,6 +610,7 @@ ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER_INFORM", addToAllowWisper)
 
 --stringDifference for repeatFilter, ranged from 0 to 1, while 0 is absolutely the same
 --This function is not utf8 awared, currently not nessesary
+--strsub(s,i,i) is really SLOW. Don't use it.
 local function stringDifference(sA, sB) -- arrays of byte
 	local len_a, len_b = #sA, #sB
 	local last, this = {}, {}
@@ -754,6 +755,7 @@ end
 for event in pairs(chatChannel) do ChatFrame_AddMessageEventFilter(event, ECFfilter) end
 
 --MonsterSayFilter
+--Turn off MSF in certain quests. Chat msg are repeated but important in these quests.
 local MSFOffQuestT = {[42880] = true} -- 42880: Meeting their Quota
 local MSFOffQuestFlag = false
 
@@ -763,6 +765,7 @@ QuestAf:SetScript("OnEvent", function(self,_,_,questId)
 	if MSFOffQuestT[questId] then MSFOffQuestFlag = true end
 end)
 
+--TODO: If player uses hearthstone to leave questzone, QUEST_REMOVED is not fired.
 local QuestRf = CreateFrame("Frame")
 QuestRf:RegisterEvent("QUEST_REMOVED") -- Fires when turn in or leave quest zone, but cant get questId when turn in
 QuestRf:SetScript("OnEvent", function(self,_,questId)
