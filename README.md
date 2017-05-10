@@ -48,4 +48,6 @@ Issues
 Licenses
 --------
 
-Original project and this one are under Public Domain.
+Original project and this one are under Public Domain.  
+Original project, written by eucalyptisch, can be found here: <https://wow.curseforge.com/projects/chat-filter>.  
+First Chinese version, modded by szpunk, can be found here: <http://bbs.nga.cn/read.php?tid=7527032>.  
