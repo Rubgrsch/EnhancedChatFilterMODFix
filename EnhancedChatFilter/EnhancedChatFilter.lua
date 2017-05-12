@@ -69,6 +69,8 @@ local defaults = {
 		},
 		advancedConfig = false, -- show advancedConfig
 		debugMode = false,
+		record = {},
+		recordPos = 1,
 	}
 }
 --------------- Common Functions from Elsewhere ---------------
@@ -223,13 +225,6 @@ local options = {
 				end,
 			order = 2,
 			disabled = false,
-		},
-		debugMode = {
-			type = "toggle",
-			name = "DebugMode",
-			desc = "For test only",
-			order = 3,
-			hidden = function() return not config.advancedConfig end,
 		},
 		AdvancedWarning = {
 			type = "execute",
@@ -572,6 +567,26 @@ local options = {
 				},
 			},
 		},
+		debugWindow = {
+			type = "group",
+			name = L["DebugWindow"],
+			order = 30,
+			args = {
+				debugMode = {
+					type = "toggle",
+					name = L["DebugMode"],
+					desc = L["DebugModeTooltips"],
+					order = 1,
+				},
+				clearRecord = {
+					type = "execute",
+					name = L["ClearRecord"],
+					desc = L["ClearRecordTooltips"],
+					order = 2,
+					func = function() config.record, config.recordPos = {}, 1 end
+				},
+			},
+		},
 	},
 }
 LibStub("AceConfigRegistry-3.0"):RegisterOptionsTable("EnhancedChatFilter", options)
@@ -630,17 +645,9 @@ local prevLineID = 0
 local filterResult = false
 local chatChannel = {["CHAT_MSG_WHISPER"] = 1, ["CHAT_MSG_SAY"] = 2, ["CHAT_MSG_YELL"] = 2, ["CHAT_MSG_CHANNEL"] = 3, ["CHAT_MSG_PARTY"] = 4, ["CHAT_MSG_PARTY_LEADER"] = 4, ["CHAT_MSG_RAID"] = 4, ["CHAT_MSG_RAID_LEADER"] = 4, ["CHAT_MSG_RAID_WARNING"] = 4, ["CHAT_MSG_INSTANCE_CHAT"] = 4, ["CHAT_MSG_INSTANCE_CHAT_LEADER"] = 4, ["CHAT_MSG_DND"] = 101}
 
-local function ECFfilter(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID)
+local function ECFfilter(event,msg,player,flags)
 	-- exit when main filter is off
 	if(not config.enableFilter) then return end
-
-	-- if it has been worked then use the worked result
-	if(lineID == prevLineID) then
-		return filterResult
-	else
-		prevLineID = lineID
-		filterResult = false
-	end
 
 	local Event = chatChannel[event]
 	local trimmedPlayer = Ambiguate(player, "none")
@@ -649,8 +656,6 @@ local function ECFfilter(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID)
 
 	-- don't filter GM or DEV
 	if type(flags) == "string" and (flags == "GM" or flags == "DEV") then return end
-
-	if config.debugMode then print(format("RAWMsg: %s: %s",trimmedPlayer,msg)) end
 
 	-- remove color/hypelink
 	local filterString = msg:upper():gsub("|C[0-9A-F]+",""):gsub("|H[^|]+|H",""):gsub("|H|R","")
@@ -663,23 +668,20 @@ local function ECFfilter(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID)
 	if(config.enableWisper and Event == 1) then --Whisper Whitelist Mode, only whisper
 		--Don't filter players that are from same guild/raid/party or who you have whispered
 		if not(allowWisper[trimmedPlayer] or (GetGuildInfo("player") == GetGuildInfo(trimmedPlayer)) or UnitInRaid(trimmedPlayer) or UnitInParty(trimmedPlayer)) then
-			if config.debugMode then print("Trigger: WhiteListMode") end
 			filterResult = true
-			return true
+			return true, "WhiteListMode"
 		end
 	end
 
 	if(config.enableDND and ((Event <= 3 and type(flags) == "string" and flags == "DND") or Event == 101)) then -- DND, whisper/yell/say/channel and auto-reply
-		if config.debugMode then print("Trigger: DND Filter") end
 		filterResult = true
-		return true
+		return true, "DND Filter"
 	end
 
 	if(Event <= 3) then --AggressiveFilter
 		if (config.enableAggressive and annoying >= 0.25 and annoying <= 0.8 and oriLen >= 30) then -- Annoying
-			if config.debugMode then print("Trigger: Annoying: "..annoying) end
 			filterResult = true
-			return true
+			return true, "Annoying: "..annoying
 		end
 	end
 
@@ -697,25 +699,22 @@ local function ECFfilter(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID)
 			if (strfind(currentString,keyWord)) then
 				if (ty.lesser) then count = count + 1
 				else
-					if config.debugMode then print("Trigger: Keyword: "..keyWord) end
 					filterResult = true
-					return true
+					return true, "Trigger: Keyword: "..keyWord
 				end
 			end
 		end
 		if count >= config.lesserBlackWordThreshold then
-			if config.debugMode then print("Trigger: LesserKeywords x"..count) end
 			filterResult = true
-			return true
+			return true, "LesserKeywords x"..count
 		end
 	end
 
 	if (config.enableRAF and (Event <= 2 or Event == 4)) then -- raid
 		for _,RaidAlertTag in ipairs(RaidAlertTagList) do
 			if(strfind(msg,RaidAlertTag)) then
-				if config.debugMode then print("Trigger: "..RaidAlertTag.." in RaidAlertTag") end
 				filterResult = true
-				return true
+				return true, RaidAlertTag.." in RaidAlertTag"
 			end
 		end
 	end
@@ -723,9 +722,8 @@ local function ECFfilter(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID)
 	if (config.enableQRF and (Event <= 2 or Event == 4)) then -- quest/party
 		for _,QuestReportTag in ipairs(QuestReportTagList) do
 			if(strfind(msg,QuestReportTag)) then
-				if config.debugMode then print("Trigger: "..QuestReportTag.." in QuestReportTag") end
 				filterResult = true
-				return true
+				return true, QuestReportTag.." in QuestReportTag"
 			end
 		end
 	end
@@ -744,15 +742,36 @@ local function ECFfilter(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID)
 			--(optional) if someone sends msgs within 0.6s, filter it
 			if (chatLines[i].Sender == msgtable.Sender and ((config.multiLine and (msgtable.Time - chatLines[i].Time) < 0.600) or stringDifference(chatLines[i].Msg,msgtable.Msg) <= 0.1)) then
 				tremove(chatLines, i)
-				if config.debugMode then print("Trigger: Repeat Filter") end
 				filterResult = true
-				return true
+				return true, "Repeat Filter"
 			end
 		end
 		if chatLinesSize >= config.chatLinesLimit then tremove(chatLines, 1) end
 	end
 end
-for event in pairs(chatChannel) do ChatFrame_AddMessageEventFilter(event, ECFfilter) end
+
+local function ECFfilterRecord(...)
+	local _,event,msg,player,_,_,_,flags,_,_,_,_,lineID = ...
+
+	-- if it has been worked then use the worked result
+	if(lineID == prevLineID) then
+		return filterResult
+	else
+		prevLineID = lineID
+		filterResult = false
+	end
+
+	local result, reason = ECFfilter(event,msg,player,flags)
+	result = not not result
+
+	if config.debugMode then
+		config.record[config.recordPos] = {event,msg,player,flags,result,reason}
+		config.recordPos = (config.recordPos >= 1000 and config.recordPos - 1000 or config.recordPos) + 1
+	end
+
+	return result
+end
+for event in pairs(chatChannel) do ChatFrame_AddMessageEventFilter(event, ECFfilterRecord) end
 
 --MonsterSayFilter
 --Turn off MSF in certain quests. Chat msg are repeated but important in these quests.
@@ -782,7 +801,6 @@ local function monsterFilter(self,_,msg)
 	for i=1, monsterLinesSize do
 		if (monsterLines[i] == msg) then
 			tremove(monsterLines, i)
-			if config.debugMode then print("Trigger: Monster Say Filter") end
 			return true
 		end
 	end
