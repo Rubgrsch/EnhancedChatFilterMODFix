@@ -641,8 +641,6 @@ local function stringDifference(sA, sB) -- arrays of byte
 end
 
 local chatLines = {}
-local prevLineID = 0
-local filterResult = false
 local chatChannel = {["CHAT_MSG_WHISPER"] = 1, ["CHAT_MSG_SAY"] = 2, ["CHAT_MSG_YELL"] = 2, ["CHAT_MSG_CHANNEL"] = 3, ["CHAT_MSG_PARTY"] = 4, ["CHAT_MSG_PARTY_LEADER"] = 4, ["CHAT_MSG_RAID"] = 4, ["CHAT_MSG_RAID_LEADER"] = 4, ["CHAT_MSG_RAID_WARNING"] = 4, ["CHAT_MSG_INSTANCE_CHAT"] = 4, ["CHAT_MSG_INSTANCE_CHAT_LEADER"] = 4, ["CHAT_MSG_DND"] = 101}
 
 local function ECFfilter(event,msg,player,flags)
@@ -668,19 +666,16 @@ local function ECFfilter(event,msg,player,flags)
 	if(config.enableWisper and Event == 1) then --Whisper Whitelist Mode, only whisper
 		--Don't filter players that are from same guild/raid/party or who you have whispered
 		if not(allowWisper[trimmedPlayer] or (GetGuildInfo("player") == GetGuildInfo(trimmedPlayer)) or UnitInRaid(trimmedPlayer) or UnitInParty(trimmedPlayer)) then
-			filterResult = true
 			return true, "WhiteListMode"
 		end
 	end
 
 	if(config.enableDND and ((Event <= 3 and type(flags) == "string" and flags == "DND") or Event == 101)) then -- DND, whisper/yell/say/channel and auto-reply
-		filterResult = true
 		return true, "DND Filter"
 	end
 
 	if(Event <= 3) then --AggressiveFilter
 		if (config.enableAggressive and annoying >= 0.25 and annoying <= 0.8 and oriLen >= 30) then -- Annoying
-			filterResult = true
 			return true, "Annoying: "..annoying
 		end
 	end
@@ -697,15 +692,14 @@ local function ECFfilter(event,msg,player,flags)
 			end
 			--Check blackList
 			if (strfind(currentString,keyWord)) then
-				if (ty.lesser) then count = count + 1
+				if (ty.lesser) then
+					count = count + 1
 				else
-					filterResult = true
-					return true, "Trigger: Keyword: "..keyWord
+					return true, "Keyword: "..keyWord
 				end
 			end
 		end
 		if count >= config.lesserBlackWordThreshold then
-			filterResult = true
 			return true, "LesserKeywords x"..count
 		end
 	end
@@ -713,7 +707,6 @@ local function ECFfilter(event,msg,player,flags)
 	if (config.enableRAF and (Event <= 2 or Event == 4)) then -- raid
 		for _,RaidAlertTag in ipairs(RaidAlertTagList) do
 			if(strfind(msg,RaidAlertTag)) then
-				filterResult = true
 				return true, RaidAlertTag.." in RaidAlertTag"
 			end
 		end
@@ -722,7 +715,6 @@ local function ECFfilter(event,msg,player,flags)
 	if (config.enableQRF and (Event <= 2 or Event == 4)) then -- quest/party
 		for _,QuestReportTag in ipairs(QuestReportTagList) do
 			if(strfind(msg,QuestReportTag)) then
-				filterResult = true
 				return true, QuestReportTag.." in QuestReportTag"
 			end
 		end
@@ -742,7 +734,6 @@ local function ECFfilter(event,msg,player,flags)
 			--(optional) if someone sends msgs within 0.6s, filter it
 			if (chatLines[i].Sender == msgtable.Sender and ((config.multiLine and (msgtable.Time - chatLines[i].Time) < 0.600) or stringDifference(chatLines[i].Msg,msgtable.Msg) <= 0.1)) then
 				tremove(chatLines, i)
-				filterResult = true
 				return true, "Repeat Filter"
 			end
 		end
@@ -750,9 +741,10 @@ local function ECFfilter(event,msg,player,flags)
 	end
 end
 
-local function ECFfilterRecord(...)
-	local _,event,msg,player,_,_,_,flags,_,_,_,_,lineID = ...
-
+local prevLineID = 0
+local filterResult = false
+local recordMax = 1000
+local function ECFfilterRecord(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID)
 	-- if it has been worked then use the worked result
 	if(lineID == prevLineID) then
 		return filterResult
@@ -762,14 +754,14 @@ local function ECFfilterRecord(...)
 	end
 
 	local result, reason = ECFfilter(event,msg,player,flags)
-	result = not not result
+	filterResult = not not result
 
 	if config.debugMode then
-		config.record[config.recordPos] = {event,msg,player,flags,result,reason}
-		config.recordPos = (config.recordPos >= 1000 and config.recordPos - 1000 or config.recordPos) + 1
+		config.record[config.recordPos] = {event,msg,player,flags,filterResult,reason}
+		config.recordPos = (config.recordPos >= recordMax and config.recordPos - recordMax or config.recordPos) + 1
 	end
 
-	return result
+	return filterResult
 end
 for event in pairs(chatChannel) do ChatFrame_AddMessageEventFilter(event, ECFfilterRecord) end
 
