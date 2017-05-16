@@ -188,6 +188,7 @@ local highlightIsLesser, blackWordHighlight = false, ""
 local lootHighlight = {}
 local stringIO = "" -- blackWord input
 local regexToggle, lesserToggle = false, false
+local recordMax = 500
 
 local colorT = {} -- used in lootFilter
 for i=0, 4 do
@@ -585,6 +586,32 @@ local options = {
 					order = 2,
 					func = function() config.record, config.recordPos = {}, 1 end
 				},
+				recordList = {
+					type = "input",
+					name = "",
+					get = function()
+						local pos = config.recordPos
+						local t = {}
+						local recordlen = #config.record
+						for idx,v in ipairs(config.record) do
+							local i
+							if recordlen == recordMax then
+								i = idx - pos + 1
+								if i <= 0 then i = i + recordMax end
+							else
+								i = idx
+							end
+							t[i] = format("%s %s: %s",v[5] and "|TInterface\\TargetingFrame\\UI-RaidTargetingIcon_7:16|t" or "|TInterface\\TargetingFrame\\UI-RaidTargetingIcon_2:16|t",v[3],v[2])
+						end
+						return tconcat(t,"|n")
+					end,
+					set = nil,
+					multiline = 10,
+					width = "full",
+					order = 10,
+					hidden = function() return not config.debugMode end,
+					disabled = true,
+				},
 			},
 		},
 	},
@@ -743,7 +770,6 @@ end
 
 local prevLineID = 0
 local filterResult = false
-local recordMax = 1000
 local function ECFfilterRecord(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID)
 	-- if it has been worked then use the worked result
 	if(lineID == prevLineID) then
