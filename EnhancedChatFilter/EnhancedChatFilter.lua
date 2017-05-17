@@ -582,7 +582,6 @@ local options = {
 				clearRecord = {
 					type = "execute",
 					name = L["ClearRecord"],
-					desc = L["ClearRecordTooltips"],
 					order = 2,
 					func = function() config.record, config.recordPos = {}, 1 end
 				},
