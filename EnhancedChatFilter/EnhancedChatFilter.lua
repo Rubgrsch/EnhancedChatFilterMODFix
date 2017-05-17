@@ -592,16 +592,16 @@ local options = {
 					get = function()
 						local pos = config.recordPos
 						local t = {}
-						local recordlen = #config.record
+						local IsMax = #config.record == recordMax
 						for idx,v in ipairs(config.record) do
 							local i
-							if recordlen == recordMax then
+							if IsMax then
 								i = idx - pos + 1
 								if i <= 0 then i = i + recordMax end
 							else
 								i = idx
 							end
-							t[i] = format("%s %s: %s",v[5] and "|TInterface\\TargetingFrame\\UI-RaidTargetingIcon_7:16|t" or "|TInterface\\TargetingFrame\\UI-RaidTargetingIcon_2:16|t",v[3],v[2])
+							t[i] = format("|TInterface\\TargetingFrame\\UI-RaidTargetingIcon_%d:16|t %s: %s",v[5] and 7 or 2,v[3],v[2])
 						end
 						return tconcat(t,"|n")
 					end,
