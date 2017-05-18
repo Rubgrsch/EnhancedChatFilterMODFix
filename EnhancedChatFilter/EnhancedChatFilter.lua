@@ -670,9 +670,6 @@ local chatLines = {}
 local chatChannel = {["CHAT_MSG_WHISPER"] = 1, ["CHAT_MSG_SAY"] = 2, ["CHAT_MSG_YELL"] = 2, ["CHAT_MSG_CHANNEL"] = 3, ["CHAT_MSG_PARTY"] = 4, ["CHAT_MSG_PARTY_LEADER"] = 4, ["CHAT_MSG_RAID"] = 4, ["CHAT_MSG_RAID_LEADER"] = 4, ["CHAT_MSG_RAID_WARNING"] = 4, ["CHAT_MSG_INSTANCE_CHAT"] = 4, ["CHAT_MSG_INSTANCE_CHAT_LEADER"] = 4, ["CHAT_MSG_DND"] = 101}
 
 local function ECFfilter(event,msg,player,flags)
-	-- exit when main filter is off
-	if(not config.enableFilter) then return end
-
 	local Event = chatChannel[event]
 	local trimmedPlayer = Ambiguate(player, "none")
 	-- don't filter player or his friends/BNfriends
@@ -770,6 +767,9 @@ end
 local prevLineID = 0
 local filterResult = false
 local function ECFfilterRecord(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID)
+	-- do nothing if main filter is off
+	if(not config.enableFilter) then return end
+
 	-- if it has been worked then use the worked result
 	if(lineID == prevLineID) then
 		return filterResult
