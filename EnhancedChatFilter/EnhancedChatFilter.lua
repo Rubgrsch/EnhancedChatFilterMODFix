@@ -669,9 +669,13 @@ end
 local chatLines = {}
 local chatChannel = {["CHAT_MSG_WHISPER"] = 1, ["CHAT_MSG_SAY"] = 2, ["CHAT_MSG_YELL"] = 2, ["CHAT_MSG_CHANNEL"] = 3, ["CHAT_MSG_PARTY"] = 4, ["CHAT_MSG_PARTY_LEADER"] = 4, ["CHAT_MSG_RAID"] = 4, ["CHAT_MSG_RAID_LEADER"] = 4, ["CHAT_MSG_RAID_WARNING"] = 4, ["CHAT_MSG_INSTANCE_CHAT"] = 4, ["CHAT_MSG_INSTANCE_CHAT_LEADER"] = 4, ["CHAT_MSG_DND"] = 101}
 
-local function ECFfilter(event,msg,player,flags)
+local function ECFfilter(event,msg,player,flags,channelName)
 	local Event = chatChannel[event]
 	local trimmedPlayer = Ambiguate(player, "none")
+
+	-- filter MeetingStone(NetEase) broad msg
+	if channelName == "集合石" and strfind(msg,"^[#&$@]") then return true, "MeetingStone" end
+
 	-- don't filter player or his friends/BNfriends
 	if UnitIsUnit(trimmedPlayer,"player") or friends[trimmedPlayer] then return end
 
@@ -766,7 +770,7 @@ end
 
 local prevLineID = 0
 local filterResult = false
-local function ECFfilterRecord(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID)
+local function ECFfilterRecord(self,event,msg,player,_,_,_,flags,_,_,channelName,_,lineID)
 	-- do nothing if main filter is off
 	if(not config.enableFilter) then return end
 
@@ -778,7 +782,7 @@ local function ECFfilterRecord(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID)
 		filterResult = false
 	end
 
-	local result, reason = ECFfilter(event,msg,player,flags)
+	local result, reason = ECFfilter(event,msg,player,flags,channelName)
 	filterResult = not not result
 
 	if config.debugMode then
