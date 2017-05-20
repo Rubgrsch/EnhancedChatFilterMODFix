@@ -600,7 +600,7 @@ local options = {
 							else
 								i = idx
 							end
-							t[i] = format("|TInterface\\TargetingFrame\\UI-RaidTargetingIcon_%d:16|t %s: %s",v[5] and 7 or 2,v[3],v[2])
+							t[i] = format("|TInterface\\TargetingFrame\\UI-RaidTargetingIcon_%d:0|t %s: %s",v[5] and 7 or 2,v[3],v[2])
 						end
 						return tconcat(t,"|n")
 					end,
