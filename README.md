@@ -12,11 +12,14 @@ It is now supporting Legion(7.2.0).
 NGA Link: <http://bbs.nga.cn/read.php?tid=9277315>  
 Curse Link: <http://mods.curse.com/addons/wow/ecfmodfix>
 
+[Github Wiki](https://github.com/Rubgrsch/EnhancedChatFilterMODFix/wiki/%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E)
+
 Main Features
 -------------
 
 |名字|效果|
 |:---:|:---:|
+|关键词过滤|根据关键词过滤聊天信息|
 |'忙碌'玩家过滤|过滤'忙碌'状态的玩家以及其自动回复|
 |重复信息过滤|过滤内容相同的聊天信息|
 |成就刷屏过滤|合并显示多人获取同一成就|
@@ -25,6 +28,7 @@ Main Features
 |天赋技能过滤|过滤满级玩家及其宠物学习天赋、技能时的通告|
 |怪物说话|用一个重复过滤器过滤NPC的说话|
 |额外过滤器|一些没名字的过滤器(合集)，大大提高广告过滤效果|
+|拾取过滤|根据物品的品质/id进行过滤|
 
 FAQ
 ---
