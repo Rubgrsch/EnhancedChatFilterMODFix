@@ -1,6 +1,6 @@
 local _, ecf = ...
+local L = ecf.L
 
-local L = {}
 -----------------------------------------------------------------------
 -- zhCN
 -----------------------------------------------------------------------
@@ -214,8 +214,6 @@ else
 	L["GotAchievement"] = "[%s]have earned the achievement%s!"
 	L["And"] = ", "
 end
-
-ecf.L = L
 
 setmetatable(ecf.L, {__index=function(self, key)
 	return key
