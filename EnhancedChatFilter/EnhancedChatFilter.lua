@@ -609,7 +609,6 @@ local options = {
 					width = "full",
 					order = 10,
 					hidden = function() return not config.debugMode end,
-					disabled = true,
 				},
 			},
 		},
