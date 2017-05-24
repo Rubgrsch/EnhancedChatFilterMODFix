@@ -122,15 +122,8 @@ local function ECFfilter(event,msg,player,flags,channelName)
 	if(Event <= (ecf.db.blackWordFilterGroup and 4 or 3)) then --blackWord Filter, whisper/yell/say/channel and party/raid(optional)
 		local count = 0
 		for keyWord,ty in pairs(ecf.db.blackWordList) do
-			local currentString
-			if (not ty.regex) then -- if it is not regex, filter most symbols
-				keyWord = keyWord:upper()
-				currentString = newfilterString
-			else
-				currentString = filterString
-			end
 			--Check blackList
-			if (strfind(currentString,keyWord)) then
+			if (strfind((not ty.regex) and newfilterString or filterString,keyWord)) then
 				if (ty.lesser) then
 					count = count + 1
 				else

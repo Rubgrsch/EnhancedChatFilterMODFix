@@ -116,6 +116,10 @@ function G.DBconvert()
 			if key ~= key2 and strfind(key,key2) then ecf.db.blackWordList[key] = nil;break end
 		end
 		if(checkBlacklist(key,v.regex)) then ecf.db.blackWordList[key] = nil end
+		if(not v.regex) then
+			ecf.db.blackWordList[key] = nil
+			ecf.db.blackWordList[key:upper()] = v
+		end
 	end
 end
 
@@ -136,6 +140,7 @@ local function AddBlackWord(word, r, l)
 	if (checkBlacklist(word, r)) then
 		ECF:Printf(L["IncludeAutofilteredWord"],word)
 	else
+		if not r then word = word:upper() end
 		ecf.db.blackWordList[word] = {regex = r, lesser = l,}
 	end
 end
