@@ -83,13 +83,12 @@ local chatChannel = {["CHAT_MSG_WHISPER"] = 1, ["CHAT_MSG_SAY"] = 2, ["CHAT_MSG_
 
 local function ECFfilter(event,msg,player,flags,channelName)
 	local Event = chatChannel[event]
-	local trimmedPlayer = Ambiguate(player, "none")
 
 	-- filter MeetingStone(NetEase) broad msg
 	if channelName == "集合石" and strfind(msg,"^[#&$@]") then return true, "MeetingStone" end
 
 	-- don't filter player or his friends/BNfriends
-	if UnitIsUnit(trimmedPlayer,"player") or friends[trimmedPlayer] then return end
+	if UnitIsUnit(player,"player") or friends[player] then return end
 
 	-- don't filter GM or DEV
 	if type(flags) == "string" and (flags == "GM" or flags == "DEV") then return end
@@ -104,7 +103,7 @@ local function ECFfilter(event,msg,player,flags,channelName)
 
 	if(ecf.db.enableWisper and Event == 1) then --Whisper Whitelist Mode, only whisper
 		--Don't filter players that are from same guild/raid/party or who you have whispered
-		if not(allowWisper[trimmedPlayer] or (GetGuildInfo("player") == GetGuildInfo(trimmedPlayer)) or UnitInRaid(trimmedPlayer) or UnitInParty(trimmedPlayer)) then
+		if not(allowWisper[player] or (GetGuildInfo("player") == GetGuildInfo(player)) or UnitInRaid(player) or UnitInParty(player)) then
 			return true, "WhiteListMode"
 		end
 	end
@@ -157,7 +156,7 @@ local function ECFfilter(event,msg,player,flags,channelName)
 		if(msgLine == "") then msgLine = msg end --If it has only symbols, don't change it
 
 		--msgdata
-		local msgtable = {Sender = trimmedPlayer, Msg = {}, Time = GetTime()}
+		local msgtable = {Sender = player, Msg = {}, Time = GetTime()}
 		for idx=1, #msgLine do msgtable.Msg[idx] = strbyte(msgLine,idx) end
 		local chatLinesSize = #chatLines
 		chatLines[chatLinesSize+1] = msgtable
@@ -187,11 +186,12 @@ local function ECFfilterRecord(self,event,msg,player,_,_,_,flags,_,_,channelName
 		filterResult = false
 	end
 
-	local result, reason = ECFfilter(event,msg,player,flags,channelName)
+	local trimmedPlayer = Ambiguate(player, "none")
+	local result, reason = ECFfilter(event,msg,trimmedPlayer,flags,channelName)
 	filterResult = not not result
 
 	if ecf.db.debugMode then
-		ecf.db.record[ecf.db.recordPos] = {event,msg,player,flags,filterResult,reason}
+		ecf.db.record[ecf.db.recordPos] = {event,msg,trimmedPlayer,flags,filterResult,reason}
 		ecf.db.recordPos = (ecf.db.recordPos >= G.recordMax and ecf.db.recordPos - G.recordMax or ecf.db.recordPos) + 1
 	end
 
