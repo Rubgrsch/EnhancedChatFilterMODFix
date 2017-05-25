@@ -112,8 +112,8 @@ local function ECFfilter(event,msg,player,flags,channelName)
 		return true, "DND Filter"
 	end
 
-	if(Event <= 3) then --AggressiveFilter
-		if (ecf.db.enableAggressive and annoying >= 0.25 and annoying <= 0.8 and oriLen >= 30) then -- Annoying
+	if(ecf.db.enableAggressive and Event <= 3) then --AggressiveFilter
+		if (annoying >= 0.25 and annoying <= 0.8 and oriLen >= 30) then -- Annoying
 			return true, "Annoying: "..annoying
 		end
 	end

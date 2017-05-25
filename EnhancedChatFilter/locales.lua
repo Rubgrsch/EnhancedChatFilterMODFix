@@ -1,10 +1,11 @@
 local _, ecf = ...
 local L = ecf.L
 
+local locale = GetLocale()
 -----------------------------------------------------------------------
 -- zhCN
 -----------------------------------------------------------------------
-if (GetLocale() == "zhCN") then
+if (locale == "zhCN") then
 --Titles
 	L["MainFilter"] = "总开关"
 	L["MinimapIcon"] = "小地图图标"
@@ -76,7 +77,7 @@ if (GetLocale() == "zhCN") then
 -- zhTW -- NEED HELP
 -- Contributors: 老虎007@NGA
 -----------------------------------------------------------------------
-elseif (GetLocale() == "zhTW") then
+elseif (locale == "zhTW") then
 --Titles
 	L["MainFilter"] = "總開關"
 	L["MinimapIcon"] = "小地圖圖標"
