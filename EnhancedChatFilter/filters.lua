@@ -192,7 +192,7 @@ local function ECFfilterRecord(self,event,msg,player,_,_,_,flags,_,_,channelName
 
 	if ecf.db.debugMode then
 		ecf.db.record[ecf.db.recordPos] = {event,msg,trimmedPlayer,flags,filterResult,reason}
-		ecf.db.recordPos = (ecf.db.recordPos >= G.recordMax and ecf.db.recordPos - G.recordMax or ecf.db.recordPos) + 1
+		ecf.db.recordPos = (ecf.db.recordPos >= 500 and ecf.db.recordPos - 500 or ecf.db.recordPos) + 1
 	end
 
 	return filterResult

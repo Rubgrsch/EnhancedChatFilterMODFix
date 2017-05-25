@@ -129,7 +129,6 @@ local highlightIsLesser, blackWordHighlight = false, ""
 local lootHighlight = {}
 local stringIO = "" -- blackWord input
 local regexToggle, lesserToggle = false, false
-G.recordMax = 500
 
 local colorT = {} -- used in lootFilter
 for i=0, 4 do
@@ -533,14 +532,12 @@ options.args.debugWindow = {
 			type = "input",
 			name = "",
 			get = function()
-				local pos = ecf.db.recordPos
-				local t = {}
-				local IsMax = #ecf.db.record == G.recordMax
+				local pos, t, IsMax = ecf.db.recordPos, {}, #ecf.db.record == 500
 				for idx,v in ipairs(ecf.db.record) do
 					local i
 					if IsMax then
 						i = idx - pos + 1
-						if i <= 0 then i = i + G.recordMax end
+						if i <= 0 then i = i + 500 end
 					else
 						i = idx
 					end
