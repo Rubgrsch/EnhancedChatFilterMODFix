@@ -199,7 +199,7 @@ options.args.ToggleTab = {
 			type = "toggle",
 			name = L["Achievement"],
 			desc = L["AchievementFilterTooltip"],
-	order = 12,
+			order = 12,
 		},
 		enableRAF = {
 			type = "toggle",
