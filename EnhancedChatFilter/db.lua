@@ -150,6 +150,13 @@ local options = {
 	get = function(info) return ecf.db[info[#info]] end,
 	set = function(info, value) ecf.db[info[#info]] = value end,
 	disabled = function() return not ecf.db.enableFilter end,
+	childGroups = "tab",
+	args = {},
+}
+options.args.General = {
+	type = "group",
+	name = L["General"],
+	order = 1,
 	args = {
 		enableFilter = {
 			type = "toggle",
@@ -181,7 +188,7 @@ local options = {
 }
 options.args.ToggleTab = {
 	type = "group",
-	name = L["General"],
+	name = _G["FILTERS"],
 	order = 10,
 	args = {
 		line1 = {
