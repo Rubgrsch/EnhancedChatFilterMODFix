@@ -87,8 +87,9 @@ local function ECFfilter(event,msg,player,flags,channelName)
 	-- filter MeetingStone(NetEase) broad msg
 	if channelName == "集合石" and strfind(msg,"^[#&$@]") then return true, "MeetingStone" end
 
+	local IsMyFriend, IsMyGuild, IsMyGroup = friends[player], GetGuildInfo("player") == GetGuildInfo(player), UnitInRaid(player) or UnitInParty(player)
 	-- don't filter player or his friends/BNfriends
-	if UnitIsUnit(player,"player") or friends[player] then return end
+	if UnitIsUnit(player,"player") then return end
 
 	-- don't filter GM or DEV
 	if type(flags) == "string" and (flags == "GM" or flags == "DEV") then return end
@@ -103,22 +104,26 @@ local function ECFfilter(event,msg,player,flags,channelName)
 
 	if(ecf.db.enableWisper and Event == 1) then --Whisper Whitelist Mode, only whisper
 		--Don't filter players that are from same guild/raid/party or who you have whispered
-		if not(allowWisper[player] or (GetGuildInfo("player") == GetGuildInfo(player)) or UnitInRaid(player) or UnitInParty(player)) then
+		if not(allowWisper[player] or IsMyFriend or IsMyGuild or IsMyGroup) then
 			return true, "WhiteListMode"
 		end
 	end
 
 	if(ecf.db.enableDND and ((Event <= 3 and type(flags) == "string" and flags == "DND") or Event == 101)) then -- DND, whisper/yell/say/channel and auto-reply
-		return true, "DND Filter"
-	end
-
-	if(ecf.db.enableAggressive and Event <= 3) then --AggressiveFilter
-		if (annoying >= 0.25 and annoying <= 0.8 and oriLen >= 30) then -- Annoying
-			return true, "Annoying: "..annoying
+		if not IsMyFriend then
+			return true, "DND Filter"
 		end
 	end
 
-	if(Event <= (ecf.db.blackWordFilterGroup and 4 or 3)) then --blackWord Filter, whisper/yell/say/channel and party/raid(optional)
+	if(ecf.db.enableAggressive and Event <= 3) then --AggressiveFilter
+		if not IsMyFriend then
+			if (annoying >= 0.25 and annoying <= 0.8 and oriLen >= 30) then -- Annoying
+				return true, "Annoying: "..annoying
+			end
+		end
+	end
+
+	if(Event <= (ecf.db.blackWordFilterGroup and 4 or 3) and not IsMyFriend) then --blackWord Filter, whisper/yell/say/channel and party/raid(optional)
 		local count = 0
 		for keyWord,ty in pairs(ecf.db.blackWordList) do
 			--Check blackList
@@ -151,7 +156,7 @@ local function ECFfilter(event,msg,player,flags,channelName)
 		end
 	end
 
-	if(ecf.db.chatLinesLimit > 0 and Event <= (ecf.db.repeatFilterGroup and 4 or 3)) then --Repeat Filter
+	if(ecf.db.chatLinesLimit > 0 and Event <= (ecf.db.repeatFilterGroup and 4 or 3) and not IsMyFriend) then --Repeat Filter
 		local msgLine = newfilterString
 		if(msgLine == "") then msgLine = msg end --If it has only symbols, don't change it
 
