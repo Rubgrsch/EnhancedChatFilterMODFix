@@ -65,8 +65,8 @@ if (locale == "zhCN") then
 --LootFilter
 	L["LootFilter"] = "拾取过滤器"
 	L["AddItemWithID"] = "添加ID"
+	L["BadID"] = "错误的ID"
 	L["AddedItem"] = "添加了物品%s"
-	L["ItemNotExists"] = "%s(ID=%d)不存在"
 	L["LootFilterList"] = "拾取屏蔽列表"
 	L["LootQualityFilter"] = "拾取物品质量"
 	L["LootQualityFilterTooltips"] = "显示拾取物品所需要的最低质量，低于此质量的物品将被过滤"
@@ -138,6 +138,7 @@ elseif (locale == "zhTW") then
 --LootFilter
 	L["LootFilter"] = "拾取过滤器"
 	L["AddItemWithID"] = "添加ID"
+	L["BadID"] = "错误的ID"
 	L["AddedItem"] = "添加了物品%s"
 	L["NotExists"] = "%s(ID=%d)不存在"
 	L["LootFilterList"] = "拾取屏蔽列表"
@@ -209,6 +210,7 @@ else
 --LootFilter
 	L["LootFilter"] = "LootFilter"
 	L["AddItemWithID"] = "Add With ID"
+	L["BadID"] = "Bad ID"
 	L["AddedItem"] = "Added item %s"
 	L["NotExists"] = "%s(ID = %d) doesn't exist"
 	L["LootFilterList"] = "LootFilterList"
