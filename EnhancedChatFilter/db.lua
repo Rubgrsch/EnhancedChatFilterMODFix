@@ -3,7 +3,7 @@ local _, ecf = ...
 local ECF, L, G = ecf.ECF, ecf.L, ecf.G -- Ace3, locales, global variables
 
 local _G = _G
-local select, ipairs, pairs, next, strsub, format, tonumber, tconcat, strfind, strbyte, fmod = select, ipairs, pairs, next, strsub, format, tonumber, table.concat, string.find, string.byte, math.fmod -- lua
+local type, select, ipairs, pairs, next, strsub, format, tonumber, tconcat, strfind, strbyte, fmod = type, select, ipairs, pairs, next, strsub, format, tonumber, table.concat, string.find, string.byte, math.fmod -- lua
 local band, GetCurrencyLink, GetItemInfo = bit.band, GetCurrencyLink, GetItemInfo -- BLZ
 
 --Default Options
@@ -82,6 +82,28 @@ local function StringHash(text)
 end
 
 --------------- ECF functions ---------------
+-- GetItemInfo Cache
+local ItemInfoRequested = {} -- [Id] = value; value: 0: want to add; 1: old config, true -> link
+local ItemCacheFrame = CreateFrame("Frame")
+ItemCacheFrame:RegisterEvent("GET_ITEM_INFO_RECEIVED")
+ItemCacheFrame:SetScript("OnEvent",function(self,_,Id)
+	local v = ItemInfoRequested[Id]
+	local _, link = GetItemInfo(Id)
+	if v == 0 then
+		if link then
+			ecf.db.lootItemFilterList[Id] = link
+			ECF:Print(format(L["AddedItem"],link))
+		else
+			ECF:Print(format(L["NotExists"],_G["ITEMS"],Id))
+		end
+	elseif v == 1 then
+		if ecf.db.lootItemFilterList[Id] == true then
+			ecf.db.lootItemFilterList[Id] = link
+		end
+	end
+	ItemInfoRequested[Id] = nil
+end)
+
 --Bit Mask for blackword type
 local regexBit, lesserBit = 1, 2
 
@@ -120,6 +142,12 @@ function G.DBconvert()
 			ecf.db.blackWordList[key] = nil
 			ecf.db.blackWordList[key:upper()] = v
 		end
+	end
+	for Id, info in pairs(ecf.db.lootItemFilterList) do
+		if info == true then ItemInfoRequested[Id] = 1 end
+	end
+	for Id, info in pairs(ecf.db.lootCurrencyFilterList) do
+		if info == true then ecf.db.lootCurrencyFilterList[Id] = GetCurrencyLink(Id) end
 	end
 end
 
@@ -445,17 +473,21 @@ options.args.lootFilter = {
 			get = nil,
 			set = function(_,value)
 				local Id = tonumber(value)
-				if(ecf.db.lootType == "ITEMS") then
-					if (Id == nil or GetItemInfo(Id) == nil) then -- TODO: If an item doesn't exist in cache, it reports as 'NotExists'(nil)
-						ECF:Print(format("%s: ID=%d%s",_G[ecf.db.lootType],Id,L["NotExists"]))
-					else
-						ecf.db.lootItemFilterList[Id] = true
+				local Type = ecf.db.lootType
+				if type(Id) ~= "number" then ECF:Print(L["BadID"]);return end
+				if(Type == "ITEMS") then
+					ItemInfoRequested[Id] = 0
+					local _, link = GetItemInfo(Id)
+					if link then
+						ItemInfoRequested[Id] = nil
+						ecf.db.lootItemFilterList[Id] = link
 					end
 				else
-					if (Id == nil or GetCurrencyLink(Id) == nil) then
-						ECF:Print(_G[ecf.db.lootType]..L["NotExists"])
+					local link = GetCurrencyLink(Id)
+					if (link == nil) then
+						ECF:Print(format(L["NotExists"],_G[Type],Id))
 					else
-						ecf.db.lootCurrencyFilterList[Id] = true
+						ecf.db.lootCurrencyFilterList[Id] = link
 					end
 				end
 			end,
@@ -499,8 +531,8 @@ options.args.lootFilter = {
 			set = function(_,key,value) lootHighlight[key] = value or nil end,
 			values = function()
 				local lootFilterLinkList = {}
-				for key in pairs(ecf.db.lootItemFilterList) do lootFilterLinkList[key] = select(2,GetItemInfo(key)) end
-				for key in pairs(ecf.db.lootCurrencyFilterList) do lootFilterLinkList[-key] = GetCurrencyLink(key) end
+				for key,v in pairs(ecf.db.lootItemFilterList) do lootFilterLinkList[key] = type(v) == "string" and v or select(2,GetItemInfo(key)) end
+				for key,v in pairs(ecf.db.lootCurrencyFilterList) do lootFilterLinkList[-key] = v end
 				return lootFilterLinkList
 			end,
 		},
