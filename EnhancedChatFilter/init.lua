@@ -10,12 +10,6 @@ function ECF:EnhancedChatFilterOpen()
 	InterfaceOptionsFrame_OpenToCategory("EnhancedChatFilter")
 end
 
---method run on /ecf-debug
-function ECF:EnhancedChatFilterDebug()
-	ECF:Print(ecf.db.debugMode and "Debug Mode Off!" or "Debug Mode On!")
-	ecf.db.debugMode = not ecf.db.debugMode
-end
-
 --MinimapIcon
 local ecfLDB = LibStub("LibDataBroker-1.1"):NewDataObject("Enhanced Chat Filter", {
 	type = "data source",
@@ -30,7 +24,6 @@ local ecfLDB = LibStub("LibDataBroker-1.1"):NewDataObject("Enhanced Chat Filter"
 --Initialize
 function ECF:OnInitialize()
 	ECF:RegisterChatCommand("ecf", "EnhancedChatFilterOpen")
-	ECF:RegisterChatCommand("ecf-debug", "EnhancedChatFilterDebug")
 
 	G.DBInitialize()
 	LibStub("LibDBIcon-1.0"):Register("Enhanced Chat Filter", ecfLDB, ecf.db.minimap)
