@@ -88,18 +88,17 @@ local ItemCacheFrame = CreateFrame("Frame")
 ItemCacheFrame:RegisterEvent("GET_ITEM_INFO_RECEIVED")
 ItemCacheFrame:SetScript("OnEvent",function(self,_,Id)
 	local v = ItemInfoRequested[Id]
+	if not v then return end
 	local _, link = GetItemInfo(Id)
-	if v == 0 then
-		if link then
+	if v == 0 then -- while adding
+		if link then -- if valid
 			ecf.db.lootItemFilterList[Id] = link
 			ECF:Print(format(L["AddedItem"],link))
 		else
 			ECF:Print(format(L["NotExists"],_G["ITEMS"],Id))
 		end
-	elseif v == 1 then
-		if ecf.db.lootItemFilterList[Id] == true then
-			ecf.db.lootItemFilterList[Id] = link
-		end
+	elseif v == 1 then -- change true to link
+		ecf.db.lootItemFilterList[Id] = link
 	end
 	ItemInfoRequested[Id] = nil
 end)
@@ -134,11 +133,11 @@ end
 --Convert old config to new one
 function G.DBconvert()
 	for key,v in pairs(ecf.db.blackWordList) do
-		for key2 in pairs(ecf.db.blackWordList) do
+		for key2 in pairs(ecf.db.blackWordList) do -- remove duplicate words
 			if key ~= key2 and strfind(key,key2) then ecf.db.blackWordList[key] = nil;break end
 		end
-		if(checkBlacklist(key,v.regex)) then ecf.db.blackWordList[key] = nil end
-		if(not v.regex) then
+		if(checkBlacklist(key,v.regex)) then ecf.db.blackWordList[key] = nil end -- remove invalid
+		if(not v.regex) then -- force upper
 			ecf.db.blackWordList[key] = nil
 			ecf.db.blackWordList[key:upper()] = v
 		end
@@ -473,8 +472,8 @@ options.args.lootFilter = {
 			get = nil,
 			set = function(_,value)
 				local Id = tonumber(value)
-				local Type = ecf.db.lootType
 				if type(Id) ~= "number" then ECF:Print(L["BadID"]);return end
+				local Type = ecf.db.lootType
 				if(Type == "ITEMS") then
 					ItemInfoRequested[Id] = 0
 					local _, link = GetItemInfo(Id)
@@ -484,10 +483,10 @@ options.args.lootFilter = {
 					end
 				else
 					local link = GetCurrencyLink(Id)
-					if (link == nil) then
-						ECF:Print(format(L["NotExists"],_G[Type],Id))
-					else
+					if link then
 						ecf.db.lootCurrencyFilterList[Id] = link
+					else
+						ECF:Print(format(L["NotExists"],_G[Type],Id))
 					end
 				end
 			end,
