@@ -18,5 +18,5 @@ Libs\AceConfig-3.0\AceConfig-3.0.xml
 
 init.lua
 locales.lua
-db.lua
+config.lua
 filters.lua
