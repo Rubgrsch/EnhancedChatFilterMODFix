@@ -551,13 +551,13 @@ options.args.lootFilter = {
 }
 options.args.debugWindow = {
 	type = "group",
-	name = L["DebugWindow"],
+	name = L["RecordWindow"],
 	order = 30,
 	args = {
 		debugMode = {
 			type = "toggle",
-			name = L["DebugMode"],
-			desc = L["DebugModeTooltips"],
+			name = L["ChatRecord"],
+			desc = L["ChatRecordTooltips"],
 			order = 1,
 		},
 		clearRecord = {
