@@ -67,7 +67,8 @@ if (locale == "zhCN") then
 	L["AddItemWithID"] = "添加ID"
 	L["BadID"] = "错误的ID"
 	L["AddedItem"] = "添加了物品%s"
-	L["LootFilterList"] = "拾取屏蔽列表"
+	L["ItemFilterList"] = "物品屏蔽列表"
+	L["CurrencyFilterList"] = "货币屏蔽列表"
 	L["LootQualityFilter"] = "拾取物品质量"
 	L["LootQualityFilterTooltips"] = "显示拾取物品所需要的最低质量，低于此质量的物品将被过滤"
 --AchievementFilter
@@ -141,7 +142,8 @@ elseif (locale == "zhTW") then
 	L["BadID"] = "错误的ID"
 	L["AddedItem"] = "添加了物品%s"
 	L["NotExists"] = "%s(ID=%d)不存在"
-	L["LootFilterList"] = "拾取屏蔽列表"
+	L["ItemFilterList"] = "物品屏蔽列表"
+	L["CurrencyFilterList"] = "货币屏蔽列表"
 	L["LootQualityFilter"] = "拾取物品质量"
 	L["LootQualityFilterTooltips"] = "显示拾取物品所需要的最低质量，低于此质量的物品将被过滤"
 --AchievementFilter
@@ -213,7 +215,8 @@ else
 	L["BadID"] = "Bad ID"
 	L["AddedItem"] = "Added item %s"
 	L["NotExists"] = "%s(ID = %d) doesn't exist"
-	L["LootFilterList"] = "LootFilterList"
+	L["ItemFilterList"] = "ItemFilterList"
+	L["CurrencyFilterList"] = "CurrencyFilterList"
 	L["LootQualityFilter"] = "LootItemQuality"
 	L["LootQualityFilterTooltips"] = "Filter any loot that is poorer than you choose"
 --AchievementFilter

@@ -153,7 +153,7 @@ end
 --------------- Options ---------------
 --These settings won't be saved
 local highlightIsLesser, blackWordHighlight = false, ""
-local lootHighlight = {}
+local itemHighlight, currencyHighlight = 0, 0
 local stringIO = "" -- blackWord input
 local regexToggle, lesserToggle = false, false
 
@@ -465,10 +465,59 @@ options.args.lootFilter = {
 	name = L["LootFilter"],
 	order = 12,
 	args = {
+		itemFilterList = {
+			type = "select",
+			name = L["ItemFilterList"],
+			order = 1,
+			get = function() return itemHighlight end,
+			set = function(_,value) itemHighlight, currencyHighlight = value or nil, 0 end,
+			values = function()
+				local itemFilterLinkList = {}
+				for key,v in pairs(ecf.db.lootItemFilterList) do itemFilterLinkList[key] = type(v) == "string" and v or select(2,GetItemInfo(key)) end
+				return itemFilterLinkList
+			end,
+		},
+		currencyFilterList = {
+			type = "select",
+			name = L["CurrencyFilterList"],
+			order = 2,
+			get = function() return currencyHighlight end,
+			set = function(_,value) currencyHighlight, itemHighlight = value or nil, 0 end,
+			values = function()
+				local currencyFilterLinkList = {}
+				for key,v in pairs(ecf.db.lootCurrencyFilterList) do currencyFilterLinkList[key] = v end
+				return currencyFilterLinkList
+			end,
+		},
+		DeleteButton = {
+			type = "execute",
+			name = _G["REMOVE"],
+			order = 3,
+			func = function()
+				if(itemHighlight > 0) then ecf.db.lootItemFilterList[itemHighlight] = nil end
+				if(currencyHighlight > 0) then ecf.db.lootCurrencyFilterList[currencyHighlight] = nil end
+				itemHighlight, currencyHighlight = 0, 0
+			end,
+			disabled = function() return itemHighlight == 0 and currencyHighlight end,
+		},
+		ClearUpButton = {
+			type = "execute",
+			name = L["ClearUp"],
+			order = 4,
+			func = function() ecf.db.lootItemFilterList, ecf.db.lootCurrencyFilterList, itemHighlight, currencyHighlight = {}, {}, 0, 0 end,
+			confirm = true,
+			confirmText = format(L["DoYouWantToClear"],L["LootFilter"]),
+			disabled = function() return next(ecf.db.lootItemFilterList) == nil and next(ecf.db.lootCurrencyFilterList) == nil end,
+		},
+		line1 = {
+			type = "header",
+			name = "",
+			order = 10,
+		},
 		addItem = {
 			type = "input",
 			name = L["AddItemWithID"],
-			order = 1,
+			order = 11,
 			get = nil,
 			set = function(_,value)
 				local Id = tonumber(value)
@@ -494,57 +543,19 @@ options.args.lootFilter = {
 		lootType = {
 			type = "select",
 			name = _G["TYPE"],
-			order = 2,
+			order = 12,
 			values = {["ITEMS"] = _G["ITEMS"], ["CURRENCY"] = _G["CURRENCY"]},
 		},
-		DeleteButton = {
-			type = "execute",
-			name = _G["REMOVE"],
-			order = 3,
-			func = function()
-				for key in pairs(lootHighlight) do
-					if(key > 0) then
-						ecf.db.lootItemFilterList[key] = nil
-					else
-						ecf.db.lootCurrencyFilterList[-key] = nil
-					end
-				end
-				lootHighlight = {}
-			end,
-			disabled = function() return next(lootHighlight) == nil end,
-		},
-		ClearUpButton = {
-			type = "execute",
-			name = L["ClearUp"],
-			order = 4,
-			func = function() ecf.db.lootItemFilterList, ecf.db.lootCurrencyFilterList, lootHighlight = {}, {}, {} end,
-			confirm = true,
-			confirmText = format(L["DoYouWantToClear"],L["LootFilterList"]),
-			disabled = function() return next(ecf.db.lootItemFilterList) == nil and next(ecf.db.lootCurrencyFilterList) == nil end,
-		},
-		LootFilterList = {
-			type = "multiselect",
-			name = L["LootFilterList"],
-			order = 5,
-			get = function(_,key) return lootHighlight[key] end,
-			set = function(_,key,value) lootHighlight[key] = value or nil end,
-			values = function()
-				local lootFilterLinkList = {}
-				for key,v in pairs(ecf.db.lootItemFilterList) do lootFilterLinkList[key] = type(v) == "string" and v or select(2,GetItemInfo(key)) end
-				for key,v in pairs(ecf.db.lootCurrencyFilterList) do lootFilterLinkList[-key] = v end
-				return lootFilterLinkList
-			end,
-		},
-		line1 = {
+		line2 = {
 			type = "header",
-			name = "",
-			order = 10,
+			name = L["LootQualityFilter"],
+			order = 50,
 		},
 		lootQualityMin = {
 			type = "select",
 			name = L["LootQualityFilter"],
 			desc = L["LootQualityFilterTooltips"],
-			order = 11,
+			order = 51,
 			values = colorT,
 		},
 	},
