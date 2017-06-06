@@ -211,13 +211,6 @@ options.args.General = {
 			hidden = function() return ecf.db.advancedConfig end,
 			order = 9,
 		},
-	}
-}
-options.args.ToggleTab = {
-	type = "group",
-	name = _G["FILTERS"],
-	order = 10,
-	args = {
 		line1 = {
 			type = "header",
 			name = _G["FILTERS"],
