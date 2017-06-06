@@ -176,7 +176,6 @@ local options = {
 	name = "EnhancedChatFilter "..GetAddOnMetadata("EnhancedChatFilter", "Version"),
 	get = function(info) return ecf.db[info[#info]] end,
 	set = function(info, value) ecf.db[info[#info]] = value end,
-	disabled = function() return not ecf.db.enableFilter end,
 	childGroups = "tab",
 	args = {},
 }
@@ -189,7 +188,6 @@ options.args.General = {
 			type = "toggle",
 			name = L["MainFilter"],
 			order = 1,
-			disabled = false,
 		},
 		MinimapToggle = {
 			type = "toggle",
