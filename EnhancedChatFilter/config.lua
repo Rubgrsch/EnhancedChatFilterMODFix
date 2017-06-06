@@ -316,7 +316,6 @@ options.args.blackListTab = {
 			set = function(_,value)
 				AddBlackWord(value, regexToggle, lesserToggle)
 			end,
-			width = "full",
 		},
 		regexToggle = {
 			type = "toggle",
@@ -337,34 +336,83 @@ options.args.blackListTab = {
 		},
 		line1 = {
 			type = "header",
-			name = _G["OPTIONS"],
+			name = "",
 			order = 10,
+		},
+		blackWordList = {
+			type = "select",
+			name = L["BlackwordList"],
+			order = 11,
+			get = function() return highlightIsLesser and "" or blackWordHighlight end,
+			set = function(_,value) highlightIsLesser, blackWordHighlight = false, value end,
+			values = function()
+				local blacklistname = {}
+				for key,v in pairs(ecf.db.blackWordList) do if not v.lesser then blacklistname[key] = key end end
+				return blacklistname
+			end,
+		},
+		lesserBlackWordList = {
+			type = "select",
+			name = L["LesserBlackwordList"],
+			order = 12,
+			get = function() return highlightIsLesser and blackWordHighlight or "" end,
+			set = function(_,value) highlightIsLesser, blackWordHighlight = true, value	end,
+			values = function()
+				local blacklistname = {}
+				for key,v in pairs(ecf.db.blackWordList) do if v.lesser then blacklistname[key] = key end end
+				return blacklistname
+			end,
+			hidden = function() return not ecf.db.advancedConfig end,
+		},
+		DeleteButton = {
+			type = "execute",
+			name = _G["REMOVE"],
+			order = 13,
+			func = function()
+				ecf.db.blackWordList[blackWordHighlight] = nil
+				blackWordHighlight = ""
+			end,
+			disabled = function() return blackWordHighlight == "" end,
+		},
+		ClearUpButton = {
+			type = "execute",
+			name = L["ClearUp"],
+			order = 14,
+			func = function() ecf.db.blackWordList, blackWordHighlight = {}, "" end,
+			confirm = true,
+			confirmText = format(L["DoYouWantToClear"],L["BlackList"]),
+			disabled = function() return next(ecf.db.blackWordList) == nil end,
+		},
+		line2 = {
+			type = "header",
+			name = _G["OPTIONS"],
+			order = 20,
 		},
 		blackWordFilterGroup = {
 			type = "toggle",
 			name = L["AlsoFilterGroup"],
 			desc = L["AlsoFilterGroupTooltips"],
-			order = 11,
+			order = 21,
 		},
 		lesserBlackWordThreshold = {
 			type = "range",
 			name = L["LesserBlackWordThreshold"],
 			desc = L["LesserBlackWordThresholdTooltips"],
-			order = 12,
+			order = 22,
 			min = 2,
 			max = 5,
 			step = 1,
 			hidden = function() return not ecf.db.advancedConfig end,
 		},
-		line2 = {
+		line3 = {
 			type = "header",
 			name = L["StringIO"],
-			order = 20,
+			order = 30,
 		},
 		stringconfig = {
 			type = "input",
 			name = "",
-			order = 21,
+			order = 31,
 			get = function() return stringIO end,
 			set = function(_,value) stringIO = value end,
 			width = "full",
@@ -372,7 +420,7 @@ options.args.blackListTab = {
 		import = {
 			type = "execute",
 			name = L["Import"],
-			order = 22,
+			order = 32,
 			func = function()
 				local wordString, HashString = strsplit("@", stringIO)
 				if (tonumber(HashString) ~= StringHash(wordString)) then
@@ -394,7 +442,7 @@ options.args.blackListTab = {
 		export = {
 			type = "execute",
 			name = L["Export"],
-			order = 23,
+			order = 33,
 			func = function()
 				local blackStringList = {}
 				for key,v in pairs(ecf.db.blackWordList) do
@@ -408,55 +456,6 @@ options.args.blackListTab = {
 				local blackString = tconcat(blackStringList,";")
 				stringIO = blackString.."@"..StringHash(blackString)
 			end,
-		},
-		line3 = {
-			type = "header",
-			name = "",
-			order = 50,
-		},
-		blackWordList = {
-			type = "select",
-			name = L["BlackwordList"],
-			order = 51,
-			get = function() return highlightIsLesser and "" or blackWordHighlight end,
-			set = function(_,value) highlightIsLesser, blackWordHighlight = false, value end,
-			values = function()
-				local blacklistname = {}
-				for key,v in pairs(ecf.db.blackWordList) do if not v.lesser then blacklistname[key] = key end end
-				return blacklistname
-			end,
-		},
-		lesserBlackWordList = {
-			type = "select",
-			name = L["LesserBlackwordList"],
-			order = 52,
-			get = function() return highlightIsLesser and blackWordHighlight or "" end,
-			set = function(_,value) highlightIsLesser, blackWordHighlight = true, value	end,
-			values = function()
-				local blacklistname = {}
-				for key,v in pairs(ecf.db.blackWordList) do if v.lesser then blacklistname[key] = key end end
-				return blacklistname
-			end,
-			hidden = function() return not ecf.db.advancedConfig end,
-		},
-		DeleteButton = {
-			type = "execute",
-			name = _G["REMOVE"],
-			order = 53,
-			func = function()
-				ecf.db.blackWordList[blackWordHighlight] = nil
-				blackWordHighlight = ""
-			end,
-			disabled = function() return blackWordHighlight == "" end,
-		},
-		ClearUpButton = {
-			type = "execute",
-			name = L["ClearUp"],
-			order = 54,
-			func = function() ecf.db.blackWordList, blackWordHighlight = {}, "" end,
-			confirm = true,
-			confirmText = format(L["DoYouWantToClear"],L["BlackList"]),
-			disabled = function() return next(ecf.db.blackWordList) == nil end,
 		},
 	},
 }
