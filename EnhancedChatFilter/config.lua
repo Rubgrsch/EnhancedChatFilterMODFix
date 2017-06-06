@@ -200,14 +200,12 @@ options.args.General = {
 			order = 2,
 			disabled = false,
 		},
-		AdvancedWarning = {
-			type = "execute",
-			name = L["EnableAdvancedConfig"],
-			confirm = true,
-			confirmText = L["AdvancedWarningText"],
-			func = function() ecf.db.advancedConfig = true end,
-			hidden = function() return ecf.db.advancedConfig end,
+		advancedConfig = {
+			type = "toggle",
+			name = L["DisplayAdvancedConfig"],
+			desc = L["DisplayAdvancedConfigTooltips"],
 			order = 9,
+			confirm = function() return not ecf.db.advancedConfig end,
 		},
 		line1 = {
 			type = "header",
@@ -268,7 +266,7 @@ options.args.General = {
 			name = L["RepeatOptions"],
 			order = 40,
 		},
-		chatLinesLimit = {
+		chatLinesLimit = { -- only show in advanced mode
 			type = "range",
 			name = L["chatLinesLimit"],
 			desc = L["chatLinesLimitTooltips"],
@@ -277,6 +275,16 @@ options.args.General = {
 			max = 100,
 			step = 1,
 			bigStep = 5,
+			hidden = function() return not ecf.db.advancedConfig end,
+		},
+		repeatToggle = { -- only show in non-advanced mode
+			type = "toggle",
+			name = L["RepeatFilter"],
+			desc = L["RepeatFilterTooltips"],
+			order = 41,
+			get = function() return ecf.db.chatLinesLimit ~= 0 end,
+			set = function(_,value) ecf.db.chatLinesLimit = value and 20 or 0 end,
+			hidden = function() return ecf.db.advancedConfig end,
 		},
 		multiLine = {
 			type = "toggle",
@@ -284,6 +292,7 @@ options.args.General = {
 			desc = L["MultiLinesTooltip"],
 			order = 42,
 			disabled = function() return ecf.db.chatLinesLimit == 0 end,
+			hidden = function() return not ecf.db.advancedConfig end,
 		},
 		repeatFilterGroup = {
 			type = "toggle",
@@ -315,6 +324,7 @@ options.args.blackListTab = {
 			get = function() return regexToggle end,
 			set = function(_,value) regexToggle = value end,
 			order = 2,
+			hidden = function() return not ecf.db.advancedConfig end,
 		},
 		lesserToggle = {
 			type = "toggle",
