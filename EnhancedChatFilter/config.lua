@@ -416,6 +416,8 @@ options.args.blackListTab = {
 			get = function() return stringIO end,
 			set = function(_,value) stringIO = value end,
 			width = "full",
+			multiline = 4,
+			control = "ECFTextBox",
 		},
 		import = {
 			type = "execute",
@@ -598,6 +600,7 @@ options.args.debugWindow = {
 			width = "full",
 			order = 10,
 			hidden = function() return not ecf.db.debugMode end,
+			control = "ECFTextBox",
 		},
 	},
 }
