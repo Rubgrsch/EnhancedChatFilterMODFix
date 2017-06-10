@@ -43,10 +43,6 @@ if (locale == "zhCN") then
 	L["WhisperWhitelistModeTooltip"] = "除了工会、团队、小队、好友发送的密语外，只允许你发送过密语的对方才能对你发起密语|n|cffE2252D慎用！"
 	L["Aggressive"] = "额外过滤器"
 	L["AggressiveTooltip"] = "一些会极大提高过滤效果和|cffE2252D误伤机率|r的过滤器集合"
-	L["RecordWindow"] = "聊天记录"
-	L["ChatRecord"] = "聊天消息记录"
-	L["ChatRecordTooltips"] = "开启后聊天信息会被记录并可以查看哪些信息被过滤。|n这将占用一定内存。"
-	L["ClearRecord"] = "清除聊天记录"
 --BlackwordList
 	L["BlackwordList"] = "黑名单关键词"
 	L["AddBlackWordTitle"] = "添加新黑名单关键词"
@@ -76,6 +72,14 @@ if (locale == "zhCN") then
 --AchievementFilter
 	L["GotAchievement"] = "[%s]获得了成就%s！"
 	L["And"] = "、"
+--Record
+	L["RecordWindow"] = "聊天记录"
+	L["ChatRecord"] = "聊天消息记录"
+	L["ChatRecordTooltips"] = "开启后聊天信息会被记录并可以查看哪些信息被过滤。|n这将占用一定内存。"
+	L["ClearRecord"] = "清除聊天记录"
+	L["ShowAll"] = "全部显示"
+	L["OnlyFiltered"] = "仅过滤"
+	L["OnlyUnfiltered"] = "仅未过滤"
 
 -----------------------------------------------------------------------
 -- zhTW -- NEED HELP
@@ -119,10 +123,6 @@ elseif (locale == "zhTW") then
 	L["WhisperWhitelistModeTooltip"] = "除了工会、团队、小队、好友发送的密语外，只允许你发送过密语的对方才能对你发起密语|n|cffE2252D慎用！"
 	L["Aggressive"] = "额外过滤器"
 	L["AggressiveTooltip"] = "一些会极大提高过滤效果和|cffE2252D误伤机率|r的过滤器集合"
-	L["RecordWindow"] = "聊天记录"
-	L["ChatRecord"] = "聊天消息记录"
-	L["ChatRecordTooltips"] = "开启后聊天信息会被记录并可以查看哪些信息被过滤。|n这将占用一定内存。"
-	L["ClearRecord"] = "清除聊天记录"
 --BlackwordList
 	L["BlackwordList"] = "黑名单關鍵詞"
 	L["AddBlackWordTitle"] = "添加新黑名單關鍵詞"
@@ -153,6 +153,15 @@ elseif (locale == "zhTW") then
 --AchievementFilter
 	L["GotAchievement"] = "[%s]獲得了成就%s！"
 	L["And"] = "、"
+--Record
+	L["RecordWindow"] = "聊天记录"
+	L["ChatRecord"] = "聊天消息记录"
+	L["ChatRecordTooltips"] = "开启后聊天信息会被记录并可以查看哪些信息被过滤。|n这将占用一定内存。"
+	L["ClearRecord"] = "清除聊天记录"
+	L["ShowAll"] = "全部显示"
+	L["OnlyFiltered"] = "仅过滤"
+	L["OnlyUnfiltered"] = "仅未过滤"
+
 -----------------------------------------------------------------------
 -- Default -- NEED HELP
 -----------------------------------------------------------------------
@@ -194,10 +203,6 @@ else
 	L["WhisperWhitelistModeTooltip"] = "Filter all whisper unless it's from guild/group/raid/friends or you have just whisper them|n|cffE2252DUse with care!"
 	L["Aggressive"] = "Aggressive Filters"
 	L["AggressiveTooltip"] = "Some aggressive but effective Filters."
-	L["RecordWindow"] = "Chat Record"
-	L["ChatRecord"] = "Chat Record"
-	L["ChatRecordTooltips"] = "Enable chat record. This will record chat msg and you can check whether they are filtered by ECF. This will consume some memory."
-	L["ClearRecord"] = "ClearRecord"
 --BlackwordList
 	L["BlackwordList"] = "BlackWordList"
 	L["AddBlackWordTitle"] = "Add Blackword"
@@ -228,6 +233,14 @@ else
 --AchievementFilter
 	L["GotAchievement"] = "[%s]have earned the achievement%s!"
 	L["And"] = ", "
+--Record
+	L["RecordWindow"] = "Chat Record"
+	L["ChatRecord"] = "Chat Record"
+	L["ChatRecordTooltips"] = "Enable chat record. This will record chat msg and you can check whether they are filtered by ECF. This will consume some memory."
+	L["ClearRecord"] = "ClearRecord"
+	L["ShowAll"] = "ShowAll"
+	L["OnlyFiltered"] = "OnlyFiltered"
+	L["OnlyUnfiltered"] = "OnlyUnfiltered"
 end
 
 setmetatable(ecf.L, {__index=function(self, key)

@@ -3,7 +3,7 @@ local _, ecf = ...
 local ECF, L, G = ecf.ECF, ecf.L, ecf.G -- Ace3, locales, global variables
 
 local _G = _G
-local type, select, ipairs, pairs, next, strsub, format, tonumber, tconcat, strfind, strbyte, fmod = type, select, ipairs, pairs, next, strsub, format, tonumber, table.concat, string.find, string.byte, math.fmod -- lua
+local type, select, ipairs, pairs, next, strsub, format, tonumber, tconcat, strfind, strbyte, fmod, unpack = type, select, ipairs, pairs, next, strsub, format, tonumber, table.concat, string.find, string.byte, math.fmod, unpack -- lua
 local band, GetCurrencyLink, GetItemInfo = bit.band, GetCurrencyLink, GetItemInfo -- BLZ
 
 --Default Options
@@ -35,6 +35,7 @@ local defaults = {
 		debugMode = false,
 		record = {},
 		recordPos = 1,
+		ChatRecordOnlyShow = 1,
 	}
 }
 
@@ -161,6 +162,7 @@ local colorT = {} -- used in lootFilter
 for i=0, 4 do
 	colorT[i]=format("|c%s%s|r",select(4,GetItemQualityColor(i)),_G["ITEM_QUALITY"..i.."_DESC"])
 end
+local recordShowT = {L["ShowAll"],L["OnlyFiltered"],L["OnlyUnfiltered"]}
 
 local function AddBlackWord(word, r, l)
 	if (checkBlacklist(word, r)) then
@@ -579,20 +581,29 @@ options.args.debugWindow = {
 			order = 2,
 			func = function() ecf.db.record, ecf.db.recordPos = {}, 1 end
 		},
+		ChatRecordOnlyShow = {
+			type = "select",
+			name = "",
+			order = 3,
+			values = recordShowT,
+		},
 		recordList = {
 			type = "input",
 			name = "",
 			get = function()
-				local pos, t, IsMax = ecf.db.recordPos, {}, #ecf.db.record == 500
-				for idx,v in ipairs(ecf.db.record) do
-					local i
+				local pos, t, IsMax, showUnfilted, showFilted = ecf.db.recordPos, {}, #ecf.db.record == 500, ecf.db.ChatRecordOnlyShow ~= 2, ecf.db.ChatRecordOnlyShow ~= 3
+				for i = 1, #ecf.db.record do
+					local j
 					if IsMax then
-						i = idx - pos + 1
-						if i <= 0 then i = i + 500 end
+						j = pos + i -1
+						if j > 500 then j = j - 500 end
 					else
-						i = idx
+						j = i
 					end
-					t[i] = format("|TInterface\\TargetingFrame\\UI-RaidTargetingIcon_%d:0|t %s: %s",v[5] and 7 or 2,v[3],v[2])
+					local _,msg,trimmedPlayer,_,filterResult = unpack(ecf.db.record[j])
+					if (showUnfilted and not filterResult) or (showFilted and filterResult) then
+						t[#t+1] = format("|TInterface\\TargetingFrame\\UI-RaidTargetingIcon_%d:0|t %s: %s",filterResult and 7 or 2,trimmedPlayer,msg)
+					end
 				end
 				return tconcat(t,"|n")
 			end,
