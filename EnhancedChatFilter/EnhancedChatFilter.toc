@@ -5,6 +5,7 @@
 ## Author: Rubgrsch
 ## Version: 7.2.0-3
 ## SavedVariables: ecfDB
+## OptionalDep: ElvUI
 
 libs\LibStub\LibStub.lua
 libs\CallbackHandler-1.0\CallbackHandler-1.0.lua
