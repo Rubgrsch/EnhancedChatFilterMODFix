@@ -310,42 +310,10 @@ options.args.blackListTab = {
 	name = L["BlackwordList"],
 	order = 11,
 	args = {
-		blackword = {
-			type = "input",
-			name = L["AddBlackWordTitle"],
-			order = 1,
-			get = nil,
-			set = function(_,value)
-				AddBlackWord(value, regexToggle, lesserToggle)
-			end,
-		},
-		regexToggle = {
-			type = "toggle",
-			name = L["Regex"],
-			desc = L["RegexTooltip"],
-			get = function() return regexToggle end,
-			set = function(_,value) regexToggle = value end,
-			order = 2,
-			hidden = function() return not ecf.db.advancedConfig end,
-		},
-		lesserToggle = {
-			type = "toggle",
-			name = L["LesserBlackWord"],
-			desc = L["LesserBlackWordTooltip"],
-			get = function() return lesserToggle end,
-			set = function(_,value) lesserToggle = value end,
-			order = 3,
-			hidden = function() return not ecf.db.advancedConfig end,
-		},
-		line1 = {
-			type = "header",
-			name = "",
-			order = 10,
-		},
 		blackWordList = {
 			type = "select",
 			name = L["BlackwordList"],
-			order = 11,
+			order = 1,
 			get = function() return highlightIsLesser and "" or blackWordHighlight end,
 			set = function(_,value) highlightIsLesser, blackWordHighlight = false, value end,
 			values = function()
@@ -357,7 +325,7 @@ options.args.blackListTab = {
 		lesserBlackWordList = {
 			type = "select",
 			name = L["LesserBlackwordList"],
-			order = 12,
+			order = 2,
 			get = function() return highlightIsLesser and blackWordHighlight or "" end,
 			set = function(_,value) highlightIsLesser, blackWordHighlight = true, value	end,
 			values = function()
@@ -370,7 +338,7 @@ options.args.blackListTab = {
 		DeleteButton = {
 			type = "execute",
 			name = _G["REMOVE"],
-			order = 13,
+			order = 3,
 			func = function()
 				ecf.db.blackWordList[blackWordHighlight] = nil
 				blackWordHighlight = ""
@@ -380,11 +348,43 @@ options.args.blackListTab = {
 		ClearUpButton = {
 			type = "execute",
 			name = L["ClearUp"],
-			order = 14,
+			order = 4,
 			func = function() ecf.db.blackWordList, blackWordHighlight = {}, "" end,
 			confirm = true,
 			confirmText = format(L["DoYouWantToClear"],L["BlackList"]),
 			disabled = function() return next(ecf.db.blackWordList) == nil end,
+		},
+		line1 = {
+			type = "header",
+			name = "",
+			order = 10,
+		},
+		blackword = {
+			type = "input",
+			name = L["AddBlackWordTitle"],
+			order = 11,
+			get = nil,
+			set = function(_,value)
+				AddBlackWord(value, regexToggle, lesserToggle)
+			end,
+		},
+		regexToggle = {
+			type = "toggle",
+			name = L["Regex"],
+			desc = L["RegexTooltip"],
+			get = function() return regexToggle end,
+			set = function(_,value) regexToggle = value end,
+			order = 12,
+			hidden = function() return not ecf.db.advancedConfig end,
+		},
+		lesserToggle = {
+			type = "toggle",
+			name = L["LesserBlackWord"],
+			desc = L["LesserBlackWordTooltip"],
+			get = function() return lesserToggle end,
+			set = function(_,value) lesserToggle = value end,
+			order = 13,
+			hidden = function() return not ecf.db.advancedConfig end,
 		},
 		line2 = {
 			type = "header",
