@@ -209,17 +209,13 @@ for event in pairs(chatChannel) do ChatFrame_AddMessageEventFilter(event, ECFfil
 local MSFOffQuestT = {[42880] = true} -- 42880: Meeting their Quota
 local MSFOffQuestFlag = false
 
-local QuestAf = CreateFrame("Frame")
-QuestAf:RegisterEvent("QUEST_ACCEPTED")
-QuestAf:SetScript("OnEvent", function(self,_,_,questId)
-	if MSFOffQuestT[questId] then MSFOffQuestFlag = true end
-end)
-
 --TODO: If player uses hearthstone to leave questzone, QUEST_REMOVED is not fired.
-local QuestRf = CreateFrame("Frame")
-QuestRf:RegisterEvent("QUEST_REMOVED") -- Fires when turn in or leave quest zone, but cant get questId when turn in
-QuestRf:SetScript("OnEvent", function(self,_,questId)
-	if MSFOffQuestT[questId] then MSFOffQuestFlag = false end
+local Questf = CreateFrame("Frame")
+Questf:RegisterEvent("QUEST_ACCEPTED")
+Questf:RegisterEvent("QUEST_REMOVED")
+Questf:SetScript("OnEvent", function(self,event,arg1,arg2)
+	if event == "QUEST_ACCEPTED" and MSFOffQuestT[arg2] then MSFOffQuestFlag = true end
+	if event == "QUEST_REMOVED" and MSFOffQuestT[arg1] then MSFOffQuestFlag = false end
 end)
 
 local monsterLines = {}
