@@ -2,7 +2,7 @@
 local _, ecf = ...
 ecf.ECF = LibStub("AceAddon-3.0"):NewAddon("EnhancedChatFilter", "AceConsole-3.0")
 ecf.L, ecf.G = {}, {}
-local ECF, G = ecf.ECF, ecf.G
+local ECF, L, G = ecf.ECF, ecf.L, ecf.G
 
 --method run on /ecf
 function ECF:EnhancedChatFilterOpen()
