@@ -270,58 +270,61 @@ local function Constructor()
 	return AceGUI:RegisterAsWidget(widget)
 end
 
-local function ConstructorHook()
-	local widget = Constructor()
-	if IsAddOnLoaded("ElvUI") then -- ElvUI Skin, code stolen from ElvUI
-		local S = _G["ElvUI"][1]["Skins"]
-		local frame = widget.scrollBar
-		local name = frame:GetName()
-		if _G[name.."ScrollUpButton"] and _G[name.."ScrollDownButton"] then
-			local scrollUpWidth, scrollUpHeight = _G[name.."ScrollUpButton"]:GetWidth(), _G[name.."ScrollUpButton"]:GetHeight()
-			local scrollDownWidth, scrollDownHeight = _G[name.."ScrollDownButton"]:GetWidth(), _G[name.."ScrollDownButton"]:GetHeight()
+-- ElvUI Skin, code stolen from ElvUI
+local function ElvUISkin(widget)
+	local S = _G["ElvUI"][1]["Skins"]
+	local frame = widget.scrollBar
+	local name = frame:GetName()
+	if _G[name.."ScrollUpButton"] and _G[name.."ScrollDownButton"] then
+		local scrollUpWidth, scrollUpHeight = _G[name.."ScrollUpButton"]:GetWidth(), _G[name.."ScrollUpButton"]:GetHeight()
+		local scrollDownWidth, scrollDownHeight = _G[name.."ScrollDownButton"]:GetWidth(), _G[name.."ScrollDownButton"]:GetHeight()
 
-			_G[name.."ScrollUpButton"]:StripTextures()
-			if not _G[name.."ScrollUpButton"].icon then
-				S:HandleNextPrevButton(_G[name.."ScrollUpButton"])
-				SquareButton_SetIcon(_G[name.."ScrollUpButton"], 'UP')
-				_G[name.."ScrollUpButton"]:Size(scrollUpWidth, scrollUpHeight) --Set size back to what it originally was
-			end
+		_G[name.."ScrollUpButton"]:StripTextures()
+		if not _G[name.."ScrollUpButton"].icon then
+			S:HandleNextPrevButton(_G[name.."ScrollUpButton"])
+			SquareButton_SetIcon(_G[name.."ScrollUpButton"], 'UP')
+			_G[name.."ScrollUpButton"]:Size(scrollUpWidth, scrollUpHeight) --Set size back to what it originally was
+		end
 
-			_G[name.."ScrollDownButton"]:StripTextures()
-			if not _G[name.."ScrollDownButton"].icon then
-				S:HandleNextPrevButton(_G[name.."ScrollDownButton"])
-				SquareButton_SetIcon(_G[name.."ScrollDownButton"], 'DOWN')
-				_G[name.."ScrollDownButton"]:Size(scrollDownWidth, scrollDownHeight) --Set size back to what it originally was
-			end
+		_G[name.."ScrollDownButton"]:StripTextures()
+		if not _G[name.."ScrollDownButton"].icon then
+			S:HandleNextPrevButton(_G[name.."ScrollDownButton"])
+			SquareButton_SetIcon(_G[name.."ScrollDownButton"], 'DOWN')
+			_G[name.."ScrollDownButton"]:Size(scrollDownWidth, scrollDownHeight) --Set size back to what it originally was
+		end
 
-			if not frame.trackbg then
-				frame.trackbg = CreateFrame("Frame", nil, frame)
-				frame.trackbg:Point("TOPLEFT", _G[name.."ScrollUpButton"], "BOTTOMLEFT", 0, -1)
-				frame.trackbg:Point("BOTTOMRIGHT", _G[name.."ScrollDownButton"], "TOPRIGHT", 0, 1)
-				frame.trackbg:SetTemplate("Transparent")
-			end
+		if not frame.trackbg then
+			frame.trackbg = CreateFrame("Frame", nil, frame)
+			frame.trackbg:Point("TOPLEFT", _G[name.."ScrollUpButton"], "BOTTOMLEFT", 0, -1)
+			frame.trackbg:Point("BOTTOMRIGHT", _G[name.."ScrollDownButton"], "TOPRIGHT", 0, 1)
+			frame.trackbg:SetTemplate("Transparent")
+		end
 
-			if frame:GetThumbTexture() then
-				frame:GetThumbTexture():SetTexture(nil)
-				if not frame.thumbbg then
-					frame.thumbbg = CreateFrame("Frame", nil, frame)
-					frame.thumbbg:Point("TOPLEFT", frame:GetThumbTexture(), "TOPLEFT", 2, -3)
-					frame.thumbbg:Point("BOTTOMRIGHT", frame:GetThumbTexture(), "BOTTOMRIGHT", -2, 3)
-					frame.thumbbg:SetTemplate("Default", true, true)
-					frame.thumbbg.backdropTexture:SetVertexColor(0.6, 0.6, 0.6)
-					if frame.trackbg then
-						frame.thumbbg:SetFrameLevel(frame.trackbg:GetFrameLevel())
-					end
+		if frame:GetThumbTexture() then
+			frame:GetThumbTexture():SetTexture(nil)
+			if not frame.thumbbg then
+				frame.thumbbg = CreateFrame("Frame", nil, frame)
+				frame.thumbbg:Point("TOPLEFT", frame:GetThumbTexture(), "TOPLEFT", 2, -3)
+				frame.thumbbg:Point("BOTTOMRIGHT", frame:GetThumbTexture(), "BOTTOMRIGHT", -2, 3)
+				frame.thumbbg:SetTemplate("Default", true, true)
+				frame.thumbbg.backdropTexture:SetVertexColor(0.6, 0.6, 0.6)
+				if frame.trackbg then
+					frame.thumbbg:SetFrameLevel(frame.trackbg:GetFrameLevel())
 				end
 			end
 		end
-		frame:Point("RIGHT", widget.frame, "RIGHT", 0 -4)
-		if not widget.scrollBG.template then
-			widget.scrollBG:SetTemplate('Default')
-		end
-		widget.scrollBG:Point("TOPRIGHT", frame, "TOPLEFT", -2, 19)
-		widget.scrollFrame:Point("BOTTOMRIGHT", widget.scrollBG, "BOTTOMRIGHT", -4, 8)
 	end
+	frame:Point("RIGHT", widget.frame, "RIGHT", 0 -4)
+	if not widget.scrollBG.template then
+		widget.scrollBG:SetTemplate('Default')
+	end
+	widget.scrollBG:Point("TOPRIGHT", frame, "TOPLEFT", -2, 19)
+	widget.scrollFrame:Point("BOTTOMRIGHT", widget.scrollBG, "BOTTOMRIGHT", -4, 8)
+end
+
+local function ConstructorHook()
+	local widget = Constructor()
+	if IsAddOnLoaded("ElvUI") then ElvUISkin(widget) end
 	return widget
 end
 
