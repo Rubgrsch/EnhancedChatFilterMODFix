@@ -109,17 +109,13 @@ local function ECFfilter(event,msg,player,flags,channelName)
 		end
 	end
 
-	if(ecf.db.enableDND and ((Event <= 3 and type(flags) == "string" and flags == "DND") or Event == 101)) then -- DND, whisper/yell/say/channel and auto-reply
-		if not IsMyFriend then
-			return true, "DND Filter"
-		end
+	if(ecf.db.enableDND and ((Event <= 3 and type(flags) == "string" and flags == "DND") or Event == 101) and not IsMyFriend) then -- DND, whisper/yell/say/channel and auto-reply
+		return true, "DND Filter"
 	end
 
-	if(ecf.db.enableAggressive and Event <= 3) then --AggressiveFilter
-		if not IsMyFriend then
-			if (annoying >= 0.25 and annoying <= 0.8 and oriLen >= 30) then -- Annoying
-				return true, "Annoying: "..annoying
-			end
+	if(ecf.db.enableAggressive and Event <= 3 and not IsMyFriend) then --AggressiveFilter
+		if (annoying >= 0.25 and annoying <= 0.8 and oriLen >= 30) then -- Annoying
+			return true, "Annoying: "..annoying
 		end
 	end
 

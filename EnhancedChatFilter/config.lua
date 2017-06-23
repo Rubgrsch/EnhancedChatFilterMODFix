@@ -96,7 +96,7 @@ ItemCacheFrame:SetScript("OnEvent",function(self,_,Id)
 			ecf.db.lootItemFilterList[Id] = link
 			ECF:Print(format(L["AddedItem"],link))
 		else
-			ECF:Print(format(L["NotExists"],_G["ITEMS"],Id))
+			ECF:Print(format(L["NotExists"],ITEMS,Id))
 		end
 	elseif v == 1 then -- change true to link
 		ecf.db.lootItemFilterList[Id] = link
@@ -162,7 +162,6 @@ local colorT = {} -- used in lootFilter
 for i=0, 4 do
 	colorT[i]=format("|c%s%s|r",select(4,GetItemQualityColor(i)),_G["ITEM_QUALITY"..i.."_DESC"])
 end
-local recordShowT = {L["ShowAll"],L["OnlyFiltered"],L["OnlyUnfiltered"]}
 
 local function AddBlackWord(word, r, l)
 	if (checkBlacklist(word, r)) then
@@ -211,7 +210,7 @@ options.args.General = {
 		},
 		line1 = {
 			type = "header",
-			name = _G["FILTERS"],
+			name = FILTERS,
 			order = 10,
 		},
 		enableDND = {
@@ -337,7 +336,7 @@ options.args.blackListTab = {
 		},
 		DeleteButton = {
 			type = "execute",
-			name = _G["REMOVE"],
+			name = REMOVE,
 			order = 3,
 			func = function()
 				ecf.db.blackWordList[blackWordHighlight] = nil
@@ -388,7 +387,7 @@ options.args.blackListTab = {
 		},
 		line2 = {
 			type = "header",
-			name = _G["OPTIONS"],
+			name = OPTIONS,
 			order = 20,
 		},
 		blackWordFilterGroup = {
@@ -412,7 +411,7 @@ options.args.blackListTab = {
 			name = L["StringIO"],
 			order = 30,
 		},
-		stringconfig = {
+		stringConfig = {
 			type = "input",
 			name = "",
 			order = 31,
@@ -495,7 +494,7 @@ options.args.lootFilter = {
 		},
 		DeleteButton = {
 			type = "execute",
-			name = _G["REMOVE"],
+			name = REMOVE,
 			order = 3,
 			func = function()
 				if(itemHighlight > 0) then ecf.db.lootItemFilterList[itemHighlight] = nil end
@@ -539,16 +538,16 @@ options.args.lootFilter = {
 					if link then
 						ecf.db.lootCurrencyFilterList[Id] = link
 					else
-						ECF:Print(format(L["NotExists"],_G[Type],Id))
+						ECF:Print(format(L["NotExists"],Type,Id))
 					end
 				end
 			end,
 		},
 		lootType = {
 			type = "select",
-			name = _G["TYPE"],
+			name = TYPE,
 			order = 12,
-			values = {["ITEMS"] = _G["ITEMS"], ["CURRENCY"] = _G["CURRENCY"]},
+			values = {["ITEMS"] = ITEMS, ["CURRENCY"] = CURRENCY},
 		},
 		line2 = {
 			type = "header",
@@ -585,7 +584,7 @@ options.args.debugWindow = {
 			type = "select",
 			name = "",
 			order = 3,
-			values = recordShowT,
+			values = {L["ShowAll"], L["OnlyFiltered"], L["OnlyUnfiltered"]},
 		},
 		recordList = {
 			type = "input",
