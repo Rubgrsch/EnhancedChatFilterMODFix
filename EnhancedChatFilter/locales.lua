@@ -43,8 +43,9 @@ if (locale == "zhCN") then
 	L["WhisperWhitelistModeTooltip"] = "除了工会、团队、小队、好友发送的密语外，只允许你发送过密语的对方才能对你发起密语|n|cffE2252D慎用！"
 	L["Aggressive"] = "额外过滤器"
 	L["AggressiveTooltip"] = "一些会极大提高过滤效果和|cffE2252D误伤机率|r的过滤器集合"
---BlackwordList
-	L["BlackwordList"] = "黑名单关键词"
+--BlackwordFilter
+	L["BlackwordFilter"] = "关键词过滤"
+	L["BlackwordList"] = "黑名单关键词列表"
 	L["AddBlackWordTitle"] = "添加新黑名单关键词"
 	L["IncludeAutofilteredWord"] = "%s包含会被自动过滤的字符，将忽略该关键词！"
 	L["Regex"] = "正则"
@@ -75,7 +76,7 @@ if (locale == "zhCN") then
 --Record
 	L["RecordWindow"] = "聊天记录"
 	L["ChatRecord"] = "聊天消息记录"
-	L["ChatRecordTooltips"] = "开启后聊天信息会被记录并可以查看哪些信息被过滤。|n这将占用一定内存。"
+	L["ChatRecordTooltips"] = "开启后将记录系统信息以外的聊天信息，并可以查看哪些信息被过滤"
 	L["ClearRecord"] = "清除聊天记录"
 	L["ShowAll"] = "全部显示"
 	L["OnlyFiltered"] = "仅过滤"
@@ -123,8 +124,9 @@ elseif (locale == "zhTW") then
 	L["WhisperWhitelistModeTooltip"] = "除了工会、团队、小队、好友发送的密语外，只允许你发送过密语的对方才能对你发起密语|n|cffE2252D慎用！"
 	L["Aggressive"] = "额外过滤器"
 	L["AggressiveTooltip"] = "一些会极大提高过滤效果和|cffE2252D误伤机率|r的过滤器集合"
---BlackwordList
-	L["BlackwordList"] = "黑名单關鍵詞"
+--BlackwordFilter
+	L["BlackwordFilter"] = "关键词过滤"
+	L["BlackwordList"] = "黑名单关键词列表"
 	L["AddBlackWordTitle"] = "添加新黑名單關鍵詞"
 	L["IncludeAutofilteredWord"] = "%s包含會被自動過濾的字符，蔣忽略該關鍵詞！"
 	L["Regex"] = "正規"
@@ -156,7 +158,7 @@ elseif (locale == "zhTW") then
 --Record
 	L["RecordWindow"] = "聊天记录"
 	L["ChatRecord"] = "聊天消息记录"
-	L["ChatRecordTooltips"] = "开启后聊天信息会被记录并可以查看哪些信息被过滤。|n这将占用一定内存。"
+	L["ChatRecordTooltips"] = "开启后将记录系统信息以外的聊天信息，并可以查看哪些信息被过滤"
 	L["ClearRecord"] = "清除聊天记录"
 	L["ShowAll"] = "全部显示"
 	L["OnlyFiltered"] = "仅过滤"
@@ -203,8 +205,9 @@ else
 	L["WhisperWhitelistModeTooltip"] = "Filter all whisper unless it's from guild/group/raid/friends or you have just whisper them|n|cffE2252DUse with care!"
 	L["Aggressive"] = "Aggressive Filters"
 	L["AggressiveTooltip"] = "Some aggressive but effective Filters."
---BlackwordList
-	L["BlackwordList"] = "BlackWordList"
+--BlackwordFilter
+	L["BlackwordFilter"] = "BlackwordFilter"
+	L["BlackwordList"] = "BlackwordList"
 	L["AddBlackWordTitle"] = "Add Blackword"
 	L["IncludeAutofilteredWord"] = "%s includes symbels to be filtered. It will be ignored."
 	L["Regex"] = "Regex"
@@ -236,7 +239,7 @@ else
 --Record
 	L["RecordWindow"] = "Chat Record"
 	L["ChatRecord"] = "Chat Record"
-	L["ChatRecordTooltips"] = "Enable chat record. This will record chat msg and you can check whether they are filtered by ECF. This will consume some memory."
+	L["ChatRecordTooltips"] = "Enable chat record. This will record non-system chat msg and you can check whether they are filtered by ECF."
 	L["ClearRecord"] = "ClearRecord"
 	L["ShowAll"] = "ShowAll"
 	L["OnlyFiltered"] = "OnlyFiltered"

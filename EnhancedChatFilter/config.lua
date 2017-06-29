@@ -306,7 +306,7 @@ options.args.General = {
 }
 options.args.blackListTab = {
 	type = "group",
-	name = L["BlackwordList"],
+	name = L["BlackwordFilter"],
 	order = 11,
 	args = {
 		blackWordList = {
