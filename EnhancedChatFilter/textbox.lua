@@ -2,12 +2,14 @@
 local Type, Version = "ECFTextBox", 1
 local AceGUI = LibStub("AceGUI-3.0")
 
--- Lua APIs
-local pairs = pairs
-
--- WoW APIs
-local CreateFrame, IsAddOnLoaded, SquareButton_SetIcon = CreateFrame, IsAddOnLoaded, SquareButton_SetIcon
 local _G = _G
+-- Lua
+local pairs = pairs
+-- WoW
+local CreateFrame = CreateFrame
+local SquareButton_SetIcon = SquareButton_SetIcon
+local IsAddOnLoaded = IsAddOnLoaded
+-- GLOBALS: ChatFontNormal, UIParent
 
 --------------- Support functions ---------------
 
@@ -208,7 +210,7 @@ local function Constructor()
 	label:SetPoint("TOPLEFT", frame, "TOPLEFT", 0, -4)
 	label:SetPoint("TOPRIGHT", frame, "TOPRIGHT", 0, -4)
 	label:SetJustifyH("LEFT")
-	label:SetText(ACCEPT)
+	label:SetText("")
 	label:SetHeight(10)
 
 	local scrollBG = CreateFrame("Frame", nil, frame)

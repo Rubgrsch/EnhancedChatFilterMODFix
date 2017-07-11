@@ -4,6 +4,12 @@ ecf.ECF = LibStub("AceAddon-3.0"):NewAddon("EnhancedChatFilter", "AceConsole-3.0
 ecf.L, ecf.G = {}, {}
 local ECF, L, G = ecf.ECF, ecf.L, ecf.G
 
+-- WoW
+local InCombatLockdown = InCombatLockdown
+local InterfaceOptionsFrame_OpenToCategory = InterfaceOptionsFrame_OpenToCategory
+local LibStub = LibStub
+local ShowFriends = ShowFriends
+
 --method run on /ecf
 function ECF:EnhancedChatFilterOpen()
 	if(InCombatLockdown()) then return end

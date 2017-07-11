@@ -3,8 +3,27 @@ local _, ecf = ...
 local ECF, L, G = ecf.ECF, ecf.L, ecf.G -- Ace3, locales, global variables
 
 local _G = _G
-local type, select, ipairs, pairs, next, strsub, format, tonumber, tconcat, strfind, strbyte, fmod, unpack = type, select, ipairs, pairs, next, strsub, format, tonumber, table.concat, string.find, string.byte, math.fmod, unpack -- lua
-local band, GetCurrencyLink, GetItemInfo = bit.band, GetCurrencyLink, GetItemInfo -- BLZ
+-- Lua
+local fmod = math.fmod
+local ipairs = ipairs
+local format = format
+local pairs = pairs
+local next = next
+local select = select
+local strbyte = string.byte
+local strfind = string.find
+local strsplit = strsplit
+local strsub = strsub
+local tconcat = table.concat
+local tonumber = tonumber
+local type = type
+local unpack = unpack
+-- WoW
+local band = bit.band
+local GetCurrencyLink = GetCurrencyLink
+local GetItemInfo = GetItemInfo
+local ITEMS = ITEMS
+local LibStub = LibStub
 
 --Default Options
 local defaults = {

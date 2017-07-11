@@ -3,8 +3,43 @@ local _, ecf = ...
 local L, G = ecf.L, ecf.G -- locales, global variables
 
 local _G = _G
-local select, ipairs, pairs, next, format, tonumber, strmatch, tconcat, strfind, strbyte = select, ipairs, pairs, next, format, tonumber, strmatch, table.concat, string.find, string.byte -- lua
-local Ambiguate, BNGetNumFriends, BNGetNumFriendGameAccounts, BNGetFriendGameAccountInfo, GetFriendInfo, GetGuildInfo, GetItemInfo, GetNumFriends, GetPlayerInfoByGUID, GetTime = Ambiguate, BNGetNumFriends, BNGetNumFriendGameAccounts, BNGetFriendGameAccountInfo, GetFriendInfo, GetGuildInfo, GetItemInfo, GetNumFriends, GetPlayerInfoByGUID, GetTime -- BLZ
+-- Lua
+local format = format
+local ipairs = ipairs
+local max = max
+local min = min
+local next = next
+local pairs = pairs
+local select = select
+local strbyte = string.byte
+local strfind = string.find
+local strmatch = strmatch
+local strsub = strsub
+local tconcat = table.concat
+local tonumber = tonumber
+local tremove = tremove
+local type = type
+-- WoW
+local Ambiguate = Ambiguate
+local BNGetFriendGameAccountInfo = BNGetFriendGameAccountInfo
+local BNGetNumFriends = BNGetNumFriends
+local BNGetNumFriendGameAccounts = BNGetNumFriendGameAccounts
+local ChatTypeInfo = ChatTypeInfo
+local CUSTOM_CLASS_COLORS = CUSTOM_CLASS_COLORS
+local GetAchievementLink = GetAchievementLink
+local GetFriendInfo = GetFriendInfo
+local GetGuildInfo = GetGuildInfo
+local GetItemInfo = GetItemInfo
+local GetNumFriends = GetNumFriends
+local GetPlayerInfoByGUID = GetPlayerInfoByGUID
+local GetRealmName = GetRealmName
+local GetTime = GetTime
+local NUM_CHAT_WINDOWS = NUM_CHAT_WINDOWS
+local RAID_CLASS_COLORS = RAID_CLASS_COLORS
+local UnitExists = UnitExists
+local UnitInParty = UnitInParty
+local UnitInRaid = UnitInRaid
+local UnitIsUnit = UnitIsUnit
 
 -- Some UTF-8 symbols that will be auto-changed
 G.UTF8Symbols = {['·']='',['＠']='',['＃']='',['％']='',['／']='',['＆']='',['＊']='',
