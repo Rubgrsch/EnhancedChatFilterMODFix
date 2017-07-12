@@ -25,7 +25,6 @@ local BNGetFriendGameAccountInfo = BNGetFriendGameAccountInfo
 local BNGetNumFriends = BNGetNumFriends
 local BNGetNumFriendGameAccounts = BNGetNumFriendGameAccounts
 local ChatTypeInfo = ChatTypeInfo
-local CUSTOM_CLASS_COLORS = CUSTOM_CLASS_COLORS
 local GetAchievementLink = GetAchievementLink
 local GetFriendInfo = GetFriendInfo
 local GetGuildInfo = GetGuildInfo
@@ -34,12 +33,12 @@ local GetNumFriends = GetNumFriends
 local GetPlayerInfoByGUID = GetPlayerInfoByGUID
 local GetRealmName = GetRealmName
 local GetTime = GetTime
-local NUM_CHAT_WINDOWS = NUM_CHAT_WINDOWS
-local RAID_CLASS_COLORS = RAID_CLASS_COLORS
 local UnitExists = UnitExists
 local UnitInParty = UnitInParty
 local UnitInRaid = UnitInRaid
 local UnitIsUnit = UnitIsUnit
+
+-- GLOBALS: CUSTOM_CLASS_COLORS, NUM_CHAT_WINDOWS, RAID_CLASS_COLORS
 
 -- Some UTF-8 symbols that will be auto-changed
 G.UTF8Symbols = {['·']='',['＠']='',['＃']='',['％']='',['／']='',['＆']='',['＊']='',
