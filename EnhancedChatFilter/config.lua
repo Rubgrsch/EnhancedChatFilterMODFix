@@ -113,7 +113,6 @@ ItemCacheFrame:SetScript("OnEvent",function(self,_,Id)
 	if v == 0 then -- while adding
 		if link then -- if valid
 			ecf.db.lootItemFilterList[Id] = link
-			ECF:Print(format(L["AddedItem"],link))
 		else
 			ECF:Print(format(L["NotExists"],ITEMS,Id))
 		end
@@ -458,7 +457,6 @@ options.args.blackListTab = {
 					end
 				end
 				stringIO = ""
-				ECF:Print(L["ImportSucceeded"])
 			end,
 			disabled = function() return stringIO == "" end,
 		},
