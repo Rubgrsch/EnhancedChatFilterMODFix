@@ -4,25 +4,9 @@ local ECF, L, G = ecf.ECF, ecf.L, ecf.G -- Ace3, locales, global variables
 
 local _G = _G
 -- Lua
-local fmod = math.fmod
-local ipairs = ipairs
-local format = format
-local pairs = pairs
-local next = next
-local select = select
-local strbyte = string.byte
-local strfind = string.find
-local strsplit = strsplit
-local strsub = strsub
-local tconcat = table.concat
-local tonumber = tonumber
-local type = type
-local unpack = unpack
+local fmod, ipairs, format, pairs, next, select, strbyte, strfind, strsplit, strsub, tconcat, tonumber, type, unpack = math.fmod, ipairs, format, pairs, next, select, strbyte, string.find, strsplit, strsub, table.concat, tonumber, type, unpack
 -- WoW
-local band = bit.band
-local GetCurrencyLink = GetCurrencyLink
-local GetItemInfo = GetItemInfo
-local ITEMS = ITEMS
+local band, GetCurrencyLink, GetItemInfo, ITEMS = bit.band, GetCurrencyLink, GetItemInfo, ITEMS
 local LibStub = LibStub
 
 --Default Options
@@ -103,7 +87,7 @@ end
 
 --------------- ECF functions ---------------
 -- GetItemInfo Cache
-local ItemInfoRequested = {} -- [Id] = value; value: 0: want to add; 1: old config, true -> link
+local ItemInfoRequested = {} -- [Id] = value. 0: want to add; 1: old config, true -> link
 local ItemCacheFrame = CreateFrame("Frame")
 ItemCacheFrame:RegisterEvent("GET_ITEM_INFO_RECEIVED")
 ItemCacheFrame:SetScript("OnEvent",function(self,_,Id)
@@ -114,7 +98,7 @@ ItemCacheFrame:SetScript("OnEvent",function(self,_,Id)
 		if link then -- if valid
 			ecf.db.lootItemFilterList[Id] = link
 		else
-			ECF:Print(format(L["NotExists"],ITEMS,Id))
+			ECF:Printf(L["NotExists"],ITEMS,Id)
 		end
 	elseif v == 1 then -- change true to link
 		ecf.db.lootItemFilterList[Id] = link
@@ -137,10 +121,6 @@ local function UnMaskType(ty) -- return boolean
 	return band(ty,regexBit) ~= 0, band(ty,lesserBit) ~= 0
 end
 
-function G.DBInitialize()
-	ecf.db = LibStub("AceDB-3.0"):New("ecfDB", defaults, "Default").profile
-end
-
 --Make sure that blackWord won't be filtered by filterCharList and utf-8 list
 local function checkBlacklist(blackWord, r)
 	local newWord = blackWord:gsub("%s", ""):gsub(G.filterCharList, "")
@@ -149,8 +129,9 @@ local function checkBlacklist(blackWord, r)
 	if(newWord ~= blackWord or blackWord == "") then return true end -- Also report "" as invalid
 end
 
---Convert old config to new one
-function G.DBconvert()
+function G.DBInitialize()
+	ecf.db = LibStub("AceDB-3.0"):New("ecfDB", defaults, "Default").profile
+	--Convert old config to new one
 	for key,v in pairs(ecf.db.blackWordList) do
 		for key2 in pairs(ecf.db.blackWordList) do -- remove duplicate words
 			if key ~= key2 and strfind(key,key2) then ecf.db.blackWordList[key] = nil;break end
@@ -555,7 +536,7 @@ options.args.lootFilter = {
 					if link then
 						ecf.db.lootCurrencyFilterList[Id] = link
 					else
-						ECF:Print(format(L["NotExists"],Type,Id))
+						ECF:Printf(L["NotExists"],Type,Id)
 					end
 				end
 			end,
@@ -609,12 +590,10 @@ options.args.debugWindow = {
 			get = function()
 				local pos, t, IsMax, showUnfilted, showFilted = ecf.db.recordPos, {}, #ecf.db.record == 500, ecf.db.ChatRecordOnlyShow ~= 2, ecf.db.ChatRecordOnlyShow ~= 3
 				for i = 1, #ecf.db.record do
-					local j
+					local j = i
 					if IsMax then
-						j = pos + i -1
+						j = pos + j -1
 						if j > 500 then j = j - 500 end
-					else
-						j = i
 					end
 					local _,msg,trimmedPlayer,_,filterResult = unpack(ecf.db.record[j])
 					if (showUnfilted and not filterResult) or (showFilted and filterResult) then

@@ -4,39 +4,9 @@ local L, G = ecf.L, ecf.G -- locales, global variables
 
 local _G = _G
 -- Lua
-local format = format
-local ipairs = ipairs
-local max = max
-local min = min
-local next = next
-local pairs = pairs
-local select = select
-local strbyte = string.byte
-local strfind = string.find
-local strmatch = strmatch
-local strsub = strsub
-local tconcat = table.concat
-local tonumber = tonumber
-local tremove = tremove
-local type = type
+local format, ipairs, max, min, next, pairs, select, strbyte, strfind, strmatch, strsub, tconcat, tonumber, tremove, type = format, ipairs, max, min, next, pairs, select, string.byte, string.find, strmatch, strsub, table.concat, tonumber, tremove, type
 -- WoW
-local Ambiguate = Ambiguate
-local BNGetFriendGameAccountInfo = BNGetFriendGameAccountInfo
-local BNGetNumFriends = BNGetNumFriends
-local BNGetNumFriendGameAccounts = BNGetNumFriendGameAccounts
-local ChatTypeInfo = ChatTypeInfo
-local GetAchievementLink = GetAchievementLink
-local GetFriendInfo = GetFriendInfo
-local GetGuildInfo = GetGuildInfo
-local GetItemInfo = GetItemInfo
-local GetNumFriends = GetNumFriends
-local GetPlayerInfoByGUID = GetPlayerInfoByGUID
-local GetRealmName = GetRealmName
-local GetTime = GetTime
-local UnitExists = UnitExists
-local UnitInParty = UnitInParty
-local UnitInRaid = UnitInRaid
-local UnitIsUnit = UnitIsUnit
+local Ambiguate, BNGetFriendGameAccountInfo, BNGetNumFriends, BNGetNumFriendGameAccounts, ChatTypeInfo, GetAchievementLink, GetFriendInfo, GetGuildInfo, GetItemInfo, GetNumFriends, GetPlayerInfoByGUID, GetRealmName, GetTime, UnitExists, UnitInParty, UnitInRaid, UnitIsUnit = Ambiguate, BNGetFriendGameAccountInfo, BNGetNumFriends, BNGetNumFriendGameAccounts, ChatTypeInfo, GetAchievementLink, GetFriendInfo, GetGuildInfo, GetItemInfo, GetNumFriends, GetPlayerInfoByGUID, GetRealmName, GetTime, UnitExists, UnitInParty, UnitInRaid, UnitIsUnit
 
 -- GLOBALS: CUSTOM_CLASS_COLORS, NUM_CHAT_WINDOWS, RAID_CLASS_COLORS
 
@@ -54,7 +24,7 @@ G.UTF8Symbols = {['·']='',['＠']='',['＃']='',['％']='',['／']='',['＆']='
 	['Ｖ']='V',['Ｗ']='W',['Ｘ']='X',['Ｙ']='Y',['Ｚ']='Z'}
 local RaidAlertTagList = {"%*%*.+%*%*", "EUI:.+施放了", "EUI:.+中断", "EUI:.+就绪", "EUI_RaidCD", "PS 死亡: .+>", "|Hspell.+ [=-]> ", "受伤源自 |Hspell.+ %(总计%): ", "Fatality:.+> ", "已打断.*|Hspell", "打断→%[.+%]"}  -- RaidAlert Tag
 local QuestReportTagList = {"任务进度提示%s?[:：]", "%(任务完成%)", "<大脚组队提示>", "%[接受任务%]", "<大脚团队提示>", "进度:.+: %d+/%d+", "接受任务: ?%[%d+%]", "【网%.易%.有%.爱】", "任务: %[%d+%]%[.+%] 已完成!"} -- QuestReport Tag
-G.filterCharList = "[|@!/<>\"`'_#&;:~\\]" -- work on any blackWord
+G.filterCharList = "[|@!/<>\"`'_#&;:~\\]" -- works on any blackWord
 G.filterCharListRegex = "[%(%)%.%%%+%-%*%?%[%]%$%^={}]" -- won't work on regex blackWord, but works on others
 
 local function SendMessage(event, msg)
@@ -126,7 +96,7 @@ local function ECFfilter(event,msg,player,flags,channelName)
 	if UnitIsUnit(player,"player") then return end
 
 	-- don't filter GM or DEV
-	if type(flags) == "string" and (flags == "GM" or flags == "DEV") then return end
+	if flags == "GM" or flags == "DEV" then return end
 
 	-- remove color/hypelink
 	local filterString = msg:upper():gsub("|C[0-9A-F]+",""):gsub("|H[^|]+|H",""):gsub("|H|R","")
@@ -143,7 +113,7 @@ local function ECFfilter(event,msg,player,flags,channelName)
 		end
 	end
 
-	if(ecf.db.enableDND and ((Event <= 3 and type(flags) == "string" and flags == "DND") or Event == 101) and not IsMyFriend) then -- DND, whisper/yell/say/channel and auto-reply
+	if(ecf.db.enableDND and ((Event <= 3 and flags == "DND") or Event == 101) and not IsMyFriend) then -- DND, whisper/yell/say/channel and auto-reply
 		return true, "DND Filter"
 	end
 
@@ -191,14 +161,14 @@ local function ECFfilter(event,msg,player,flags,channelName)
 		if(msgLine == "") then msgLine = msg end --If it has only symbols, don't change it
 
 		--msgdata
-		local msgtable = {Sender = player, Msg = {}, Time = GetTime()}
-		for idx=1, #msgLine do msgtable.Msg[idx] = strbyte(msgLine,idx) end
+		local msgtable = {player, {}, GetTime()}
+		for idx=1, #msgLine do msgtable[2][idx] = strbyte(msgLine,idx) end
 		local chatLinesSize = #chatLines
 		chatLines[chatLinesSize+1] = msgtable
 		for i=1, chatLinesSize do
 			--if there is not much difference between msgs, filter it
 			--(optional) if someone sends msgs within 0.6s, filter it
-			if (chatLines[i].Sender == msgtable.Sender and ((ecf.db.multiLine and (msgtable.Time - chatLines[i].Time) < 0.600) or stringDifference(chatLines[i].Msg,msgtable.Msg) <= 0.1)) then
+			if (chatLines[i][1] == msgtable[1] and ((ecf.db.multiLine and (msgtable[3] - chatLines[i][3]) < 0.600) or stringDifference(chatLines[i][2],msgtable[2]) <= 0.1)) then
 				tremove(chatLines, i)
 				return true, "Repeat Filter"
 			end
@@ -329,9 +299,8 @@ end)
 local function achievementFilter(self, event, msg, _, _, _, _, _, _, _, _, _, _, guid)
 	if (not ecf.db.enableCFA or not ecf.db.enableFilter) then return end
 	if (not guid or not strfind(guid,"Player")) then return end
-	local achievementID = strmatch(msg, "achievement:(%d+)")
+	local achievementID = tonumber(strmatch(msg, "achievement:(%d+)"))
 	if (not achievementID) then return end
-	achievementID = tonumber(achievementID)
 	local _,class,_,_,_,name,server = GetPlayerInfoByGUID(guid)
 	if (not name) then return end -- check nil
 	if (server ~= "" and server ~= GetRealmName()) then name = name.."-"..server end
@@ -344,7 +313,7 @@ end
 ChatFrame_AddMessageEventFilter("CHAT_MSG_ACHIEVEMENT", achievementFilter)
 ChatFrame_AddMessageEventFilter("CHAT_MSG_GUILD_ACHIEVEMENT", achievementFilter)
 
--- LootFilter
+--LootFilter
 local function lootItemFilter(self,_,msg)
 	if (not ecf.db.enableFilter) then return end
 	local itemID = tonumber(strmatch(msg, "|Hitem:(%d+)"))

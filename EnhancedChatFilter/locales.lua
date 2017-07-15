@@ -240,6 +240,4 @@ else
 	L["OnlyUnfiltered"] = "OnlyUnfiltered"
 end
 
-setmetatable(ecf.L, {__index=function(self, key)
-	return key
-end})
+setmetatable(ecf.L, {__index=function(self, key) return key end})

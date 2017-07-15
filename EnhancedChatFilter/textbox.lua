@@ -6,9 +6,8 @@ local _G = _G
 -- Lua
 local pairs = pairs
 -- WoW
-local CreateFrame = CreateFrame
-local SquareButton_SetIcon = SquareButton_SetIcon
-local IsAddOnLoaded = IsAddOnLoaded
+local CreateFrame, SquareButton_SetIcon, IsAddOnLoaded = CreateFrame, SquareButton_SetIcon, IsAddOnLoaded
+
 -- GLOBALS: ChatFontNormal, UIParent
 
 --------------- Support functions ---------------

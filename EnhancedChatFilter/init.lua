@@ -5,10 +5,8 @@ ecf.L, ecf.G = {}, {}
 local ECF, L, G = ecf.ECF, ecf.L, ecf.G
 
 -- WoW
-local InCombatLockdown = InCombatLockdown
-local InterfaceOptionsFrame_OpenToCategory = InterfaceOptionsFrame_OpenToCategory
+local InCombatLockdown, InterfaceOptionsFrame_OpenToCategory, ShowFriends = InCombatLockdown, InterfaceOptionsFrame_OpenToCategory, ShowFriends
 local LibStub = LibStub
-local ShowFriends = ShowFriends
 
 --method run on /ecf
 function ECF:EnhancedChatFilterOpen()
@@ -33,7 +31,6 @@ function ECF:OnInitialize()
 
 	G.DBInitialize()
 	LibStub("LibDBIcon-1.0"):Register("Enhanced Chat Filter", ecfLDB, ecf.db.minimap)
-	G.DBconvert()
 	ShowFriends()
 end
 
