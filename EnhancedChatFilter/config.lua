@@ -6,7 +6,7 @@ local _G = _G
 -- Lua
 local fmod, ipairs, format, pairs, next, select, strbyte, strfind, strsplit, strsub, tconcat, tonumber, type, unpack = math.fmod, ipairs, format, pairs, next, select, strbyte, string.find, strsplit, strsub, table.concat, tonumber, type, unpack
 -- WoW
-local band, GetCurrencyLink, GetItemInfo, ITEMS = bit.band, GetCurrencyLink, GetItemInfo, ITEMS
+local GetCurrencyLink, GetItemInfo, ITEMS = GetCurrencyLink, GetItemInfo, ITEMS
 local LibStub = LibStub
 
 --Default Options
@@ -105,21 +105,6 @@ ItemCacheFrame:SetScript("OnEvent",function(self,_,Id)
 	end
 	ItemInfoRequested[Id] = nil
 end)
-
---Bit Mask for blackword type
-local regexBit, lesserBit = 1, 2
-
-local function MaskType(...) -- ... are boolean
-	local ty = 0
-	for idx, v in ipairs({...}) do
-		if(v) then ty = ty + 2^(idx-1) end
-	end
-	return ty
-end
-
-local function UnMaskType(ty) -- return boolean
-	return band(ty,regexBit) ~= 0, band(ty,lesserBit) ~= 0
-end
 
 --Make sure that blackWord won't be filtered by filterCharList and utf-8 list
 local function checkBlacklist(blackWord, r)
@@ -433,8 +418,9 @@ options.args.blackListTab = {
 				local newBlackList = {strsplit(";", wordString)}
 				for _, blacklist in ipairs(newBlackList) do
 					if (blacklist ~= nil) then
-						local imNewWord, imTypeWord = strsplit(",",blacklist)
-						if imTypeWord then AddBlackWord(imNewWord, UnMaskType(imTypeWord)) end
+						local imNewWord, r, l = strsplit(",",blacklist)
+						r, l = r == "r", l == "l"
+						AddBlackWord(imNewWord, r, l)
 					end
 				end
 				stringIO = ""
@@ -448,11 +434,10 @@ options.args.blackListTab = {
 			func = function()
 				local blackStringList = {}
 				for key,v in pairs(ecf.db.blackWordList) do
-					local num = MaskType(v.regex, v.lesser)
 					if (checkBlacklist(key, v.regex)) then
 						ECF:Printf(L["IncludeAutofilteredWord"],key)
 					else
-						blackStringList[#blackStringList+1] = key..","..num
+						blackStringList[#blackStringList+1] = format("%s,%s,%s",key,v.regex and "r" or "",v.lesser and "l" or "")
 					end
 				end
 				local blackString = tconcat(blackStringList,";")
