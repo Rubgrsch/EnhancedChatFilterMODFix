@@ -75,6 +75,7 @@ local function OnTextChanged(self, userInput)				-- EditBox
 	if userInput then
 		self = self.obj
 		self:Fire("OnTextChanged", self.editBox:GetText())
+		self:Fire("OnEnterPressed", self.editBox:GetText())
 	end
 end
 
