@@ -347,9 +347,7 @@ options.args.blackListTab = {
 			name = L["AddBlackWordTitle"],
 			order = 11,
 			get = nil,
-			set = function(_,value)
-				AddBlackWord(value, regexToggle, lesserToggle)
-			end,
+			set = function(_,value) AddBlackWord(value, regexToggle, lesserToggle) end,
 		},
 		regexToggle = {
 			type = "toggle",
@@ -400,37 +398,28 @@ options.args.blackListTab = {
 			name = "",
 			order = 31,
 			get = function() return stringIO end,
-			set = function(_,value) stringIO = value end,
-			width = "full",
-			multiline = 4,
-			control = "ECFTextBox",
-		},
-		import = {
-			type = "execute",
-			name = L["Import"],
-			order = 32,
-			func = function()
-				local wordString, HashString = strsplit("@", stringIO)
+			set = function(_,value)
+				local wordString, HashString = strsplit("@", value)
 				if (tonumber(HashString) ~= StringHash(wordString)) then
 					ECF:Print(L["StringHashMismatch"])
-					return
-				end
-				local newBlackList = {strsplit(";", wordString)}
-				for _, blacklist in ipairs(newBlackList) do
-					if (blacklist ~= nil) then
-						local imNewWord, r, l = strsplit(",",blacklist)
-						r, l = r == "r", l == "l"
-						AddBlackWord(imNewWord, r, l)
+				else
+					local newBlackList = {strsplit(";", wordString)}
+					for _, blacklist in ipairs(newBlackList) do
+						if (blacklist ~= nil) then
+							local imNewWord, r, l = strsplit(",",blacklist)
+							r, l = r == "r", l == "l"
+							AddBlackWord(imNewWord, r, l)
+						end
 					end
 				end
 				stringIO = ""
 			end,
-			disabled = function() return stringIO == "" end,
+			width = "full",
 		},
 		export = {
 			type = "execute",
 			name = L["Export"],
-			order = 33,
+			order = 32,
 			func = function()
 				local blackStringList = {}
 				for key,v in pairs(ecf.db.blackWordList) do

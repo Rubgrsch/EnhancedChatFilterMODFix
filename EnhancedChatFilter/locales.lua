@@ -57,7 +57,6 @@ if (locale == "zhCN") then
 	L["LesserBlackWordThresholdTooltips"] = "过滤包含至少阈值数目的次级关键词的信息"
 	L["BlackList"] = "关键词列表"
 	L["StringIO"] = "字符串导入导出"
-	L["Import"] = "导入"
 	L["StringHashMismatch"] = "字符串校验错误"
 	L["Export"] = "导出"
 --LootFilter
@@ -136,7 +135,6 @@ elseif (locale == "zhTW") then
 	L["LesserBlackWordThresholdTooltips"] = "过滤包含至少阈值数目的次级关键词的信息"
 	L["BlackList"] = "关键词列表"
 	L["StringIO"] = "字符串導入導出"
-	L["Import"] = "導入"
 	L["StringHashMismatch"] = "字符串校驗錯誤"
 	L["Export"] = "導出"
 --LootFilter
@@ -215,7 +213,6 @@ else
 	L["LesserBlackWordThresholdTooltips"] = "Filter msgs contained many lesser blackwords"
 	L["BlackList"] = "BlackList"
 	L["StringIO"] = "Import/Export"
-	L["Import"] = "Import"
 	L["StringHashMismatch"] = "String Hash Mismatch"
 	L["Export"] = "Export"
 --LootFilter
