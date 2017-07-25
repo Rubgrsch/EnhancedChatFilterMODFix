@@ -21,4 +21,3 @@ init.lua
 locales.lua
 config.lua
 filters.lua
-textbox.lua

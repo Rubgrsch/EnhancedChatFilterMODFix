@@ -581,7 +581,6 @@ options.args.debugWindow = {
 			width = "full",
 			order = 10,
 			hidden = function() return not ecf.db.debugMode end,
-			control = "ECFTextBox",
 		},
 	},
 }
