@@ -35,7 +35,7 @@ local defaults = {
 			hide = false, -- minimap
 		},
 		advancedConfig = false, -- show advancedConfig
-		debugMode = false,
+		debugMode = false, -- now it's the record toggle
 		record = {},
 		recordPos = 1,
 		ChatRecordOnlyShow = 1,
@@ -137,8 +137,8 @@ end
 
 --------------- Options ---------------
 --These settings won't be saved
-local highlightIsLesser, blackWordHighlight = false, ""
-local itemHighlight, currencyHighlight = 0, 0
+local lesserWordChosen, blackWordChosen = "", ""
+local itemChosen, currencyChosen = 0, 0
 local stringIO = "" -- blackWord input
 local regexToggle, lesserToggle = false, false
 
@@ -183,7 +183,6 @@ options.args.General = {
 					if(toggle) then LibStub("LibDBIcon-1.0"):Show("Enhanced Chat Filter") else LibStub("LibDBIcon-1.0"):Hide("Enhanced Chat Filter") end
 				end,
 			order = 2,
-			disabled = false,
 		},
 		advancedConfig = {
 			type = "toggle",
@@ -251,7 +250,7 @@ options.args.General = {
 			name = L["RepeatOptions"],
 			order = 40,
 		},
-		chatLinesLimit = { -- only show in advanced mode
+		chatLinesLimit = { -- only shown in advanced mode
 			type = "range",
 			name = L["chatLinesLimit"],
 			desc = L["chatLinesLimitTooltips"],
@@ -262,7 +261,7 @@ options.args.General = {
 			bigStep = 5,
 			hidden = function() return not ecf.db.advancedConfig end,
 		},
-		repeatToggle = { -- only show in non-advanced mode
+		repeatToggle = { -- only shown in non-advanced mode
 			type = "toggle",
 			name = L["RepeatFilter"],
 			desc = L["RepeatFilterTooltips"],
@@ -297,8 +296,8 @@ options.args.blackListTab = {
 			type = "select",
 			name = L["BlackwordList"],
 			order = 1,
-			get = function() return highlightIsLesser and "" or blackWordHighlight end,
-			set = function(_,value) highlightIsLesser, blackWordHighlight = false, value end,
+			get = function() return blackWordChosen end,
+			set = function(_,value) lesserWordChosen, blackWordChosen = "", value end,
 			values = function()
 				local blacklistname = {}
 				for key,v in pairs(ecf.db.blackWordList) do if not v.lesser then blacklistname[key] = key end end
@@ -309,8 +308,8 @@ options.args.blackListTab = {
 			type = "select",
 			name = L["LesserBlackwordList"],
 			order = 2,
-			get = function() return highlightIsLesser and blackWordHighlight or "" end,
-			set = function(_,value) highlightIsLesser, blackWordHighlight = true, value	end,
+			get = function() return lesserWordChosen end,
+			set = function(_,value) lesserWordChosen, blackWordChosen = value, "" end,
 			values = function()
 				local blacklistname = {}
 				for key,v in pairs(ecf.db.blackWordList) do if v.lesser then blacklistname[key] = key end end
@@ -323,16 +322,16 @@ options.args.blackListTab = {
 			name = REMOVE,
 			order = 3,
 			func = function()
-				ecf.db.blackWordList[blackWordHighlight] = nil
-				blackWordHighlight = ""
+				ecf.db.blackWordList[lesserWordChosen ~= "" and lesserWordChosen or blackWordChosen] = nil
+				lesserWordChosen, blackWordChosen = "", ""
 			end,
-			disabled = function() return blackWordHighlight == "" end,
+			disabled = function() return lesserWordChosen == "" and blackWordChosen == "" end,
 		},
 		ClearUpButton = {
 			type = "execute",
 			name = L["ClearUp"],
 			order = 4,
-			func = function() ecf.db.blackWordList, blackWordHighlight = {}, "" end,
+			func = function() ecf.db.blackWordList, lesserWordChosen, blackWordChosen = {}, "", "" end,
 			confirm = true,
 			confirmText = format(L["DoYouWantToClear"],L["BlackList"]),
 			disabled = function() return next(ecf.db.blackWordList) == nil end,
@@ -444,8 +443,8 @@ options.args.lootFilter = {
 			type = "select",
 			name = L["ItemFilterList"],
 			order = 1,
-			get = function() return itemHighlight end,
-			set = function(_,value) itemHighlight, currencyHighlight = value or nil, 0 end,
+			get = function() return itemChosen end,
+			set = function(_,value) itemChosen, currencyChosen = value or 0, 0 end,
 			values = function()
 				local itemFilterLinkList = {}
 				for key,v in pairs(ecf.db.lootItemFilterList) do itemFilterLinkList[key] = type(v) == "string" and v or select(2,GetItemInfo(key)) end
@@ -456,8 +455,8 @@ options.args.lootFilter = {
 			type = "select",
 			name = L["CurrencyFilterList"],
 			order = 2,
-			get = function() return currencyHighlight end,
-			set = function(_,value) currencyHighlight, itemHighlight = value or nil, 0 end,
+			get = function() return currencyChosen end,
+			set = function(_,value) currencyChosen, itemChosen = value or 0, 0 end,
 			values = function()
 				local currencyFilterLinkList = {}
 				for key,v in pairs(ecf.db.lootCurrencyFilterList) do currencyFilterLinkList[key] = v end
@@ -469,17 +468,17 @@ options.args.lootFilter = {
 			name = REMOVE,
 			order = 3,
 			func = function()
-				if(itemHighlight > 0) then ecf.db.lootItemFilterList[itemHighlight] = nil end
-				if(currencyHighlight > 0) then ecf.db.lootCurrencyFilterList[currencyHighlight] = nil end
-				itemHighlight, currencyHighlight = 0, 0
+				if(itemChosen > 0) then ecf.db.lootItemFilterList[itemChosen] = nil end
+				if(currencyChosen > 0) then ecf.db.lootCurrencyFilterList[currencyChosen] = nil end
+				itemChosen, currencyChosen = 0, 0
 			end,
-			disabled = function() return itemHighlight == 0 and currencyHighlight end,
+			disabled = function() return itemChosen == 0 and currencyChosen == 0 end,
 		},
 		ClearUpButton = {
 			type = "execute",
 			name = L["ClearUp"],
 			order = 4,
-			func = function() ecf.db.lootItemFilterList, ecf.db.lootCurrencyFilterList, itemHighlight, currencyHighlight = {}, {}, 0, 0 end,
+			func = function() ecf.db.lootItemFilterList, ecf.db.lootCurrencyFilterList, itemChosen, currencyChosen = {}, {}, 0, 0 end,
 			confirm = true,
 			confirmText = format(L["DoYouWantToClear"],L["LootFilter"]),
 			disabled = function() return next(ecf.db.lootItemFilterList) == nil and next(ecf.db.lootCurrencyFilterList) == nil end,
