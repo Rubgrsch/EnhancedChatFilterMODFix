@@ -25,7 +25,7 @@ G.UTF8Symbols = {
 	['〕']='',['〈']='',['〉']='',['＇']='',['＂']='',['’']='',['‘']='',['“']='',['”']='',}
 local RaidAlertTagList = {"%*%*.+%*%*", "EUI:.+施放了", "EUI:.+中断", "EUI:.+就绪", "EUI_RaidCD", "PS 死亡: .+>", "|Hspell.+ [=-]> ", "受伤源自 |Hspell.+ %(总计%): ", "Fatality:.+> ", "已打断.*|Hspell", "打断→%[.+%]"}  -- RaidAlert Tag
 local QuestReportTagList = {"任务进度提示%s?[:：]", "%(任务完成%)", "<大脚组队提示>", "%[接受任务%]", "<大脚团队提示>", "进度:.+: %d+/%d+", "接受任务: ?%[%d+%]", "【网%.易%.有%.爱】", "任务: %[%d+%]%[.+%] 已完成!"} -- QuestReport Tag
-G.filterCharList = "[|@!/<>\"`'_#&;:~\\]" -- works on any blackWord
+G.filterCharList = "[|@!/<>\"`'_#&;:~\\%s]" -- works on any blackWord
 G.filterCharListRegex = "[%(%)%.%%%+%-%*%?%[%]%$%^={}]" -- won't work on regex blackWord, but works on others
 
 local function SendMessage(event, msg)
@@ -100,10 +100,10 @@ local function ECFfilter(event,msg,player,flags,channelName)
 	if flags == "GM" or flags == "DEV" then return end
 
 	-- remove color/hypelink
-	local filterString = msg:upper():gsub("|C[0-9A-F]+",""):gsub("|H[^|]+|H",""):gsub("|H|R","")
+	local filterString = msg:gsub("|H[^|]+|h([^|]+)|h","%1"):upper():gsub("|C%x%x%x%x%x%x%x%x",""):gsub("|R","")
 	local oriLen = #filterString
 	-- remove utf-8 chars/raidicon/space/symbols
-	filterString = G.utf8replace(filterString, G.UTF8Symbols):gsub("{RT%d}",""):gsub("%s", ""):gsub(G.filterCharList, "")
+	filterString = G.utf8replace(filterString, G.UTF8Symbols):gsub("{RT%d}",""):gsub(G.filterCharList, "")
 	local newfilterString = filterString:gsub(G.filterCharListRegex, "")
 	local annoying = (oriLen - #newfilterString) / oriLen
 
