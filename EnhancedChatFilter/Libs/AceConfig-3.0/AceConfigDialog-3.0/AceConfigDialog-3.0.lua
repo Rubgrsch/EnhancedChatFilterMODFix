@@ -1,10 +1,13 @@
 --- AceConfigDialog-3.0 generates AceGUI-3.0 based windows based on option tables.
 -- @class file
 -- @name AceConfigDialog-3.0
--- @release $Id: AceConfigDialog-3.0.lua 1159 2017-06-29 02:45:04Z funkydude $
+-- @release $Id: AceConfigDialog-3.0.lua 1161 2017-08-12 14:30:16Z funkydude $
 
 local LibStub = LibStub
-local MAJOR, MINOR = "AceConfigDialog-3.0", 61
+local gui = LibStub("AceGUI-3.0")
+local reg = LibStub("AceConfigRegistry-3.0")
+
+local MAJOR, MINOR = "AceConfigDialog-3.0", 62
 local AceConfigDialog, oldminor = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not AceConfigDialog then return end
@@ -16,9 +19,6 @@ AceConfigDialog.frame = AceConfigDialog.frame or CreateFrame("Frame")
 AceConfigDialog.frame.apps = AceConfigDialog.frame.apps or {}
 AceConfigDialog.frame.closing = AceConfigDialog.frame.closing or {}
 AceConfigDialog.frame.closeAllOverride = AceConfigDialog.frame.closeAllOverride or {}
-
-local gui = LibStub("AceGUI-3.0")
-local reg = LibStub("AceConfigRegistry-3.0")
 
 -- Lua APIs
 local tconcat, tinsert, tsort, tremove, tsort = table.concat, table.insert, table.sort, table.remove, table.sort

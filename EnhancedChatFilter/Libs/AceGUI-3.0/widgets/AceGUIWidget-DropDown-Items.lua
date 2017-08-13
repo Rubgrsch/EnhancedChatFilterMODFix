@@ -1,4 +1,4 @@
---[[ $Id: AceGUIWidget-DropDown-Items.lua 1159 2017-06-29 02:45:04Z funkydude $ ]]--
+--[[ $Id: AceGUIWidget-DropDown-Items.lua 1161 2017-08-12 14:30:16Z funkydude $ ]]--
 
 local AceGUI = LibStub("AceGUI-3.0")
 
@@ -323,7 +323,7 @@ end
 -- Does not close the pullout on click.
 do
 	local widgetType = "Dropdown-Item-Toggle"
-	local widgetVersion = 3
+	local widgetVersion = 4
 	
 	local function UpdateToggle(self)
 		if self.value then

@@ -1,4 +1,4 @@
---[[ $Id: AceGUIWidget-DropDown.lua 1159 2017-06-29 02:45:04Z funkydude $ ]]--
+--[[ $Id: AceGUIWidget-DropDown.lua 1161 2017-08-12 14:30:16Z funkydude $ ]]--
 local AceGUI = LibStub("AceGUI-3.0")
 
 -- Lua APIs
@@ -356,7 +356,7 @@ end
 
 do
 	local widgetType = "Dropdown"
-	local widgetVersion = 30
+	local widgetVersion = 31
 	
 	--[[ Static data ]]--
 	
