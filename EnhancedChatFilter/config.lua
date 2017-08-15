@@ -4,7 +4,7 @@ local ECF, L, G = ecf.ECF, ecf.L, ecf.G -- Ace3, locales, global variables
 
 local _G = _G
 -- Lua
-local fmod, ipairs, format, pairs, next, select, strbyte, strfind, strsplit, strsub, tconcat, tonumber, type, unpack = math.fmod, ipairs, format, pairs, next, select, strbyte, string.find, strsplit, strsub, table.concat, tonumber, type, unpack
+local ipairs, format, pairs, next, select, strbyte, strfind, strsplit, strsub, tconcat, tonumber, type, unpack = ipairs, format, pairs, next, select, strbyte, string.find, strsplit, strsub, table.concat, tonumber, type, unpack
 -- WoW
 local GetCurrencyLink, GetItemInfo, ITEMS = GetCurrencyLink, GetItemInfo, ITEMS
 local LibStub = LibStub
@@ -77,12 +77,12 @@ end
 local function StringHash(text)
 	local counter, len = 1, #text
 	for i = 1, len, 3 do
-		counter = fmod(counter*8161, 4294967279) +  -- 2^32 - 17: Prime!
+		counter = ((counter*8161)%4294967279) +  -- 2^32 - 17: Prime!
 			(strbyte(text,i)*16776193) +
 			((strbyte(text,i+1) or (len-i+256))*8372226) +
 			((strbyte(text,i+2) or (len-i+256))*3932164)
 	end
-	return fmod(counter, 4294967291) -- 2^32 - 5: Prime (and different from the prime in the loop)
+	return counter%4294967291 -- 2^32 - 5: Prime (and different from the prime in the loop)
 end
 
 --------------- ECF functions ---------------
