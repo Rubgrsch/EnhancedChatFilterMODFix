@@ -280,8 +280,8 @@ options.args.General = {
 		},
 		repeatFilterGroup = {
 			type = "toggle",
-			name = L["AlsoFilterGroup"],
-			desc = L["AlsoFilterGroupTooltips"],
+			name = L["FilterGroup"],
+			desc = L["FilterGroupTooltips"],
 			order = 43,
 			disabled = function() return ecf.db.chatLinesLimit == 0 end,
 		},
@@ -373,8 +373,8 @@ options.args.blackListTab = {
 		},
 		blackWordFilterGroup = {
 			type = "toggle",
-			name = L["AlsoFilterGroup"],
-			desc = L["AlsoFilterGroupTooltips"],
+			name = L["FilterGroup"],
+			desc = L["FilterGroupTooltips"],
 			order = 21,
 		},
 		lesserBlackWordThreshold = {
