@@ -108,9 +108,8 @@ end)
 
 --Make sure that blackWord won't be filtered by filterCharList and utf-8 list
 local function checkBlacklist(blackWord, r)
-	local newWord = blackWord:gsub("%s", ""):gsub(G.filterCharList, "")
-	if (not r) then newWord=newWord:gsub(G.filterCharListRegex, "") end
-	newWord = G.utf8replace(newWord, G.UTF8Symbols)
+	local newWord = G.utf8replace(blackWord, G.UTF8Symbols):gsub("%s", "")
+	if (not r) then newWord=newWord:gsub(G.RegexCharList, "") end
 	if(newWord ~= blackWord or blackWord == "") then return true end -- Also report "" as invalid
 end
 
