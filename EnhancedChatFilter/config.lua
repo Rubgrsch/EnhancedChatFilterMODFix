@@ -401,8 +401,7 @@ options.args.blackListTab = {
 				if (tonumber(HashString) ~= StringHash(wordString)) then
 					ECF:Print(L["StringHashMismatch"])
 				else
-					local newBlackList = {strsplit(";", wordString)}
-					for _, blacklist in ipairs(newBlackList) do
+					for _, blacklist in ipairs({strsplit(";", wordString)}) do
 						if (blacklist ~= nil) then
 							local imNewWord, r, l = strsplit(",",blacklist)
 							r, l = r == "r", l == "l"
@@ -494,7 +493,7 @@ options.args.lootFilter = {
 			get = nil,
 			set = function(_,value)
 				local Id = tonumber(value)
-				if type(Id) ~= "number" then ECF:Print(L["BadID"]);return end
+				if not Id then ECF:Print(L["BadID"]);return end
 				local Type = ecf.db.lootType
 				if(Type == "ITEMS") then
 					ItemInfoRequested[Id] = 0

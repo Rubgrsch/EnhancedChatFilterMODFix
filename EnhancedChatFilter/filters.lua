@@ -88,9 +88,8 @@ end
 --metaTable of repeatFilters
 local mt = {__newindex=function(self, _, v)
 	local size = type(self.size) == "number" and self.size or self.size()
-	local pos = #self < size and (#self+1) or self.n
-	rawset(self, pos, v)
-	self.n = pos+1
+	rawset(self, self.n, v)
+	self.n = self.n + 1
 	if self.n > size then self.n = self.n - size end
 end}
 
