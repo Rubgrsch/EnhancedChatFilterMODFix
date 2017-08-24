@@ -111,16 +111,15 @@ local function checkBlacklist(blackWord, r)
 	if(newWord ~= blackWord or blackWord == "") then return true end -- Also report "" as invalid
 end
 
+--Initialize and convert old config to new one
 function G.DBInitialize()
-	if ecfDB.profiles.Default then
+	if next(ecfDB) == nil then ecfDB = defaults
+	elseif ecfDB.profiles and ecfDB.profiles.Default then
 		ecfDB = ecfDB.profiles.Default
-		for k,v in pairs(defaults) do
-			if ecfDB[k] == nil then ecfDB[k] = v end
-		end
+		for k in pairs(ecfDB) do if defaults[k] == nil then ecfDB[k] = nil end end -- remove old keys
+		for k,v in pairs(defaults) do if ecfDB[k] == nil then ecfDB[k] = v end end -- fallback to defaults
 	end
-	if next(ecfDB) == nil then ecfDB = defaults end
 	ecf.db = ecfDB
-	--Convert old config to new one
 	for key,v in pairs(ecf.db.blackWordList) do
 		for key2 in pairs(ecf.db.blackWordList) do -- remove duplicate words
 			if key ~= key2 and strfind(key,key2) then ecf.db.blackWordList[key] = nil;break end
