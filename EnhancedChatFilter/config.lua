@@ -11,35 +11,33 @@ local LibStub = LibStub
 
 --Default Options
 local defaults = {
-	profile = {
-		enableFilter = true, -- Main Toggle
-		enableWisper = false, -- Wisper WhiteMode
-		enableDND = true, -- DND
-		enableCFA = true, -- Achievement Filter
-		enableRAF = false, -- RaidAlert Filter
-		enableQRF = false, -- Quest/Group Report Filter
-		enableDSS = true, -- Spec spell Filter
-		enableMSF = false, -- Monster Say Filter
-		enableAggressive = false, -- Aggressive Filter
-		chatLinesLimit = 20, -- also enable repeatFilter
-		multiLine = false, -- MultiLines, in RepeatFilter
-		repeatFilterGroup = true, -- repeatFilter enabled in group and raid
-		blackWordList = {},
-		lesserBlackWordThreshold = 3, -- in lesserBlackWord
-		blackWordFilterGroup = false, -- blackWord enabled in group and raid
-		lootType = "ITEMS", -- loot filter type
-		lootItemFilterList = {[118043] = true, [71096] = true, [49655] = true}, -- item list, [id] = true
-		lootCurrencyFilterList = {[944] = true, [1268] = true}, -- Currency list, [id] = true
-		lootQualityMin = 0, -- loot quality filter, 0..4 = poor..epic
-		minimap = {
-			hide = false, -- minimap
-		},
-		advancedConfig = false, -- show advancedConfig
-		debugMode = false, -- now it's the record toggle
-		record = {},
-		recordPos = 1,
-		ChatRecordOnlyShow = 1,
-	}
+	enableFilter = true, -- Main Toggle
+	enableWisper = false, -- Wisper WhiteMode
+	enableDND = true, -- DND
+	enableCFA = true, -- Achievement Filter
+	enableRAF = false, -- RaidAlert Filter
+	enableQRF = false, -- Quest/Group Report Filter
+	enableDSS = true, -- Spec spell Filter
+	enableMSF = false, -- Monster Say Filter
+	enableAggressive = false, -- Aggressive Filter
+	chatLinesLimit = 20, -- also enable repeatFilter
+	multiLine = false, -- MultiLines, in RepeatFilter
+	repeatFilterGroup = true, -- repeatFilter enabled in group and raid
+	blackWordList = {},
+	lesserBlackWordThreshold = 3, -- in lesserBlackWord
+	blackWordFilterGroup = false, -- blackWord enabled in group and raid
+	lootType = "ITEMS", -- loot filter type
+	lootItemFilterList = {[118043] = true, [71096] = true, [49655] = true}, -- item list, [id] = true
+	lootCurrencyFilterList = {[944] = true, [1268] = true}, -- Currency list, [id] = true
+	lootQualityMin = 0, -- loot quality filter, 0..4 = poor..epic
+	minimap = {
+		hide = false, -- minimap
+	},
+	advancedConfig = false, -- show advancedConfig
+	debugMode = false, -- now it's the record toggle
+	record = {},
+	recordPos = 1,
+	ChatRecordOnlyShow = 1,
 }
 
 --------------- Functions from Elsewhere ---------------
@@ -114,7 +112,14 @@ local function checkBlacklist(blackWord, r)
 end
 
 function G.DBInitialize()
-	ecf.db = LibStub("AceDB-3.0"):New("ecfDB", defaults, "Default").profile
+	if ecfDB.profiles.Default then
+		ecfDB = ecfDB.profiles.Default
+		for k,v in pairs(defaults) do
+			if ecfDB[k] == nil then ecfDB[k] = v end
+		end
+	end
+	if next(ecfDB) == nil then ecfDB = defaults end
+	ecf.db = ecfDB
 	--Convert old config to new one
 	for key,v in pairs(ecf.db.blackWordList) do
 		for key2 in pairs(ecf.db.blackWordList) do -- remove duplicate words
