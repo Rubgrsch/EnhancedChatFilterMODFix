@@ -5,9 +5,9 @@ Description
 -----------
 
 This is a WoW chat filter addon mainly for CN servers.  
-It is now supporting Legion(7.2.5).  
+It is now supporting Legion(7.3.0).  
 这是一个主要适用于国服魔兽世界的聊天屏蔽插件。  
-现已更新至军团再临(7.2.5)。  
+现已更新至军团再临(7.3.0)。  
 
 NGA Link: <http://bbs.nga.cn/read.php?tid=9277315>  
 Curse Link: <http://mods.curse.com/addons/wow/ecfmodfix>
