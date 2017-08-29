@@ -4,7 +4,7 @@ local L, G = ecf.L, ecf.G -- locales, global variables
 
 local _G = _G
 -- Lua
-local format, ipairs, max, min, next, pairs, rawset, select, strbyte, strfind, strmatch, strsub, tconcat, tonumber, type = format, ipairs, max, min, next, pairs, rawset, select, string.byte, string.find, strmatch, strsub, table.concat, tonumber, type
+local format, ipairs, max, min, next, pairs, rawset, select, tconcat, tonumber, type = format, ipairs, max, min, next, pairs, rawset, select, table.concat, tonumber, type
 -- WoW
 local Ambiguate, BNGetFriendGameAccountInfo, BNGetNumFriends, BNGetNumFriendGameAccounts, ChatTypeInfo, GetAchievementLink, GetFriendInfo, GetGuildInfo, GetItemInfo, GetNumFriends, GetPlayerInfoByGUID, GetRealmName, GetTime, UnitExists, UnitInParty, UnitInRaid, UnitIsUnit = Ambiguate, BNGetFriendGameAccountInfo, BNGetNumFriends, BNGetNumFriendGameAccounts, ChatTypeInfo, GetAchievementLink, GetFriendInfo, GetGuildInfo, GetItemInfo, GetNumFriends, GetPlayerInfoByGUID, GetRealmName, GetTime, UnitExists, UnitInParty, UnitInRaid, UnitIsUnit
 
@@ -31,7 +31,7 @@ local QuestReportTagList = {"任务进度提示%s?[:：]", "%(任务完成%)", "
 G.RegexCharList = "[%(%)%.%%%+%-%*%?%[%]%$%^{}]" -- won't work on regex blackWord, but works on others
 
 local function SendMessage(event, msg)
-	local info = ChatTypeInfo[strsub(event, 10)]
+	local info = ChatTypeInfo[event:sub(10)]
 	for i = 1, NUM_CHAT_WINDOWS do
 		local ChatFrames = _G["ChatFrame"..i]
 		if (ChatFrames and ChatFrames:IsEventRegistered(event)) then
@@ -101,7 +101,7 @@ local function ECFfilter(event,msg,player,flags,channelName)
 	local Event = chatChannel[event]
 
 	-- filter MeetingStone(NetEase) broad msg
-	if channelName == "集合石" and strfind(msg,"^[#&$@]") then return true, "MeetingStone" end
+	if channelName == "集合石" and msg:find("^[#&$@]") then return true, "MeetingStone" end
 
 	local IsMyFriend, IsMyGuild, IsMyGroup = friends[player], GetGuildInfo("player") == GetGuildInfo(player), UnitInRaid(player) or UnitInParty(player)
 	-- don't filter player or his friends/BNfriends
@@ -139,7 +139,7 @@ local function ECFfilter(event,msg,player,flags,channelName)
 		local count = 0
 		for keyWord,ty in pairs(ecf.db.blackWordList) do
 			--Check blackList
-			if (strfind((not ty.regex) and newfilterString or filterString,keyWord)) then
+			if ((not ty.regex) and newfilterString or filterString):find(keyWord) then
 				if (ty.lesser) then
 					count = count + 1
 				else
@@ -154,7 +154,7 @@ local function ECFfilter(event,msg,player,flags,channelName)
 
 	if (ecf.db.enableRAF and (Event <= 2 or Event == 4)) then -- raid
 		for _,RaidAlertTag in ipairs(RaidAlertTagList) do
-			if(strfind(msg,RaidAlertTag)) then
+			if msg:find(RaidAlertTag) then
 				return true, RaidAlertTag.." in RaidAlertTag"
 			end
 		end
@@ -162,7 +162,7 @@ local function ECFfilter(event,msg,player,flags,channelName)
 
 	if (ecf.db.enableQRF and (Event <= 2 or Event == 4)) then -- quest/party
 		for _,QuestReportTag in ipairs(QuestReportTagList) do
-			if(strfind(msg,QuestReportTag)) then
+			if msg:find(QuestReportTag) then
 				return true, QuestReportTag.." in QuestReportTag"
 			end
 		end
@@ -174,7 +174,7 @@ local function ECFfilter(event,msg,player,flags,channelName)
 
 		--msgdata
 		local msgtable = {player, {}, GetTime()}
-		for idx=1, #msgLine do msgtable[2][idx] = strbyte(msgLine,idx) end
+		for idx=1, #msgLine do msgtable[2][idx] = msgLine:byte(idx) end
 		for i,v in ipairs(chatLines) do
 			--if there is not much difference between msgs, filter it
 			--(optional) if someone sends msgs within 0.6s, filter it
@@ -187,8 +187,7 @@ local function ECFfilter(event,msg,player,flags,channelName)
 	end
 end
 
-local prevLineID = 0
-local filterResult = false
+local prevLineID, filterResult = 0, false
 local function ECFfilterRecord(self,event,msg,player,_,_,_,flags,_,_,channelName,_,lineID)
 	-- do nothing if main filter is off
 	if(not ecf.db.enableFilter) then return end
@@ -252,7 +251,7 @@ local function SSFilter(self,_,msg)
 	if (not ecf.db.enableFilter or not ecf.db.enableDSS) then return end
 
 	for _,s in ipairs(SSFilterStrings) do
-		if strfind(msg, s) then return true end
+		if msg:find(s) then return true end
 	end
 end
 if (UnitLevel("player") == GetMaxPlayerLevel()) then ChatFrame_AddMessageEventFilter("CHAT_MSG_SYSTEM", SSFilter) end
@@ -301,8 +300,8 @@ end)
 
 local function achievementFilter(self, event, msg, _, _, _, _, _, _, _, _, _, _, guid)
 	if (not ecf.db.enableCFA or not ecf.db.enableFilter) then return end
-	if (not guid or not strfind(guid,"Player")) then return end
-	local achievementID = tonumber(strmatch(msg, "achievement:(%d+)"))
+	if (not guid or not guid:find("Player")) then return end
+	local achievementID = tonumber(msg:match("achievement:(%d+)"))
 	if (not achievementID) then return end
 	local _,class,_,_,_,name,server = GetPlayerInfoByGUID(guid)
 	if (not name) then return end -- check nil
@@ -319,7 +318,7 @@ ChatFrame_AddMessageEventFilter("CHAT_MSG_GUILD_ACHIEVEMENT", achievementFilter)
 --LootFilter
 local function lootItemFilter(self,_,msg)
 	if (not ecf.db.enableFilter) then return end
-	local itemID = tonumber(strmatch(msg, "|Hitem:(%d+)"))
+	local itemID = tonumber(msg:match("|Hitem:(%d+)"))
 	if(not itemID) then return end -- pet cages don't have 'item'
 	if(ecf.db.lootItemFilterList[itemID]) then return true end
 	if(select(3,GetItemInfo(itemID)) < ecf.db.lootQualityMin) then return true end -- ItemQuality is in ascending order
@@ -328,7 +327,7 @@ ChatFrame_AddMessageEventFilter("CHAT_MSG_LOOT", lootItemFilter)
 
 local function lootCurrecyFilter(self,_,msg)
 	if (not ecf.db.enableFilter) then return end
-	local currencyID = tonumber(strmatch(msg, "|Hcurrency:(%d+)"))
+	local currencyID = tonumber(msg:match("|Hcurrency:(%d+)"))
 	if(ecf.db.lootCurrencyFilterList[currencyID]) then return true end
 end
 ChatFrame_AddMessageEventFilter("CHAT_MSG_CURRENCY", lootCurrecyFilter)

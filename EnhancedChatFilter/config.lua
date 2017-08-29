@@ -4,7 +4,7 @@ local ECF, L, G = ecf.ECF, ecf.L, ecf.G -- Ace3, locales, global variables
 
 local _G = _G
 -- Lua
-local ipairs, format, pairs, next, select, strbyte, strfind, strsplit, strsub, tconcat, tonumber, type, unpack = ipairs, format, pairs, next, select, strbyte, string.find, strsplit, strsub, table.concat, tonumber, type, unpack
+local ipairs, format, pairs, next, select, strsplit, tconcat, tonumber, type, unpack = ipairs, format, pairs, next, select, strsplit, table.concat, tonumber, type, unpack
 -- WoW
 local GetCurrencyLink, GetItemInfo, ITEMS = GetCurrencyLink, GetItemInfo, ITEMS
 local LibStub = LibStub
@@ -43,7 +43,7 @@ local defaults = {
 --------------- Functions from Elsewhere ---------------
 -- utf8 functions are taken from utf8replace from @Phanx @Pastamancer
 local function utf8charbytes(s, i)
-	local c = strbyte(s, i or 1)
+	local c = s:byte(i or 1)
 	-- determine bytes needed for character, based on RFC 3629
 	if c > 0 and c <= 127 then
 		return 1
@@ -58,12 +58,11 @@ end
 
 -- replace UTF-8 characters based on a mapping table
 function G.utf8replace(s, mapping)
-	local pos = 1
-	local t = {}
+	local t, pos = {}, 1
 
 	while pos <= #s do
 		local charbytes = utf8charbytes(s, pos)
-		local c = strsub(s, pos, pos + charbytes - 1)
+		local c = s:sub(pos, pos + charbytes - 1)
 		t[#t+1] = (mapping[c] or c)
 		pos = pos + charbytes
 	end
@@ -76,9 +75,9 @@ local function StringHash(text)
 	local counter, len = 1, #text
 	for i = 1, len, 3 do
 		counter = ((counter*8161)%4294967279) +  -- 2^32 - 17: Prime!
-			(strbyte(text,i)*16776193) +
-			((strbyte(text,i+1) or (len-i+256))*8372226) +
-			((strbyte(text,i+2) or (len-i+256))*3932164)
+			(text:byte(i)*16776193) +
+			((text:byte(i+1) or (len-i+256))*8372226) +
+			((text:byte(i+2) or (len-i+256))*3932164)
 	end
 	return counter%4294967291 -- 2^32 - 5: Prime (and different from the prime in the loop)
 end
@@ -122,7 +121,7 @@ function G.DBInitialize()
 	ecf.db = ecfDB
 	for key,v in pairs(ecf.db.blackWordList) do
 		for key2 in pairs(ecf.db.blackWordList) do -- remove duplicate words
-			if key ~= key2 and strfind(key,key2) then ecf.db.blackWordList[key] = nil;break end
+			if key ~= key2 and key:find(key2) then ecf.db.blackWordList[key] = nil;break end
 		end
 		if(checkBlacklist(key,v.regex)) then ecf.db.blackWordList[key] = nil end -- remove invalid
 		if(not v.regex) then -- force upper
