@@ -110,6 +110,10 @@ local function checkBlacklist(blackWord, r)
 	if(newWord ~= blackWord or blackWord == "") then return true end -- Also report "" as invalid
 end
 
+local function updateBlackWordTable()
+	G.BuildedBlackWordTable = G.ACBuild(ecf.db.blackWordList)
+end
+
 --Initialize and convert old config to new one
 function G.DBInitialize()
 	if next(ecfDB) == nil then ecfDB = defaults
@@ -135,6 +139,7 @@ function G.DBInitialize()
 	for Id, info in pairs(ecf.db.lootCurrencyFilterList) do
 		if info == true then ecf.db.lootCurrencyFilterList[Id] = GetCurrencyLink(Id) end
 	end
+	updateBlackWordTable()
 end
 
 --------------- Options ---------------
@@ -326,6 +331,7 @@ options.args.blackListTab = {
 			func = function()
 				ecf.db.blackWordList[lesserWordChosen ~= "" and lesserWordChosen or blackWordChosen] = nil
 				lesserWordChosen, blackWordChosen = "", ""
+				updateBlackWordTable()
 			end,
 			disabled = function() return lesserWordChosen == "" and blackWordChosen == "" end,
 		},
@@ -333,7 +339,10 @@ options.args.blackListTab = {
 			type = "execute",
 			name = L["ClearUp"],
 			order = 4,
-			func = function() ecf.db.blackWordList, lesserWordChosen, blackWordChosen = {}, "", "" end,
+			func = function()
+				ecf.db.blackWordList, lesserWordChosen, blackWordChosen = {}, "", ""
+				updateBlackWordTable()
+			end,
 			confirm = true,
 			confirmText = format(L["DoYouWantToClear"],L["BlackList"]),
 			disabled = function() return next(ecf.db.blackWordList) == nil end,
@@ -348,7 +357,10 @@ options.args.blackListTab = {
 			name = L["AddBlackWordTitle"],
 			order = 11,
 			get = nil,
-			set = function(_,value) AddBlackWord(value, regexToggle, lesserToggle) end,
+			set = function(_,value)
+				AddBlackWord(value, regexToggle, lesserToggle)
+				updateBlackWordTable()
+			end,
 		},
 		regexToggle = {
 			type = "toggle",
@@ -411,6 +423,7 @@ options.args.blackListTab = {
 							AddBlackWord(imNewWord, r, l)
 						end
 					end
+					updateBlackWordTable()
 				end
 				stringIO = ""
 			end,

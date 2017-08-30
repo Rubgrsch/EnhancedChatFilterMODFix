@@ -136,20 +136,9 @@ local function ECFfilter(event,msg,player,flags,channelName)
 	end
 
 	if(Event <= (ecf.db.blackWordFilterGroup and 4 or 3) and not IsMyFriend) then --blackWord Filter, whisper/yell/say/channel and party/raid(optional)
-		local count = 0
-		for keyWord,ty in pairs(ecf.db.blackWordList) do
-			--Check blackList
-			if ((not ty.regex) and newfilterString or filterString):find(keyWord) then
-				if (ty.lesser) then
-					count = count + 1
-				else
-					return true, "Keyword: "..keyWord
-				end
-			end
-		end
-		if count >= ecf.db.lesserBlackWordThreshold then
-			return true, "LesserKeywords x"..count
-		end
+		local count, keyWord = G.ACMatch(newfilterString,G.BuildedBlackWordTable,ecf.db.blackWordList)
+		if count == -1 then return true, "Keyword: "..keyWord end
+		if count >= ecf.db.lesserBlackWordThreshold then return true, "LesserKeywords x"..count end
 	end
 
 	if (ecf.db.enableRAF and (Event <= 2 or Event == 4)) then -- raid
