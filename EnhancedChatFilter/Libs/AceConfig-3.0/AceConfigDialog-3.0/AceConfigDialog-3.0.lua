@@ -1,7 +1,7 @@
 --- AceConfigDialog-3.0 generates AceGUI-3.0 based windows based on option tables.
 -- @class file
 -- @name AceConfigDialog-3.0
--- @release $Id: AceConfigDialog-3.0.lua 1163 2017-08-14 14:04:39Z nevcairiel $
+-- @release $Id: AceConfigDialog-3.0.lua 1167 2017-08-29 22:08:48Z funkydude $
 
 local LibStub = LibStub
 local gui = LibStub("AceGUI-3.0")
@@ -740,7 +740,7 @@ local function ActivateControl(widget, event, ...)
 		else
 			validationErrorPopup(validated)
 		end
-		PlaySound(PlaySoundKitID and "igPlayerInviteDecline" or 882) -- SOUNDKIT.IG_PLAYER_INVITE_DECLINE || XXX _DECLINE is actually missing from the table
+		PlaySound(882) -- SOUNDKIT.IG_PLAYER_INVITE_DECLINE || _DECLINE is actually missing from the table
 		del(info)
 		return true
 	else
