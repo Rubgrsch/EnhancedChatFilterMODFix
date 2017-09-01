@@ -117,6 +117,13 @@ local function ECFfilter(event,msg,player,flags,channelName)
 	filterString = G.utf8replace(filterString, G.UTF8Symbols):gsub("{RT%d}",""):gsub("%s",""):gsub(G.RegexCharList, "")
 	local annoying = (oriLen - #filterString) / oriLen
 
+	local msgLine = filterString
+	if(msgLine == "") then msgLine = msg end --If it has only symbols, don't change it
+
+	--msgdata
+	local msgtable = {player, {}, GetTime()}
+	for idx=1, #msgLine do msgtable[2][idx] = msgLine:byte(idx) end
+
 	if(ecf.db.enableWisper and Event == 1) then --Whisper Whitelist Mode, only whisper
 		--Don't filter players that are from same guild/raid/party or who you have whispered
 		if not(allowWisper[player] or IsMyFriend or IsMyGuild or IsMyGroup) then
@@ -135,7 +142,7 @@ local function ECFfilter(event,msg,player,flags,channelName)
 	end
 
 	if(Event <= (ecf.db.blackWordFilterGroup and 4 or 3) and not IsMyFriend) then --blackWord Filter, whisper/yell/say/channel and party/raid(optional)
-		local count, keyWord = G.ACMatch(filterString,G.BuildedBlackWordTable,ecf.db.blackWordList)
+		local count, keyWord = G.ACMatch(msgtable[2],G.BuildedBlackWordTable)
 		if count == -1 then return true, "Keyword: "..keyWord end
 		if count >= ecf.db.lesserBlackWordThreshold then return true, "LesserKeywords x"..count end
 	end
@@ -157,12 +164,6 @@ local function ECFfilter(event,msg,player,flags,channelName)
 	end
 
 	if(ecf.db.chatLinesLimit > 0 and Event <= (ecf.db.repeatFilterGroup and 4 or 3) and not IsMyFriend) then --Repeat Filter
-		local msgLine = filterString
-		if(msgLine == "") then msgLine = msg end --If it has only symbols, don't change it
-
-		--msgdata
-		local msgtable = {player, {}, GetTime()}
-		for idx=1, #msgLine do msgtable[2][idx] = msgLine:byte(idx) end
 		for i,v in ipairs(chatLines) do
 			--if there is not much difference between msgs, filter it
 			--(optional) if someone sends msgs within 0.6s, filter it

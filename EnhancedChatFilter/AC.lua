@@ -32,7 +32,7 @@
 local _, ecf = ...
 local G = ecf.G -- global variables
 
-local char, pairs = string.char, pairs
+local char, pairs, ipairs = string.char, pairs, ipairs
 
 local root = ""
 
@@ -41,14 +41,14 @@ local function ACMake(t, c, f)
 	t[c].to   = {}
 	t[c].fail = f
 	t[c].hit  = root
-	t[c].word = false
+	t[c].word = nil
 end
 
 function G.ACBuild(m)
 	local t = {}
 	ACMake(t, root, root)
 
-	for k in pairs(m) do
+	for k,v in pairs(m) do
 		local current = root
 		for j = 1, k:len() do
 			local c = k:byte(j)
@@ -63,7 +63,7 @@ function G.ACBuild(m)
 			end
 			current = path
 		end
-		t[k].word = true
+		t[k].word = v.lesser
 	end
 
 	local q = {root}
@@ -76,7 +76,7 @@ function G.ACBuild(m)
 			while fail ~= "" and t[fail] == nil do fail = fail:sub(2) end
 			t[p].fail = fail
 			local hit = p:sub(2)
-			while hit ~= "" and (t[hit] == nil or not t[hit].word) do hit = hit:sub(2) end
+			while hit ~= "" and (t[hit] == nil or t[hit].word == nil) do hit = hit:sub(2) end
 			t[p].hit = hit
 		end
 	end
@@ -84,21 +84,20 @@ function G.ACBuild(m)
 	return t
 end
 
-function G.ACMatch(s, t, m)
+function G.ACMatch(s, t)
 	local path = root
 	local hits = 0
-	for i = 1,s:len() do
-		local c = s:byte(i)
+	for _, c in ipairs(s) do
 		while t[path].to[c] == nil and path ~= root do path = t[path].fail end
 		local n = t[path].to[c]
 		if n ~= nil then
 			path = n
-			if t[n].word then hits = hits + 1 end
+			if t[n].word ~= nil then hits = hits + 1 end
 			while t[n].hit ~= root do
 				n = t[n].hit
 				hits = hits + 1
 			end
-			if m[n] and not m[n].lesser and hits > 0 then return -1, n end
+			if t[n] and t[n].word == false then return -1, n end
 		end
 	end
 
