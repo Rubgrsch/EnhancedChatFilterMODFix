@@ -36,51 +36,38 @@ local char, pairs, ipairs = string.char, pairs, ipairs
 
 local root = ""
 
-local function ACMake(t, c, f)
-	t[c]	  = {}
-	t[c].to   = {}
-	t[c].fail = f
-	t[c].hit  = root
-	t[c].word = nil
-end
-
 function G.ACBuild(m)
 	local t = {}
-	ACMake(t, root, root)
-
+	-- [1] = to, [2] = fail, [3] = hit, [4] = word/lesser
+	t[root] = {{}, root, root, nil}
 	for k,v in pairs(m) do
 		local current = root
-		for j = 1, k:len() do
+		for j = 1, #k do
 			local c = k:byte(j)
 			local path = current..char(c)
-			if t[current].to[c] == nil then
-				t[current].to[c] = path
-				if current == root then
-					ACMake(t, path, root)
-				else
-					ACMake(t, path)
-				end
+			if t[current][1][c] == nil then
+				t[current][1][c] = path
+				t[path] = {{}, root, root, nil}
 			end
 			current = path
 		end
-		t[k].word = v.lesser
+		t[k][4] = v.lesser
 	end
 
 	local q = {root}
 	while #q > 0 do
 		local path = q[#q]
 		q[#q] = nil
-		for _, p in pairs(t[path].to) do
+		for _, p in pairs(t[path][1]) do
 			q[#q+1] = p
 			local fail = p:sub(2)
 			while fail ~= "" and t[fail] == nil do fail = fail:sub(2) end
-			t[p].fail = fail
+			t[p][2] = fail
 			local hit = p:sub(2)
-			while hit ~= "" and (t[hit] == nil or t[hit].word == nil) do hit = hit:sub(2) end
-			t[p].hit = hit
+			while hit ~= "" and (t[hit] == nil or t[hit][4] == nil) do hit = hit:sub(2) end
+			t[p][3] = hit
 		end
 	end
-
 	return t
 end
 
@@ -88,18 +75,17 @@ function G.ACMatch(s, t)
 	local path = root
 	local hits = 0
 	for _, c in ipairs(s) do
-		while t[path].to[c] == nil and path ~= root do path = t[path].fail end
-		local n = t[path].to[c]
+		while t[path][1][c] == nil and path ~= root do path = t[path][2] end
+		local n = t[path][1][c]
 		if n ~= nil then
 			path = n
-			if t[n].word ~= nil then hits = hits + 1 end
-			while t[n].hit ~= root do
-				n = t[n].hit
+			if t[n][4] ~= nil then hits = hits + 1 end
+			while t[n][3] ~= root do
+				n = t[n][3]
 				hits = hits + 1
 			end
-			if t[n] and t[n].word == false then return -1, n end
+			if t[n] and t[n][4] == false then return -1, n end
 		end
 	end
-
 	return hits
 end
