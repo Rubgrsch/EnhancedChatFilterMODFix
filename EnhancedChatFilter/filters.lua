@@ -114,10 +114,11 @@ local function ECFfilter(event,msg,player,flags,channelName)
 	local filterString = msg:gsub("|H[^|]+|h([^|]+)|h","%1"):upper():gsub("|C%x%x%x%x%x%x%x%x",""):gsub("|R","")
 	local oriLen = #filterString
 	-- remove utf-8 chars/raidicon/space/symbols
-	filterString = G.utf8replace(filterString, G.UTF8Symbols):gsub("{RT%d}",""):gsub("%s",""):gsub(G.RegexCharList, "")
+	filterString = G.utf8replace(filterString, G.UTF8Symbols):gsub("{RT%d}",""):gsub("%s","")
+	local newfilterString = filterString:gsub(G.RegexCharList, "")
 	local annoying = (oriLen - #filterString) / oriLen
 
-	local msgLine = filterString
+	local msgLine = newfilterString
 	if(msgLine == "") then msgLine = msg end --If it has only symbols, don't change it
 
 	--msgdata
@@ -142,7 +143,14 @@ local function ECFfilter(event,msg,player,flags,channelName)
 	end
 
 	if(Event <= (ecf.db.blackWordFilterGroup and 4 or 3) and not IsMyFriend) then --blackWord Filter, whisper/yell/say/channel and party/raid(optional)
-		local count, keyWord = G.ACMatch(msgtable[2],G.BuildedBlackWordTable)
+		local count, keyWord = G.ACMatch(msgtable[2],G.BuiltBlackWordTable)
+		if count ~= -1 then
+			for k,v in pairs(ecf.db.regexWordsList) do
+				if filterString:find(k) then
+					if v.lesser then count = count + 1 else count, keyWord = -1, k;break end
+				end
+			end
+		end
 		if count == -1 then return true, "Keyword: "..keyWord end
 		if count >= ecf.db.lesserBlackWordThreshold then return true, "LesserKeywords x"..count end
 	end

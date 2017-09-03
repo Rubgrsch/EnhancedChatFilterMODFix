@@ -23,7 +23,8 @@ local defaults = {
 	chatLinesLimit = 20, -- also enable repeatFilter
 	multiLine = false, -- MultiLines, in RepeatFilter
 	repeatFilterGroup = true, -- repeatFilter enabled in group and raid
-	blackWordList = {},
+	regexWordsList = {},
+	normalWordsList = {},
 	lesserBlackWordThreshold = 3, -- in lesserBlackWord
 	blackWordFilterGroup = false, -- blackWord enabled in group and raid
 	lootType = "ITEMS", -- loot filter type
@@ -111,28 +112,21 @@ local function checkBlacklist(blackWord, r)
 end
 
 local function updateBlackWordTable()
-	G.BuildedBlackWordTable = G.ACBuild(ecf.db.blackWordList)
+	G.BuiltBlackWordTable = G.ACBuild(ecf.db.normalWordsList)
 end
 
 --Initialize and convert old config to new one
 function G.DBInitialize()
 	if next(ecfDB) == nil then ecfDB = defaults
-	elseif ecfDB.profiles and ecfDB.profiles.Default then
-		ecfDB = ecfDB.profiles.Default
-		for k in pairs(ecfDB) do if defaults[k] == nil then ecfDB[k] = nil end end -- remove old keys
-		for k,v in pairs(defaults) do if ecfDB[k] == nil then ecfDB[k] = v end end -- fallback to defaults
-	end
+	elseif ecfDB.profiles and ecfDB.profiles.Default then ecfDB = ecfDB.profiles.Default end
 	ecf.db = ecfDB
-	for key,v in pairs(ecf.db.blackWordList) do
-		for key2 in pairs(ecf.db.blackWordList) do -- remove duplicate words
-			if key ~= key2 and key:find(key2) then ecf.db.blackWordList[key] = nil;break end
-		end
-		if(checkBlacklist(key,v.regex)) then ecf.db.blackWordList[key] = nil end -- remove invalid
-		if(not v.regex) then -- force upper
-			ecf.db.blackWordList[key] = nil
-			ecf.db.blackWordList[key:upper()] = v
+	for k,v in pairs(defaults) do if ecf.db[k] == nil then ecf.db[k] = v end end -- fallback to defaults
+	if ecf.db.blackWordList then
+		for k,v in pairs(ecf.db.blackWordList) do
+			(v.regex and ecf.db.regexWordsList or ecf.db.normalWordsList)[k] = {lesser = v.lesser}
 		end
 	end
+	for k in pairs(ecf.db) do if defaults[k] == nil then ecf.db[k] = nil end end -- remove old keys
 	for Id, info in pairs(ecf.db.lootItemFilterList) do
 		if info == true then ItemInfoRequested[Id] = 1 end
 	end
@@ -144,7 +138,8 @@ end
 
 --------------- Options ---------------
 --These settings won't be saved
-local lesserWordChosen, blackWordChosen = "", ""
+local wordChosenDefault = {"", false, false} -- string, regex, lesser
+local wordChosen = wordChosenDefault
 local itemChosen, currencyChosen = 0, 0
 local stringIO = "" -- blackWord input
 local regexToggle, lesserToggle = false, false
@@ -158,8 +153,11 @@ local function AddBlackWord(word, r, l)
 	if (checkBlacklist(word, r)) then
 		print(format(L["IncludeAutofilteredWord"],word))
 	else
-		if not r then word = word:upper() end
-		ecf.db.blackWordList[word] = {regex = r, lesser = l,}
+		if r then
+			ecf.db.regexWordsList[word] = {lesser = l}
+		else
+			ecf.db.normalWordsList[word:upper()] = {lesser = l}
+		end
 	end
 end
 
@@ -303,11 +301,12 @@ options.args.blackListTab = {
 			type = "select",
 			name = L["BlackwordList"],
 			order = 1,
-			get = function() return blackWordChosen end,
-			set = function(_,value) lesserWordChosen, blackWordChosen = "", value end,
+			get = function() return wordChosen[3] and "" or wordChosen[1] end,
+			set = function(_,value) wordChosen = {value, not ecf.db.normalWordsList[value], false} end,
 			values = function()
 				local blacklistname = {}
-				for key,v in pairs(ecf.db.blackWordList) do if not v.lesser then blacklistname[key] = key end end
+				for key,v in pairs(ecf.db.regexWordsList) do if not v.lesser then blacklistname[key] = key end end
+				for key,v in pairs(ecf.db.normalWordsList) do if not v.lesser then blacklistname[key] = key end end
 				return blacklistname
 			end,
 		},
@@ -315,11 +314,12 @@ options.args.blackListTab = {
 			type = "select",
 			name = L["LesserBlackwordList"],
 			order = 2,
-			get = function() return lesserWordChosen end,
-			set = function(_,value) lesserWordChosen, blackWordChosen = value, "" end,
+			get = function() return wordChosen[3] and wordChosen[1] or "" end,
+			set = function(_,value) wordChosen = {value, not ecf.db.normalWordsList[value], true} end,
 			values = function()
 				local blacklistname = {}
-				for key,v in pairs(ecf.db.blackWordList) do if v.lesser then blacklistname[key] = key end end
+				for key,v in pairs(ecf.db.regexWordsList) do if v.lesser then blacklistname[key] = key end end
+				for key,v in pairs(ecf.db.normalWordsList) do if v.lesser then blacklistname[key] = key end end
 				return blacklistname
 			end,
 			hidden = function() return not ecf.db.advancedConfig end,
@@ -329,23 +329,23 @@ options.args.blackListTab = {
 			name = REMOVE,
 			order = 3,
 			func = function()
-				ecf.db.blackWordList[lesserWordChosen ~= "" and lesserWordChosen or blackWordChosen] = nil
-				lesserWordChosen, blackWordChosen = "", ""
+				(wordChosen[2] and ecf.db.regexWordsList or ecf.db.normalWordsList)[wordChosen[1]] = nil
+				wordChosen = wordChosenDefault
 				updateBlackWordTable()
 			end,
-			disabled = function() return lesserWordChosen == "" and blackWordChosen == "" end,
+			disabled = function() return wordChosen[1] == "" end,
 		},
 		ClearUpButton = {
 			type = "execute",
 			name = L["ClearUp"],
 			order = 4,
 			func = function()
-				ecf.db.blackWordList, lesserWordChosen, blackWordChosen = {}, "", ""
+				wordChosen = wordChosenDefault
 				updateBlackWordTable()
 			end,
 			confirm = true,
 			confirmText = format(L["DoYouWantToClear"],L["BlackList"]),
-			disabled = function() return next(ecf.db.blackWordList) == nil end,
+			disabled = function() return next(ecf.db.regexWordsList) == nil and next(ecf.db.normalWordsList) == nil end,
 		},
 		line1 = {
 			type = "header",
@@ -435,11 +435,18 @@ options.args.blackListTab = {
 			order = 32,
 			func = function()
 				local blackStringList = {}
-				for key,v in pairs(ecf.db.blackWordList) do
-					if (checkBlacklist(key, v.regex)) then
+				for key,v in pairs(ecf.db.regexWordsList) do
+					if (checkBlacklist(key, true)) then
 						print(format(L["IncludeAutofilteredWord"],key))
 					else
-						blackStringList[#blackStringList+1] = format("%s,%s,%s",key,v.regex and "r" or "",v.lesser and "l" or "")
+						blackStringList[#blackStringList+1] = format("%s,%s,%s",key,"r",v.lesser and "l" or "")
+					end
+				end
+				for key,v in pairs(ecf.db.normalWordsList) do
+					if (checkBlacklist(key, false)) then
+						print(format(L["IncludeAutofilteredWord"],key))
+					else
+						blackStringList[#blackStringList+1] = format("%s,%s,%s",key,"",v.lesser and "l" or "")
 					end
 				end
 				local blackString = tconcat(blackStringList,";")
