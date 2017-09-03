@@ -1,10 +1,10 @@
 -- ECF
 local _, ecf = ...
-local ECF, L, G = ecf.ECF, ecf.L, ecf.G -- Ace3, locales, global variables
+local L, G = ecf.L, ecf.G -- locales, global variables
 
 local _G = _G
 -- Lua
-local ipairs, format, pairs, next, select, strsplit, tconcat, tonumber, type, unpack = ipairs, format, pairs, next, select, strsplit, table.concat, tonumber, type, unpack
+local ipairs, format, pairs, print, next, select, strsplit, tconcat, tonumber, type, unpack = ipairs, format, pairs, print, next, select, strsplit, table.concat, tonumber, type, unpack
 -- WoW
 local GetCurrencyLink, GetItemInfo, ITEMS = GetCurrencyLink, GetItemInfo, ITEMS
 local LibStub = LibStub
@@ -95,7 +95,7 @@ ItemCacheFrame:SetScript("OnEvent",function(self,_,Id)
 		if link then -- if valid
 			ecf.db.lootItemFilterList[Id] = link
 		else
-			ECF:Printf(L["NotExists"],ITEMS,Id)
+			print(format(L["NotExists"],ITEMS,Id))
 		end
 	elseif v == 1 then -- change true to link
 		ecf.db.lootItemFilterList[Id] = link
@@ -156,7 +156,7 @@ end
 
 local function AddBlackWord(word, r, l)
 	if (checkBlacklist(word, r)) then
-		ECF:Printf(L["IncludeAutofilteredWord"],word)
+		print(format(L["IncludeAutofilteredWord"],word))
 	else
 		if not r then word = word:upper() end
 		ecf.db.blackWordList[word] = {regex = r, lesser = l,}
@@ -414,7 +414,7 @@ options.args.blackListTab = {
 			set = function(_,value)
 				local wordString, HashString = strsplit("@", value)
 				if (tonumber(HashString) ~= StringHash(wordString)) then
-					ECF:Print(L["StringHashMismatch"])
+					print(L["StringHashMismatch"])
 				else
 					for _, blacklist in ipairs({strsplit(";", wordString)}) do
 						if (blacklist ~= nil) then
@@ -437,7 +437,7 @@ options.args.blackListTab = {
 				local blackStringList = {}
 				for key,v in pairs(ecf.db.blackWordList) do
 					if (checkBlacklist(key, v.regex)) then
-						ECF:Printf(L["IncludeAutofilteredWord"],key)
+						print(format(L["IncludeAutofilteredWord"],key))
 					else
 						blackStringList[#blackStringList+1] = format("%s,%s,%s",key,v.regex and "r" or "",v.lesser and "l" or "")
 					end
@@ -509,7 +509,7 @@ options.args.lootFilter = {
 			get = nil,
 			set = function(_,value)
 				local Id = tonumber(value)
-				if not Id then ECF:Print(L["BadID"]);return end
+				if not Id then print(L["BadID"]);return end
 				local Type = ecf.db.lootType
 				if(Type == "ITEMS") then
 					ItemInfoRequested[Id] = 0
@@ -523,7 +523,7 @@ options.args.lootFilter = {
 					if link then
 						ecf.db.lootCurrencyFilterList[Id] = link
 					else
-						ECF:Printf(L["NotExists"],Type,Id)
+						print(format(L["NotExists"],Type,Id))
 					end
 				end
 			end,
