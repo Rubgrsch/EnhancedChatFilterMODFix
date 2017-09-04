@@ -30,13 +30,13 @@
 
 -- ECF
 local _, ecf = ...
-local G = ecf.G -- global variables
+local AC = ecf.AC -- Aho-Corasick
 
 local char, pairs, ipairs = string.char, pairs, ipairs
 
 local root = ""
 
-function G.ACBuild(m)
+function AC:Build(m)
 	local t = {}
 	-- [1] = to, [2] = fail, [3] = hit, [4] = word/lesser
 	t[root] = {{}, root, root, nil}
@@ -71,7 +71,7 @@ function G.ACBuild(m)
 	return t
 end
 
-function G.ACMatch(s, t)
+function AC:Match(s, t)
 	local path = root
 	local hits = 0
 	for _, c in ipairs(s) do

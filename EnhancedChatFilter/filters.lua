@@ -1,6 +1,6 @@
 -- ECF
 local _, ecf = ...
-local L, G = ecf.L, ecf.G -- locales, global variables
+local AC, L, G = ecf.AC, ecf.L, ecf.G -- Aho-Corasick, locales, global variables
 
 local _G = _G
 -- Lua
@@ -143,7 +143,7 @@ local function ECFfilter(event,msg,player,flags,channelName)
 	end
 
 	if(Event <= (ecf.db.blackWordFilterGroup and 4 or 3) and not IsMyFriend) then --blackWord Filter, whisper/yell/say/channel and party/raid(optional)
-		local count, keyWord = G.ACMatch(msgtable[2],G.BuiltBlackWordTable)
+		local count, keyWord = AC:Match(msgtable[2],AC.BuiltBlackWordTable)
 		if count ~= -1 then
 			for k,v in pairs(ecf.db.regexWordsList) do
 				if filterString:find(k) then

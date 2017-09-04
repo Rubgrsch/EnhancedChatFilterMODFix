@@ -1,7 +1,7 @@
 -- ECF
 local _, ecf = ...
 ecf.ECF = LibStub("AceAddon-3.0"):NewAddon("EnhancedChatFilter")
-ecf.L, ecf.G = {}, {}
+ecf.AC, ecf.L, ecf.G = {}, {}, {}
 local ECF, L, G = ecf.ECF, ecf.L, ecf.G
 
 -- WoW

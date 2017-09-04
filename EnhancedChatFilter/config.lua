@@ -1,6 +1,6 @@
 -- ECF
 local _, ecf = ...
-local L, G = ecf.L, ecf.G -- locales, global variables
+local AC, L, G = ecf.AC, ecf.L, ecf.G -- Aho-Corasick, locales, global variables
 
 local _G = _G
 -- Lua
@@ -112,7 +112,7 @@ local function checkBlacklist(blackWord, r)
 end
 
 local function updateBlackWordTable()
-	G.BuiltBlackWordTable = G.ACBuild(ecf.db.normalWordsList)
+	AC.BuiltBlackWordTable = AC:Build(ecf.db.normalWordsList)
 end
 
 --Initialize and convert old config to new one
