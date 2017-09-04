@@ -117,7 +117,7 @@ end
 
 --Initialize and convert old config to new one
 function G.DBInitialize()
-	if next(ecfDB) == nil then ecfDB = defaults
+	if type(ecfDB) ~= "table" or next(ecfDB) == nil then ecfDB = defaults
 	elseif ecfDB.profiles and ecfDB.profiles.Default then ecfDB = ecfDB.profiles.Default end
 	ecf.db = ecfDB
 	for k,v in pairs(defaults) do if ecf.db[k] == nil then ecf.db[k] = v end end -- fallback to defaults
