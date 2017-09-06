@@ -340,6 +340,7 @@ options.args.blackListTab = {
 			name = L["ClearUp"],
 			order = 4,
 			func = function()
+				ecf.db.regexWordsList, ecf.db.normalWordsList = {}, {}
 				wordChosen = wordChosenDefault
 				updateBlackWordTable()
 			end,
