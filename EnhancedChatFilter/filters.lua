@@ -144,7 +144,7 @@ local function ECFfilter(event,msg,player,flags,channelName)
 
 	if(Event <= (ecf.db.blackWordFilterGroup and 4 or 3) and not IsMyFriend) then --blackWord Filter, whisper/yell/say/channel and party/raid(optional)
 		local count, keyWord = AC:Match(msgtable[2],AC.BuiltBlackWordTable)
-		if count ~= -1 then
+		if count ~= -1 then -- if no non-lesser word in normalBlackWordList matches
 			for k,v in pairs(ecf.db.regexWordsList) do
 				if filterString:find(k) then
 					if v.lesser then count = count + 1 else count, keyWord = -1, k;break end
@@ -247,9 +247,7 @@ local SSFilterStrings = {
 local function SSFilter(self,_,msg)
 	if (not ecf.db.enableFilter or not ecf.db.enableDSS) then return end
 
-	for _,s in ipairs(SSFilterStrings) do
-		if msg:find(s) then return true end
-	end
+	for _,s in ipairs(SSFilterStrings) do if msg:find(s) then return true end end
 end
 if (UnitLevel("player") == GetMaxPlayerLevel()) then ChatFrame_AddMessageEventFilter("CHAT_MSG_SYSTEM", SSFilter) end
 
@@ -274,7 +272,7 @@ local function achievementReady(id, achievement)
 		end
 	end
 	for event,players in pairs(achievement) do
-		if type(players) == "table" and next(players) ~= nil then
+		if type(players) == "table" and next(players) ~= nil then -- skip empty and .timeout
 			SendAchievement(event, id, players)
 		end
 	end

@@ -36,9 +36,9 @@ local char, pairs, ipairs = string.char, pairs, ipairs
 
 local root = ""
 
-function AC:Build(m)
+function AC:Build(m) -- m: blackwordTable
 	local t = {}
-	-- [1] = to, [2] = fail, [3] = hit, [4] = word/lesser
+	-- [1] = to, [2] = fail, [3] = hit, [4] = nil: not blackword, true/false: isLesser
 	t[root] = {{}, root, root, nil}
 	for k,v in pairs(m) do
 		local current = root
@@ -71,9 +71,8 @@ function AC:Build(m)
 	return t
 end
 
-function AC:Match(s, t)
-	local path = root
-	local hits = 0
+function AC:Match(s, t) -- s: arrays of byte
+	local path, hits = root, 0
 	for _, c in ipairs(s) do
 		while t[path][1][c] == nil and path ~= root do path = t[path][2] end
 		local n = t[path][1][c]
