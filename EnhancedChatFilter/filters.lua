@@ -4,7 +4,7 @@ local AC, L, G = ecf.AC, ecf.L, ecf.G -- Aho-Corasick, locales, global variables
 
 local _G = _G
 -- Lua
-local format, ipairs, max, min, next, pairs, rawset, select, tconcat, tonumber, type = format, ipairs, max, min, next, pairs, rawset, select, table.concat, tonumber, type
+local format, ipairs, max, min, next, pairs, rawset, select, tconcat, tonumber, tremove, type = format, ipairs, max, min, next, pairs, rawset, select, table.concat, tonumber, tremove, type
 -- WoW
 local Ambiguate, BNGetFriendGameAccountInfo, BNGetNumFriends, BNGetNumFriendGameAccounts, ChatTypeInfo, GetAchievementLink, GetFriendInfo, GetGuildInfo, GetItemInfo, GetNumFriends, GetPlayerInfoByGUID, GetRealmName, GetTime, UnitExists, UnitInParty, UnitInRaid, UnitIsUnit = Ambiguate, BNGetFriendGameAccountInfo, BNGetNumFriends, BNGetNumFriendGameAccounts, ChatTypeInfo, GetAchievementLink, GetFriendInfo, GetGuildInfo, GetItemInfo, GetNumFriends, GetPlayerInfoByGUID, GetRealmName, GetTime, UnitExists, UnitInParty, UnitInRaid, UnitIsUnit
 
@@ -85,16 +85,7 @@ local function stringDifference(sA, sB) -- arrays of byte
 	return this[len_b+1]/max(len_a,len_b)
 end
 
---metaTable of repeatFilters
-local mt = {__newindex=function(self, _, v)
-	local size = type(self.size) == "number" and self.size or self.size()
-	rawset(self, self.n, v)
-	self.n = self.n + 1
-	if self.n > size then self.n = self.n - size end
-end}
-
-local chatLines = {size = function() return ecf.db.chatLinesLimit end, n=1}
-setmetatable(chatLines,mt)
+local chatLines = {}
 local chatChannel = {["CHAT_MSG_WHISPER"] = 1, ["CHAT_MSG_SAY"] = 2, ["CHAT_MSG_YELL"] = 2, ["CHAT_MSG_CHANNEL"] = 3, ["CHAT_MSG_PARTY"] = 4, ["CHAT_MSG_PARTY_LEADER"] = 4, ["CHAT_MSG_RAID"] = 4, ["CHAT_MSG_RAID_LEADER"] = 4, ["CHAT_MSG_RAID_WARNING"] = 4, ["CHAT_MSG_INSTANCE_CHAT"] = 4, ["CHAT_MSG_INSTANCE_CHAT_LEADER"] = 4, ["CHAT_MSG_DND"] = 101}
 
 local function ECFfilter(event,msg,player,flags,channelName)
@@ -172,15 +163,17 @@ local function ECFfilter(event,msg,player,flags,channelName)
 	end
 
 	if(ecf.db.chatLinesLimit > 0 and Event <= (ecf.db.repeatFilterGroup and 4 or 3) and not IsMyFriend) then --Repeat Filter
-		for i,v in ipairs(chatLines) do
+        local chatLinesSize = #chatLines
+        chatLines[chatLinesSize+1] = msgtable
+        for i=1, chatLinesSize do
 			--if there is not much difference between msgs, filter it
 			--(optional) if someone sends msgs within 0.6s, filter it
-			if (v[1] == msgtable[1] and ((ecf.db.multiLine and (msgtable[3] - v[3]) < 0.600) or stringDifference(v[2],msgtable[2]) <= 0.1)) then
-				chatLines[i] = msgtable
+            if (chatLines[i][1] == msgtable[1] and ((ecf.db.multiLine and (msgtable[3] - chatLines[i][3]) < 0.600) or stringDifference(chatLines[i][2],msgtable[2]) <= 0.1)) then
+                tremove(chatLines, i)
 				return true, "Repeat Filter"
 			end
 		end
-		chatLines[#chatLines+1] = msgtable
+        if chatLinesSize >= ecf.db.chatLinesLimit then tremove(chatLines, 1) end
 	end
 end
 
@@ -224,8 +217,11 @@ Questf:SetScript("OnEvent", function(self,event,arg1,arg2)
 	if event == "QUEST_REMOVED" and MSFOffQuestT[arg1] then MSFOffQuestFlag = false end
 end)
 
-local monsterLines = {size=7, n=1}
-setmetatable(monsterLines,mt)
+local monsterLines = {n=1, __newindex=function(self, _, v)
+	rawset(self, self.n, v)
+	self.n = self.n + 1
+	if self.n > 7 then self.n = self.n - 7 end
+end}
 local function monsterFilter(self,_,msg)
 	if (not ecf.db.enableFilter or not ecf.db.enableMSF or MSFOffQuestFlag) then return end
 
