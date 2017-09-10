@@ -116,7 +116,7 @@ local function ECFfilter(event,msg,player,flags,channelName)
 	-- remove utf-8 chars/raidicon/space/symbols
 	filterString = G.utf8replace(filterString, G.UTF8Symbols):gsub("{RT%d}",""):gsub("%s","")
 	local newfilterString = filterString:gsub(G.RegexCharList, "")
-	local annoying = (oriLen - #filterString) / oriLen
+	local annoying = (oriLen - #newfilterString) / oriLen
 
 	local msgLine = newfilterString
 	if(msgLine == "") then msgLine = msg end --If it has only symbols, don't change it
