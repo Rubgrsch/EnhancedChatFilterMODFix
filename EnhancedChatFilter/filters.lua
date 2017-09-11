@@ -217,11 +217,12 @@ Questf:SetScript("OnEvent", function(self,event,arg1,arg2)
 	if event == "QUEST_REMOVED" and MSFOffQuestT[arg1] then MSFOffQuestFlag = false end
 end)
 
-local monsterLines = {n=1, __newindex=function(self, _, v)
+local monsterLines = {n=1}
+setmetatable(monsterLines,{__newindex=function(self, _, v)
 	rawset(self, self.n, v)
 	self.n = self.n + 1
 	if self.n > 7 then self.n = self.n - 7 end
-end}
+end})
 local function monsterFilter(self,_,msg)
 	if (not ecf.db.enableFilter or not ecf.db.enableMSF or MSFOffQuestFlag) then return end
 
