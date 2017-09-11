@@ -84,17 +84,20 @@ local function stringDifference(sA, sB) -- arrays of byte
 	end
 	return this[len_b+1]/max(len_a,len_b)
 end
+local playerCache = {}
+setmetatable(playerCache, {__index=function(self) return 0 end})
 
 local chatLines = {}
 local chatChannel = {["CHAT_MSG_WHISPER"] = 1, ["CHAT_MSG_SAY"] = 2, ["CHAT_MSG_YELL"] = 2, ["CHAT_MSG_CHANNEL"] = 3, ["CHAT_MSG_PARTY"] = 4, ["CHAT_MSG_PARTY_LEADER"] = 4, ["CHAT_MSG_RAID"] = 4, ["CHAT_MSG_RAID_LEADER"] = 4, ["CHAT_MSG_RAID_WARNING"] = 4, ["CHAT_MSG_INSTANCE_CHAT"] = 4, ["CHAT_MSG_INSTANCE_CHAT_LEADER"] = 4, ["CHAT_MSG_DND"] = 101}
 
-local function ECFfilter(event,msg,player,flags,channelName)
+local function ECFfilter(event,msg,player,flags,channelName,IsMyFriend,IsMyGuild,IsMyGroup)
+	local good = IsMyFriend or IsMyGuild or IsMyGroup
+	if not good and playerCache[player] and playerCache[player] >= 3 then return true,"Bad Player" end
+
 	local Event = chatChannel[event]
 
 	-- filter MeetingStone(NetEase) broad msg
 	if channelName == "集合石" and msg:find("^[#&$@]") then return true, "MeetingStone" end
-
-	local IsMyFriend, IsMyGuild, IsMyGroup = friends[player], GetGuildInfo("player") == GetGuildInfo(player), UnitInRaid(player) or UnitInParty(player)
 	-- don't filter player or his friends/BNfriends
 	if UnitIsUnit(player,"player") then return end
 
@@ -118,7 +121,7 @@ local function ECFfilter(event,msg,player,flags,channelName)
 
 	if(ecf.db.enableWisper and Event == 1) then --Whisper Whitelist Mode, only whisper
 		--Don't filter players that are from same guild/raid/party or who you have whispered
-		if not(allowWisper[player] or IsMyFriend or IsMyGuild or IsMyGroup) then
+		if not(allowWisper[player] or good) then
 			return true, "WhiteListMode"
 		end
 	end
@@ -191,8 +194,11 @@ local function ECFfilterRecord(self,event,msg,player,_,_,_,flags,_,_,channelName
 	end
 
 	local trimmedPlayer = Ambiguate(player, "none")
-	local result, reason = ECFfilter(event,msg,trimmedPlayer,flags,channelName)
+	local IsMyFriend, IsMyGuild, IsMyGroup = friends[player], GetGuildInfo("player") == GetGuildInfo(player), UnitInRaid(player) or UnitInParty(player)
+	local result, reason = ECFfilter(event,msg,trimmedPlayer,flags,channelName,IsMyFriend,IsMyGuild,IsMyGroup)
 	filterResult = not not result
+
+	if filterResult and not (IsMyFriend or IsMyGuild or IsMyGroup) then playerCache[player] = playerCache[player] + 1 end
 
 	if ecf.db.debugMode then
 		ecf.db.record[ecf.db.recordPos] = {event,msg,trimmedPlayer,flags,filterResult,reason}
