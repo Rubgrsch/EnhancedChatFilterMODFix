@@ -255,18 +255,10 @@ end
 if (UnitLevel("player") == GetMaxPlayerLevel()) then ChatFrame_AddMessageEventFilter("CHAT_MSG_SYSTEM", SSFilter) end
 
 --AchievementFilter
-local function SendAchievement(event, achievementID, players)
-	local list = {}
-	for name,class in pairs(players) do
-		local color = (CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS)[class]
-		list[#list+1] = format("|cff%02x%02x%02x|Hplayer:%s|h%s|h|r", color.r*255, color.g*255, color.b*255, name, name)
-	end
-	SendMessage(event, format(L["GotAchievement"], tconcat(list, L["And"]), GetAchievementLink(achievementID)))
-end
-
-local function achievementReady(id, achievement)
-	local area, guild = achievement.CHAT_MSG_ACHIEVEMENT, achievement.CHAT_MSG_GUILD_ACHIEVEMENT
-	if (area and guild) then
+local achievements = {}
+local function achievementReady(id)
+	local area, guild = achievements[id].CHAT_MSG_ACHIEVEMENT, achievements[id].CHAT_MSG_GUILD_ACHIEVEMENT
+	if (area and guild) then -- merge area to guild
 		local myGuild = GetGuildInfo("player")
 		for name in pairs(area) do
 			if (UnitExists(name) and myGuild and myGuild == GetGuildInfo(name)) then
@@ -274,23 +266,25 @@ local function achievementReady(id, achievement)
 			end
 		end
 	end
-	for event,players in pairs(achievement) do
+	for event,players in pairs(achievements[id]) do
 		if type(players) == "table" and next(players) ~= nil then -- skip empty and .timeout
-			SendAchievement(event, id, players)
+			local list = {}
+			for name,class in pairs(players) do
+				local color = (CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS)[class]
+				list[#list+1] = format("|cff%02x%02x%02x|Hplayer:%s|h%s|h|r", color.r*255, color.g*255, color.b*255, name, name)
+			end
+			SendMessage(event, format(L["GotAchievement"], tconcat(list, L["And"]), GetAchievementLink(id)))
 		end
 	end
+	achievements[id] = nil
 end
 
-local achievements = {}
 local achievementFrame = CreateFrame("Frame")
 achievementFrame:Hide()
 achievementFrame:SetScript("OnUpdate", function(self)
 	local found = false
 	for id, achievement in pairs(achievements) do
-		if (achievement.timeout <= GetTime()) then
-			achievementReady(id, achievement)
-			achievements[id] = nil
-		end
+		if (achievement.timeout <= GetTime()) then achievementReady(id) end
 		found = true
 	end
 	if (not found) then self:Hide() end
@@ -299,14 +293,14 @@ end)
 local function achievementFilter(self, event, msg, _, _, _, _, _, _, _, _, _, _, guid)
 	if (not ecf.db.enableCFA or not ecf.db.enableFilter) then return end
 	if (not guid or not guid:find("Player")) then return end
-	local achievementID = tonumber(msg:match("achievement:(%d+)"))
-	if (not achievementID) then return end
+	local id = tonumber(msg:match("achievement:(%d+)"))
+	if (not id) then return end
 	local _,class,_,_,_,name,server = GetPlayerInfoByGUID(guid)
 	if (not name) then return end -- check nil
 	if (server ~= "" and server ~= GetRealmName()) then name = name.."-"..server end
-	achievements[achievementID] = achievements[achievementID] or {timeout = GetTime() + 0.5}
-	achievements[achievementID][event] = achievements[achievementID][event] or {}
-	achievements[achievementID][event][name] = class
+	achievements[id] = achievements[id] or {timeout = GetTime() + 0.5}
+	achievements[id][event] = achievements[id][event] or {}
+	achievements[id][event][name] = class
 	achievementFrame:Show()
 	return true
 end
