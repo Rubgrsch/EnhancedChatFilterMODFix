@@ -105,11 +105,11 @@ local function ECFfilter(event,msg,player,flags,channelName,IsMyFriend,IsMyGuild
 	if flags == "GM" or flags == "DEV" then return end
 
 	-- remove color/hypelink
-	local filterString = msg:gsub("|H[^|]+|h([^|]+)|h","%1"):upper():gsub("|C%x%x%x%x%x%x%x%x",""):gsub("|R","")
+	local filterString = msg:gsub("|H[^|]+|h([^|]+)|h","%1"):gsub("|c%x%x%x%x%x%x%x%x",""):gsub("|r","")
 	local oriLen = #filterString
 	-- remove utf-8 chars/raidicon/space/symbols
-	filterString = G.utf8replace(filterString, G.UTF8Symbols):gsub("{RT%d}",""):gsub("%s","")
-	local newfilterString = filterString:gsub(G.RegexCharList, "")
+	filterString = G.utf8replace(filterString, G.UTF8Symbols):gsub("{rt%d}",""):gsub("%s","")
+	local newfilterString = filterString:gsub(G.RegexCharList, ""):upper()
 	local annoying = (oriLen - #newfilterString) / oriLen
 
 	local msgLine = newfilterString
