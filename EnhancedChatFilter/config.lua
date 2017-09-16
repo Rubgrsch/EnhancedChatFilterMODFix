@@ -9,6 +9,9 @@ local ipairs, format, pairs, print, next, select, strsplit, tconcat, tonumber, t
 local GetCurrencyLink, GetItemInfo, ITEMS = GetCurrencyLink, GetItemInfo, ITEMS
 local LibStub = LibStub
 
+-- DB Version Check
+local currentVer, lastCompatibleVer = 1, 1
+
 --Default Options
 local defaults = {
 	enableFilter = true, -- Main Toggle
@@ -39,6 +42,7 @@ local defaults = {
 	record = {},
 	recordPos = 1,
 	ChatRecordOnlyShow = 1,
+	DBversion = 1,
 }
 
 --------------- Functions from Elsewhere ---------------
@@ -121,11 +125,15 @@ function G.DBInitialize()
 	elseif ecfDB.profiles and ecfDB.profiles.Default then ecfDB = ecfDB.profiles.Default end
 	ecf.db = ecfDB
 	for k,v in pairs(defaults) do if ecf.db[k] == nil then ecf.db[k] = v end end -- fallback to defaults
-	if ecf.db.blackWordList then
+	if ecf.db.DBversion < lastCompatibleVer then error(format(L["DBOutOfDate"],ecf.db.DBversion,lastCompatibleVer)) end
+	-- Start of DB Conversion
+	if ecf.db.blackWordList then -- Compatible for 1
 		for k,v in pairs(ecf.db.blackWordList) do
 			(v.regex and ecf.db.regexWordsList or ecf.db.normalWordsList)[k] = {lesser = v.lesser}
 		end
 	end
+	-- End of DB conversion
+	ecf.db.DBversion = currentVer
 	for k in pairs(ecf.db) do if defaults[k] == nil then ecf.db[k] = nil end end -- remove old keys
 	for Id, info in pairs(ecf.db.lootItemFilterList) do
 		if info == true then ItemInfoRequested[Id] = 1 end
