@@ -30,7 +30,6 @@ local defaults = {
 	normalWordsList = {},
 	lesserBlackWordThreshold = 3, -- in lesserBlackWord
 	blackWordFilterGroup = false, -- blackWord enabled in group and raid
-	lootType = "ITEMS", -- loot filter type
 	lootItemFilterList = {[118043] = true, [71096] = true, [49655] = true}, -- item list, [id] = true
 	lootCurrencyFilterList = {[944] = true, [1268] = true}, -- Currency list, [id] = true
 	lootQualityMin = 0, -- loot quality filter, 0..4 = poor..epic
@@ -150,7 +149,7 @@ local wordChosenDefault = {"", false, false} -- string, regex, lesser
 local wordChosen = wordChosenDefault
 local itemChosen, currencyChosen = 0, 0
 local stringIO = "" -- blackWord input
-local regexToggle, lesserToggle = false, false
+local regexToggle, lesserToggle, lootType = false, false, "ITEMS"
 
 local colorT = {} -- used in lootFilter
 for i=0, 4 do
@@ -526,8 +525,7 @@ options.args.lootFilter = {
 			set = function(_,value)
 				local Id = tonumber(value)
 				if not Id then print(L["BadID"]);return end
-				local Type = ecf.db.lootType
-				if(Type == "ITEMS") then
+				if(lootType == "ITEMS") then
 					ItemInfoRequested[Id] = 0
 					local _, link = GetItemInfo(Id)
 					if link then
@@ -539,7 +537,7 @@ options.args.lootFilter = {
 					if link then
 						ecf.db.lootCurrencyFilterList[Id] = link
 					else
-						print(format(L["NotExists"],Type,Id))
+						print(format(L["NotExists"],lootType,Id))
 					end
 				end
 			end,
@@ -548,6 +546,8 @@ options.args.lootFilter = {
 			type = "select",
 			name = TYPE,
 			order = 12,
+			get = function() return lootType end,
+			set = function(_,value) lootType = value end,
 			values = {["ITEMS"] = ITEMS, ["CURRENCY"] = CURRENCY},
 		},
 		line2 = {
