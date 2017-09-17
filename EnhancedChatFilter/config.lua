@@ -4,7 +4,7 @@ local AC, L, G = ecf.AC, ecf.L, ecf.G -- Aho-Corasick, locales, global variables
 
 local _G = _G
 -- Lua
-local ipairs, format, pairs, print, next, select, strsplit, tconcat, tonumber, type, unpack = ipairs, format, pairs, print, next, select, strsplit, table.concat, tonumber, type, unpack
+local error, ipairs, format, pairs, print, next, select, strsplit, tconcat, tonumber, type, unpack = error, ipairs, format, pairs, print, next, select, strsplit, table.concat, tonumber, type, unpack
 -- WoW
 local GetCurrencyLink, GetItemInfo, ITEMS = GetCurrencyLink, GetItemInfo, ITEMS
 local LibStub = LibStub
