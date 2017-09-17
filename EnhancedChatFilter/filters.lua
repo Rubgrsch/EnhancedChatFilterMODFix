@@ -193,15 +193,15 @@ local function ECFfilterRecord(self,event,msg,player,_,_,_,flags,_,_,channelName
 		filterResult = false
 	end
 
-	local trimmedPlayer = Ambiguate(player, "none")
+	player = Ambiguate(player, "none")
 	local IsMyFriend, IsMyGuild, IsMyGroup = friends[player], GetGuildInfo("player") == GetGuildInfo(player), UnitInRaid(player) or UnitInParty(player)
-	local result, reason = ECFfilter(event,msg,trimmedPlayer,flags,channelName,IsMyFriend,IsMyGuild,IsMyGroup)
+	local result, reason = ECFfilter(event,msg,player,flags,channelName,IsMyFriend,IsMyGuild,IsMyGroup)
 	filterResult = not not result
 
 	if filterResult and not (IsMyFriend or IsMyGuild or IsMyGroup) then playerCache[player] = playerCache[player] + 1 end
 
 	if ecf.db.debugMode then
-		ecf.db.record[ecf.db.recordPos] = {event,msg,trimmedPlayer,flags,filterResult,reason}
+		ecf.db.record[ecf.db.recordPos] = {event,msg,player,flags,filterResult,reason}
 		ecf.db.recordPos = (ecf.db.recordPos >= 500 and ecf.db.recordPos - 500 or ecf.db.recordPos) + 1
 	end
 
