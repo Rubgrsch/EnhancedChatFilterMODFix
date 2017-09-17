@@ -92,7 +92,7 @@ local chatChannel = {["CHAT_MSG_WHISPER"] = 1, ["CHAT_MSG_SAY"] = 2, ["CHAT_MSG_
 
 local function ECFfilter(event,msg,player,flags,channelName,IsMyFriend,IsMyGuild,IsMyGroup)
 	local good = IsMyFriend or IsMyGuild or IsMyGroup
-	if not good and playerCache[player] and playerCache[player] >= 3 then return true,"Bad Player" end
+	if ecf.db.enableAggressive and not good and playerCache[player] and playerCache[player] >= 3 then return true,"Bad Player" end
 
 	local Event = chatChannel[event]
 
