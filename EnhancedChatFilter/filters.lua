@@ -90,9 +90,11 @@ setmetatable(playerCache, {__index=function(self) return 0 end})
 local chatLines = {}
 local chatChannel = {["CHAT_MSG_WHISPER"] = 1, ["CHAT_MSG_SAY"] = 2, ["CHAT_MSG_YELL"] = 2, ["CHAT_MSG_CHANNEL"] = 3, ["CHAT_MSG_PARTY"] = 4, ["CHAT_MSG_PARTY_LEADER"] = 4, ["CHAT_MSG_RAID"] = 4, ["CHAT_MSG_RAID_LEADER"] = 4, ["CHAT_MSG_RAID_WARNING"] = 4, ["CHAT_MSG_INSTANCE_CHAT"] = 4, ["CHAT_MSG_INSTANCE_CHAT_LEADER"] = 4, ["CHAT_MSG_DND"] = 101}
 
-local function ECFfilter(event,msg,player,flags,channelName,IsMyFriend,IsMyGuild,IsMyGroup)
-	local good = IsMyFriend or IsMyGuild or IsMyGroup
-	if ecf.db.enableAggressive and not good and playerCache[player] and playerCache[player] >= 3 then return true,"Bad Player" end
+local function ECFfilter(event,msg,player,flags,channelName,IsMyFriend,good)
+	if ecf.db.enableAggressive and not good and playerCache[player] and playerCache[player] >= 3 then
+		playerCache[player] = playerCache[player] + 1
+		return true,"Bad Player"
+	end
 
 	local Event = chatChannel[event]
 
@@ -166,16 +168,16 @@ local function ECFfilter(event,msg,player,flags,channelName,IsMyFriend,IsMyGuild
 	end
 
 	if(ecf.db.chatLinesLimit > 0 and Event <= (ecf.db.repeatFilterGroup and 4 or 3) and not IsMyFriend) then --Repeat Filter
-        local chatLinesSize = #chatLines
-        chatLines[chatLinesSize+1] = msgtable
-        for i=1, chatLinesSize do
+		local chatLinesSize = #chatLines
+		chatLines[chatLinesSize+1] = msgtable
+		for i=1, chatLinesSize do
 			--if there is not much difference between msgs, filter it
-            if (chatLines[i][1] == msgtable[1] and stringDifference(chatLines[i][2],msgtable[2]) <= 0.1) then
-                tremove(chatLines, i)
+			if (chatLines[i][1] == msgtable[1] and stringDifference(chatLines[i][2],msgtable[2]) <= 0.1) then
+				tremove(chatLines, i)
 				return true, "Repeat Filter"
 			end
 		end
-        if chatLinesSize >= ecf.db.chatLinesLimit then tremove(chatLines, 1) end
+		if chatLinesSize >= ecf.db.chatLinesLimit then tremove(chatLines, 1) end
 	end
 end
 
@@ -194,10 +196,8 @@ local function ECFfilterRecord(self,event,msg,player,_,_,_,flags,_,_,channelName
 
 	player = Ambiguate(player, "none")
 	local IsMyFriend, IsMyGuild, IsMyGroup = friends[player], GetGuildInfo("player") == GetGuildInfo(player), UnitInRaid(player) or UnitInParty(player)
-	local result, reason = ECFfilter(event,msg,player,flags,channelName,IsMyFriend,IsMyGuild,IsMyGroup)
+	local result, reason = ECFfilter(event,msg,player,flags,channelName,IsMyFriend,IsMyFriend or IsMyGuild or IsMyGroup)
 	filterResult = not not result
-
-	if filterResult and not (IsMyFriend or IsMyGuild or IsMyGroup) then playerCache[player] = playerCache[player] + 1 end
 
 	if ecf.db.debugMode then
 		ecf.db.record[ecf.db.recordPos] = {event,msg,player,flags,filterResult,reason}
