@@ -24,7 +24,6 @@ local defaults = {
 	enableMSF = false, -- Monster Say Filter
 	enableAggressive = false, -- Aggressive Filter
 	chatLinesLimit = 20, -- also enable repeatFilter
-	multiLine = false, -- MultiLines, in RepeatFilter
 	repeatFilterGroup = true, -- repeatFilter enabled in group and raid
 	regexWordsList = {},
 	normalWordsList = {},
@@ -282,19 +281,11 @@ options.args.General = {
 			set = function(_,value) ecf.db.chatLinesLimit = value and 20 or 0 end,
 			hidden = function() return ecf.db.advancedConfig end,
 		},
-		multiLine = {
-			type = "toggle",
-			name = L["MultiLines"],
-			desc = L["MultiLinesTooltip"],
-			order = 42,
-			disabled = function() return ecf.db.chatLinesLimit == 0 end,
-			hidden = function() return not ecf.db.advancedConfig end,
-		},
 		repeatFilterGroup = {
 			type = "toggle",
 			name = L["FilterGroup"],
 			desc = L["FilterGroupTooltips"],
-			order = 43,
+			order = 42,
 			disabled = function() return ecf.db.chatLinesLimit == 0 end,
 		},
 	},

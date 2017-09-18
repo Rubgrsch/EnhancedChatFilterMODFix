@@ -116,7 +116,7 @@ local function ECFfilter(event,msg,player,flags,channelName,IsMyFriend,IsMyGuild
 	if(msgLine == "") then msgLine = msg end --If it has only symbols, don't change it
 
 	--msgdata
-	local msgtable = {player, {}, GetTime()}
+	local msgtable = {player, {}}
 	for idx=1, #msgLine do msgtable[2][idx] = msgLine:byte(idx) end
 
 	if(ecf.db.enableWisper and Event == 1) then --Whisper Whitelist Mode, only whisper
@@ -170,8 +170,7 @@ local function ECFfilter(event,msg,player,flags,channelName,IsMyFriend,IsMyGuild
         chatLines[chatLinesSize+1] = msgtable
         for i=1, chatLinesSize do
 			--if there is not much difference between msgs, filter it
-			--(optional) if someone sends msgs within 0.6s, filter it
-            if (chatLines[i][1] == msgtable[1] and ((ecf.db.multiLine and (msgtable[3] - chatLines[i][3]) < 0.600) or stringDifference(chatLines[i][2],msgtable[2]) <= 0.1)) then
+            if (chatLines[i][1] == msgtable[1] and stringDifference(chatLines[i][2],msgtable[2]) <= 0.1) then
                 tremove(chatLines, i)
 				return true, "Repeat Filter"
 			end
