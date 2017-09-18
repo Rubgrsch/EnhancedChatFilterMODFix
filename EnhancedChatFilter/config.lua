@@ -40,7 +40,7 @@ local defaults = {
 	record = {},
 	recordPos = 1,
 	ChatRecordOnlyShow = 1,
-	DBversion = 1,
+	DBversion = currentVer,
 }
 
 --------------- Functions from Elsewhere ---------------
