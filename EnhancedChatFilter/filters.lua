@@ -4,9 +4,9 @@ local AC, L, G = ecf.AC, ecf.L, ecf.G -- Aho-Corasick, locales, global variables
 
 local _G = _G
 -- Lua
-local format, ipairs, max, min, next, pairs, rawset, select, tconcat, tonumber, tremove, type = format, ipairs, max, min, next, pairs, rawset, select, table.concat, tonumber, tremove, type
+local format, ipairs, max, min, pairs, rawset, select, tconcat, tonumber, tremove = format, ipairs, max, min, pairs, rawset, select, table.concat, tonumber, tremove
 -- WoW
-local Ambiguate, BNGetFriendGameAccountInfo, BNGetNumFriends, BNGetNumFriendGameAccounts, ChatTypeInfo, GetAchievementLink, GetFriendInfo, GetGuildInfo, GetItemInfo, GetNumFriends, GetPlayerInfoByGUID, GetRealmName, GetTime, UnitExists, UnitInParty, UnitInRaid, UnitIsUnit = Ambiguate, BNGetFriendGameAccountInfo, BNGetNumFriends, BNGetNumFriendGameAccounts, ChatTypeInfo, GetAchievementLink, GetFriendInfo, GetGuildInfo, GetItemInfo, GetNumFriends, GetPlayerInfoByGUID, GetRealmName, GetTime, UnitExists, UnitInParty, UnitInRaid, UnitIsUnit
+local Ambiguate, BNGetFriendGameAccountInfo, BNGetNumFriends, BNGetNumFriendGameAccounts, C_Timer_After, ChatTypeInfo, GetAchievementLink, GetFriendInfo, GetGuildInfo, GetItemInfo, GetNumFriends, GetPlayerInfoByGUID, GetRealmName, UnitExists, UnitInParty, UnitInRaid, UnitIsUnit = Ambiguate, BNGetFriendGameAccountInfo, BNGetNumFriends, BNGetNumFriendGameAccounts, C_Timer.After, ChatTypeInfo, GetAchievementLink, GetFriendInfo, GetGuildInfo, GetItemInfo, GetNumFriends, GetPlayerInfoByGUID, GetRealmName, UnitExists, UnitInParty, UnitInRaid, UnitIsUnit
 
 -- GLOBALS: CUSTOM_CLASS_COLORS, NUM_CHAT_WINDOWS, RAID_CLASS_COLORS
 
@@ -265,37 +265,24 @@ if (UnitLevel("player") == GetMaxPlayerLevel()) then ChatFrame_AddMessageEventFi
 local achievements = {}
 local function achievementReady(id)
 	local area, guild = achievements[id].CHAT_MSG_ACHIEVEMENT, achievements[id].CHAT_MSG_GUILD_ACHIEVEMENT
-	if (area and guild) then -- merge area to guild
-		local myGuild = GetGuildInfo("player")
+	local myGuild = GetGuildInfo("player")
+	if (area and guild and myGuild) then -- merge area to guild
 		for name in pairs(area) do
-			if (UnitExists(name) and myGuild and myGuild == GetGuildInfo(name)) then
+			if (UnitExists(name) and myGuild == GetGuildInfo(name)) then
 				guild[name], area[name] = area[name], nil
 			end
 		end
 	end
 	for event,players in pairs(achievements[id]) do
-		if type(players) == "table" and next(players) ~= nil then -- skip empty and .timeout
-			local list = {}
-			for name,class in pairs(players) do
-				local color = (CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS)[class]
-				list[#list+1] = format("|cff%02x%02x%02x|Hplayer:%s|h%s|h|r", color.r*255, color.g*255, color.b*255, name, name)
-			end
-			SendMessage(event, format(L["GotAchievement"], tconcat(list, L["And"]), GetAchievementLink(id)))
+		local list = {}
+		for name,class in pairs(players) do
+			local color = (CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS)[class]
+			list[#list+1] = format("|cff%02x%02x%02x|Hplayer:%s|h%s|h|r", color.r*255, color.g*255, color.b*255, name, name)
 		end
+		SendMessage(event, format(L["GotAchievement"], tconcat(list, L["And"]), GetAchievementLink(id)))
 	end
 	achievements[id] = nil
 end
-
-local achievementFrame = CreateFrame("Frame")
-achievementFrame:Hide()
-achievementFrame:SetScript("OnUpdate", function(self)
-	local found = false
-	for id, achievement in pairs(achievements) do
-		if (achievement.timeout <= GetTime()) then achievementReady(id) end
-		found = true
-	end
-	if (not found) then self:Hide() end
-end)
 
 local function achievementFilter(self, event, msg, _, _, _, _, _, _, _, _, _, _, guid)
 	if (not ecf.db.enableCFA or not ecf.db.enableFilter) then return end
@@ -305,10 +292,12 @@ local function achievementFilter(self, event, msg, _, _, _, _, _, _, _, _, _, _,
 	local _,class,_,_,_,name,server = GetPlayerInfoByGUID(guid)
 	if (not name) then return end -- check nil
 	if (server ~= "" and server ~= GetRealmName()) then name = name.."-"..server end
-	achievements[id] = achievements[id] or {timeout = GetTime() + 0.5}
+	if not achievements[id] then
+		achievements[id] = {}
+		C_Timer_After(0.5, function() achievementReady(id) end)
+	end
 	achievements[id][event] = achievements[id][event] or {}
 	achievements[id][event][name] = class
-	achievementFrame:Show()
 	return true
 end
 ChatFrame_AddMessageEventFilter("CHAT_MSG_ACHIEVEMENT", achievementFilter)
