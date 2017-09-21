@@ -168,6 +168,8 @@ local function AddBlackWord(word, r, l)
 	end
 end
 
+local function adv() return not ecf.db.advancedConfig end
+
 local options = {
 	type = "group",
 	name = "EnhancedChatFilter "..GetAddOnMetadata("EnhancedChatFilter", "Version"),
@@ -205,14 +207,14 @@ options.args.General = {
 					updateBlackWordTable()
 				end,
 			order = 3,
-			hidden = function() return not ecf.db.advancedConfig end,
+			hidden = adv,
 		},
 		advancedConfig = {
 			type = "toggle",
 			name = L["DisplayAdvancedConfig"],
 			desc = L["DisplayAdvancedConfigTooltips"],
 			order = 9,
-			confirm = function() return not ecf.db.advancedConfig end,
+			confirm = adv,
 		},
 		line1 = {
 			type = "header",
@@ -266,7 +268,7 @@ options.args.General = {
 			name = L["WhisperWhitelistMode"],
 			desc = L["WhisperWhitelistModeTooltip"],
 			order = 18,
-			hidden = function() return not ecf.db.advancedConfig end,
+			hidden = adv,
 		},
 		line2 = {
 			type = "header",
@@ -282,7 +284,7 @@ options.args.General = {
 			max = 100,
 			step = 1,
 			bigStep = 5,
-			hidden = function() return not ecf.db.advancedConfig end,
+			hidden = adv,
 		},
 		repeatToggle = { -- only shown in non-advanced mode
 			type = "toggle",
@@ -332,7 +334,7 @@ options.args.blackListTab = {
 				for key,v in pairs(ecf.db.normalWordsList) do if v.lesser then blacklistname[key] = key end end
 				return blacklistname
 			end,
-			hidden = function() return not ecf.db.advancedConfig end,
+			hidden = adv
 		},
 		DeleteButton = {
 			type = "execute",
@@ -380,7 +382,7 @@ options.args.blackListTab = {
 			get = function() return regexToggle end,
 			set = function(_,value) regexToggle = value end,
 			order = 12,
-			hidden = function() return not ecf.db.advancedConfig end,
+			hidden = adv,
 		},
 		lesserToggle = {
 			type = "toggle",
@@ -389,7 +391,7 @@ options.args.blackListTab = {
 			get = function() return lesserToggle end,
 			set = function(_,value) lesserToggle = value end,
 			order = 13,
-			hidden = function() return not ecf.db.advancedConfig end,
+			hidden = adv,
 		},
 		line2 = {
 			type = "header",
@@ -410,7 +412,7 @@ options.args.blackListTab = {
 			min = 2,
 			max = 5,
 			step = 1,
-			hidden = function() return not ecf.db.advancedConfig end,
+			hidden = adv,
 		},
 		line3 = {
 			type = "header",
