@@ -4,7 +4,7 @@ local AC, L, G = ecf.AC, ecf.L, ecf.G -- Aho-Corasick, locales, global variables
 
 local _G = _G
 -- Lua
-local format, ipairs, max, min, pairs, rawset, select, tconcat, tonumber, tremove = format, ipairs, max, min, pairs, rawset, select, table.concat, tonumber, tremove
+local format, ipairs, max, min, next, pairs, rawset, select, tconcat, tonumber, tremove, type = format, ipairs, max, min, next, pairs, rawset, select, table.concat, tonumber, tremove, type
 -- WoW
 local Ambiguate, BNGetFriendGameAccountInfo, BNGetNumFriends, BNGetNumFriendGameAccounts, C_Timer_After, ChatTypeInfo, GetAchievementLink, GetFriendInfo, GetGuildInfo, GetItemInfo, GetNumFriends, GetPlayerInfoByGUID, GetRealmName, UnitExists, UnitInParty, UnitInRaid, UnitIsUnit = Ambiguate, BNGetFriendGameAccountInfo, BNGetNumFriends, BNGetNumFriendGameAccounts, C_Timer.After, ChatTypeInfo, GetAchievementLink, GetFriendInfo, GetGuildInfo, GetItemInfo, GetNumFriends, GetPlayerInfoByGUID, GetRealmName, UnitExists, UnitInParty, UnitInRaid, UnitIsUnit
 
@@ -91,10 +91,7 @@ local chatLines = {}
 local chatChannel = {["CHAT_MSG_WHISPER"] = 1, ["CHAT_MSG_SAY"] = 2, ["CHAT_MSG_YELL"] = 2, ["CHAT_MSG_CHANNEL"] = 3, ["CHAT_MSG_PARTY"] = 4, ["CHAT_MSG_PARTY_LEADER"] = 4, ["CHAT_MSG_RAID"] = 4, ["CHAT_MSG_RAID_LEADER"] = 4, ["CHAT_MSG_RAID_WARNING"] = 4, ["CHAT_MSG_INSTANCE_CHAT"] = 4, ["CHAT_MSG_INSTANCE_CHAT_LEADER"] = 4, ["CHAT_MSG_DND"] = 101}
 
 local function ECFfilter(event,msg,player,flags,channelName,IsMyFriend,good)
-	if ecf.db.enableAggressive and not good and playerCache[player] and playerCache[player] >= 3 then
-		playerCache[player] = playerCache[player] + 1
-		return true,"Bad Player"
-	end
+	if ecf.db.enableAggressive and not good and playerCache[player] and playerCache[player] >= 3 then return true,"Bad Player" end
 
 	local Event = chatChannel[event]
 
@@ -204,8 +201,11 @@ local function ECFfilterRecord(self,event,msg,player,_,_,_,flags,_,_,channelName
 
 	player = Ambiguate(player, "none")
 	local IsMyFriend, IsMyGuild, IsMyGroup = friends[player], GetGuildInfo("player") == GetGuildInfo(player), UnitInRaid(player) or UnitInParty(player)
-	local result, reason = ECFfilter(event,msg,player,flags,channelName,IsMyFriend,IsMyFriend or IsMyGuild or IsMyGroup)
+	local good = IsMyFriend or IsMyGuild or IsMyGroup
+	local result, reason = ECFfilter(event,msg,player,flags,channelName,IsMyFriend,good)
 	filterResult = not not result
+
+	if filterResult and not good then playerCache[player] = playerCache[player] + 1 end
 
 	if ecf.db.debugMode then
 		ecf.db.record[ecf.db.recordPos] = {event,msg,player,flags,filterResult,reason}
@@ -274,12 +274,14 @@ local function achievementReady(id)
 		end
 	end
 	for event,players in pairs(achievements[id]) do
-		local list = {}
-		for name,class in pairs(players) do
-			local color = (CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS)[class]
-			list[#list+1] = format("|cff%02x%02x%02x|Hplayer:%s|h%s|h|r", color.r*255, color.g*255, color.b*255, name, name)
+		if type(players) == "table" and next(players) ~= nil then -- skip empty
+			local list = {}
+			for name,class in pairs(players) do
+				local color = (CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS)[class]
+				list[#list+1] = format("|cff%02x%02x%02x|Hplayer:%s|h%s|h|r", color.r*255, color.g*255, color.b*255, name, name)
+			end
+			SendMessage(event, format(L["GotAchievement"], tconcat(list, L["And"]), GetAchievementLink(id)))
 		end
-		SendMessage(event, format(L["GotAchievement"], tconcat(list, L["And"]), GetAchievementLink(id)))
 	end
 	achievements[id] = nil
 end
