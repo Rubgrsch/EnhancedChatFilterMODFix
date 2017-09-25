@@ -4,7 +4,7 @@ local AC, L, G = ecf.AC, ecf.L, ecf.G -- Aho-Corasick, locales, global variables
 
 local _G = _G
 -- Lua
-local format, ipairs, max, min, next, pairs, rawset, select, tconcat, tonumber, tremove, type = format, ipairs, max, min, next, pairs, rawset, select, table.concat, tonumber, tremove, type
+local format, ipairs, max, min, next, pairs, rawset, select, tconcat, tonumber, tremove = format, ipairs, max, min, next, pairs, rawset, select, table.concat, tonumber, tremove
 -- WoW
 local Ambiguate, BNGetFriendGameAccountInfo, BNGetNumFriends, BNGetNumFriendGameAccounts, C_Timer_After, ChatTypeInfo, GetAchievementLink, GetFriendInfo, GetGuildInfo, GetItemInfo, GetNumFriends, GetPlayerInfoByGUID, GetRealmName, UnitExists, UnitInParty, UnitInRaid, UnitIsUnit = Ambiguate, BNGetFriendGameAccountInfo, BNGetNumFriends, BNGetNumFriendGameAccounts, C_Timer.After, ChatTypeInfo, GetAchievementLink, GetFriendInfo, GetGuildInfo, GetItemInfo, GetNumFriends, GetPlayerInfoByGUID, GetRealmName, UnitExists, UnitInParty, UnitInRaid, UnitIsUnit
 
@@ -84,6 +84,8 @@ local function stringDifference(sA, sB) -- arrays of byte
 	end
 	return this[len_b+1]/max(len_a,len_b)
 end
+
+--Record how many times players are filterd
 local playerCache = {}
 setmetatable(playerCache, {__index=function(self) return 0 end})
 
@@ -91,12 +93,12 @@ local chatLines = {}
 local chatChannel = {["CHAT_MSG_WHISPER"] = 1, ["CHAT_MSG_SAY"] = 2, ["CHAT_MSG_YELL"] = 2, ["CHAT_MSG_CHANNEL"] = 3, ["CHAT_MSG_PARTY"] = 4, ["CHAT_MSG_PARTY_LEADER"] = 4, ["CHAT_MSG_RAID"] = 4, ["CHAT_MSG_RAID_LEADER"] = 4, ["CHAT_MSG_RAID_WARNING"] = 4, ["CHAT_MSG_INSTANCE_CHAT"] = 4, ["CHAT_MSG_INSTANCE_CHAT_LEADER"] = 4, ["CHAT_MSG_DND"] = 101}
 
 local function ECFfilter(event,msg,player,flags,channelName,IsMyFriend,good)
-	if ecf.db.enableAggressive and not good and playerCache[player] and playerCache[player] >= 3 then return true,"Bad Player" end
+	if ecf.db.enableAggressive and not good and playerCache[player] >= 3 then return "Bad Player" end
 
 	local Event = chatChannel[event]
 
 	-- filter MeetingStone(NetEase) broad msg
-	if channelName == "集合石" and msg:find("^[#&$@]") then return true, "MeetingStone" end
+	if channelName == "集合石" and msg:find("^[#&$@]") then return "MeetingStone" end
 	-- don't filter player or his friends/BNfriends
 	if UnitIsUnit(player,"player") then return end
 
@@ -121,17 +123,17 @@ local function ECFfilter(event,msg,player,flags,channelName,IsMyFriend,good)
 	if(ecf.db.enableWisper and Event == 1) then --Whisper Whitelist Mode, only whisper
 		--Don't filter players that are from same guild/raid/party or who you have whispered
 		if not(allowWisper[player] or good) then
-			return true, "WhiteListMode"
+			return "WhiteListMode"
 		end
 	end
 
 	if(ecf.db.enableDND and ((Event <= 3 and flags == "DND") or Event == 101) and not IsMyFriend) then -- DND, whisper/yell/say/channel and auto-reply
-		return true, "DND Filter"
+		return "DND Filter"
 	end
 
 	if(ecf.db.enableAggressive and Event <= 3 and not IsMyFriend) then --AggressiveFilter
 		if (annoying >= 0.25 and annoying <= 0.8 and oriLen >= 30) then -- Annoying
-			return true, "Annoying: "..annoying
+			return "Annoying: "..annoying
 		end
 	end
 
@@ -152,14 +154,14 @@ local function ECFfilter(event,msg,player,flags,channelName,IsMyFriend,good)
 				end
 			end
 		end
-		if count == -1 then return true, "Keyword: "..keyWord end
-		if count >= ecf.db.lesserBlackWordThreshold then return true, "LesserKeywords x"..count end
+		if count == -1 then return "Keyword: "..keyWord end
+		if count >= ecf.db.lesserBlackWordThreshold then return "LesserKeywords x"..count end
 	end
 
 	if (ecf.db.enableRAF and (Event <= 2 or Event == 4)) then -- raid
 		for _,RaidAlertTag in ipairs(RaidAlertTagList) do
 			if msg:find(RaidAlertTag) then
-				return true, RaidAlertTag.." in RaidAlertTag"
+				return RaidAlertTag.." in RaidAlertTag"
 			end
 		end
 	end
@@ -167,7 +169,7 @@ local function ECFfilter(event,msg,player,flags,channelName,IsMyFriend,good)
 	if (ecf.db.enableQRF and (Event <= 2 or Event == 4)) then -- quest/party
 		for _,QuestReportTag in ipairs(QuestReportTagList) do
 			if msg:find(QuestReportTag) then
-				return true, QuestReportTag.." in QuestReportTag"
+				return QuestReportTag.." in QuestReportTag"
 			end
 		end
 	end
@@ -179,7 +181,7 @@ local function ECFfilter(event,msg,player,flags,channelName,IsMyFriend,good)
 			--if there is not much difference between msgs, filter it
 			if (chatLines[i][1] == msgtable[1] and stringDifference(chatLines[i][2],msgtable[2]) <= 0.1) then
 				tremove(chatLines, i)
-				return true, "Repeat Filter"
+				return "Repeat Filter"
 			end
 		end
 		if chatLinesSize >= ecf.db.chatLinesLimit then tremove(chatLines, 1) end
@@ -200,10 +202,10 @@ local function ECFfilterRecord(self,event,msg,player,_,_,_,flags,_,_,channelName
 	end
 
 	player = Ambiguate(player, "none")
-	local IsMyFriend, IsMyGuild, IsMyGroup = friends[player], GetGuildInfo("player") == GetGuildInfo(player), UnitInRaid(player) or UnitInParty(player)
-	local good = IsMyFriend or IsMyGuild or IsMyGroup
-	local result, reason = ECFfilter(event,msg,player,flags,channelName,IsMyFriend,good)
-	filterResult = not not result
+	local IsMyFriend = friends[player]
+	local good = IsMyFriend or (GetGuildInfo("player") == GetGuildInfo(player)) or UnitInRaid(player) or UnitInParty(player)
+	local reason = ECFfilter(event,msg,player,flags,channelName,IsMyFriend,good)
+	filterResult = not not reason
 
 	if filterResult and not good then playerCache[player] = playerCache[player] + 1 end
 
@@ -274,7 +276,7 @@ local function achievementReady(id)
 		end
 	end
 	for event,players in pairs(achievements[id]) do
-		if type(players) == "table" and next(players) ~= nil then -- skip empty
+		if next(players) ~= nil then -- skip empty
 			local list = {}
 			for name,class in pairs(players) do
 				local color = (CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS)[class]
