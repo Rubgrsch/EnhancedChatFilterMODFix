@@ -93,7 +93,6 @@ local chatLines = {}
 local chatChannel = {["CHAT_MSG_WHISPER"] = 1, ["CHAT_MSG_SAY"] = 2, ["CHAT_MSG_YELL"] = 2, ["CHAT_MSG_CHANNEL"] = 3, ["CHAT_MSG_PARTY"] = 4, ["CHAT_MSG_PARTY_LEADER"] = 4, ["CHAT_MSG_RAID"] = 4, ["CHAT_MSG_RAID_LEADER"] = 4, ["CHAT_MSG_RAID_WARNING"] = 4, ["CHAT_MSG_INSTANCE_CHAT"] = 4, ["CHAT_MSG_INSTANCE_CHAT_LEADER"] = 4, ["CHAT_MSG_DND"] = 101}
 
 local function ECFfilter(event,msg,player,flags,channelName,IsMyFriend,good)
-	if ecf.db.enableAggressive and not good and playerCache[player] >= 3 then return "Bad Player" end
 
 	local Event = chatChannel[event]
 
@@ -105,6 +104,8 @@ local function ECFfilter(event,msg,player,flags,channelName,IsMyFriend,good)
 	-- don't filter GM or DEV
 	if flags == "GM" or flags == "DEV" then return end
 
+	-- filter bad players
+	if ecf.db.enableAggressive and not good and playerCache[player] >= 3 then return "Bad Player" end
 	-- remove color/hypelink
 	local filterString = msg:gsub("|H[^|]+|h([^|]+)|h","%1"):gsub("|c%x%x%x%x%x%x%x%x",""):gsub("|r","")
 	local oriLen = #filterString
