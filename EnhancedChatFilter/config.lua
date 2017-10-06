@@ -147,13 +147,13 @@ end
 --These settings won't be saved
 local wordChosenDefault = {"", false, false} -- string, regex, lesser
 local wordChosen = wordChosenDefault
-local itemChosen, currencyChosen = 0, 0
+local lootIDChosen, lootTypeChosen = nil, nil
 local stringIO = "" -- blackWord input
 local regexToggle, lesserToggle, lootType = false, false, "ITEMS"
 
 local colorT = {} -- used in lootFilter
 for i=0, 4 do
-	colorT[i]=format("|c%s%s|r",select(4,GetItemQualityColor(i)),_G["ITEM_QUALITY"..i.."_DESC"])
+	colorT[i]=format("%s%s|r",ITEM_QUALITY_COLORS[i].hex,_G["ITEM_QUALITY"..i.."_DESC"])
 end
 
 local function AddBlackWord(word, r, l)
@@ -477,8 +477,8 @@ options.args.lootFilter = {
 			type = "select",
 			name = L["ItemFilterList"],
 			order = 1,
-			get = function() return itemChosen end,
-			set = function(_,value) itemChosen, currencyChosen = value or 0, 0 end,
+			get = function() return lootTypeChosen == "ITEMS" and lootIDChosen end,
+			set = function(_,value) lootIDChosen, lootTypeChosen = value, "ITEMS" end,
 			values = function()
 				local itemFilterLinkList = {}
 				for key,v in pairs(ecf.db.lootItemFilterList) do itemFilterLinkList[key] = type(v) == "string" and v or select(2,GetItemInfo(key)) end
@@ -489,8 +489,8 @@ options.args.lootFilter = {
 			type = "select",
 			name = L["CurrencyFilterList"],
 			order = 2,
-			get = function() return currencyChosen end,
-			set = function(_,value) currencyChosen, itemChosen = value or 0, 0 end,
+			get = function() return lootTypeChosen == "CURRENCY" and lootIDChosen end,
+			set = function(_,value) lootIDChosen, lootTypeChosen = value, "CURRENCY" end,
 			values = function()
 				local currencyFilterLinkList = {}
 				for key,v in pairs(ecf.db.lootCurrencyFilterList) do currencyFilterLinkList[key] = v end
@@ -502,17 +502,16 @@ options.args.lootFilter = {
 			name = REMOVE,
 			order = 3,
 			func = function()
-				if(itemChosen > 0) then ecf.db.lootItemFilterList[itemChosen] = nil end
-				if(currencyChosen > 0) then ecf.db.lootCurrencyFilterList[currencyChosen] = nil end
-				itemChosen, currencyChosen = 0, 0
+				(lootTypeChosen == "ITEMS" and ecf.db.lootItemFilterList or ecf.db.lootCurrencyFilterList)[lootIDChosen] = nil
+				lootIDChosen = nil
 			end,
-			disabled = function() return itemChosen == 0 and currencyChosen == 0 end,
+			disabled = function() return not lootIDChosen end,
 		},
 		ClearUpButton = {
 			type = "execute",
 			name = L["ClearUp"],
 			order = 4,
-			func = function() ecf.db.lootItemFilterList, ecf.db.lootCurrencyFilterList, itemChosen, currencyChosen = {}, {}, 0, 0 end,
+			func = function() ecf.db.lootItemFilterList, ecf.db.lootCurrencyFilterList, lootIDChosen = {}, {}, nil end,
 			confirm = true,
 			confirmText = format(L["DoYouWantToClear"],L["LootFilter"]),
 			disabled = function() return next(ecf.db.lootItemFilterList) == nil and next(ecf.db.lootCurrencyFilterList) == nil end,

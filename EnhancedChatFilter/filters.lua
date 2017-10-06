@@ -4,11 +4,13 @@ local AC, L, G = ecf.AC, ecf.L, ecf.G -- Aho-Corasick, locales, global variables
 
 local _G = _G
 -- Lua
-local format, ipairs, max, min, next, pairs, rawset, select, tconcat, tonumber, tremove = format, ipairs, max, min, next, pairs, rawset, select, table.concat, tonumber, tremove
+local format, ipairs, max, min, next, pairs, select, tconcat, tonumber, tremove = format, ipairs, max, min, next, pairs, select, table.concat, tonumber, tremove
 -- WoW
-local Ambiguate, BNGetFriendGameAccountInfo, BNGetNumFriends, BNGetNumFriendGameAccounts, C_Timer_After, ChatTypeInfo, GetAchievementLink, GetFriendInfo, GetGuildInfo, GetItemInfo, GetNumFriends, GetPlayerInfoByGUID, GetRealmName, UnitExists, UnitInParty, UnitInRaid, UnitIsUnit = Ambiguate, BNGetFriendGameAccountInfo, BNGetNumFriends, BNGetNumFriendGameAccounts, C_Timer.After, ChatTypeInfo, GetAchievementLink, GetFriendInfo, GetGuildInfo, GetItemInfo, GetNumFriends, GetPlayerInfoByGUID, GetRealmName, UnitExists, UnitInParty, UnitInRaid, UnitIsUnit
+local Ambiguate, BNGetFriendGameAccountInfo, BNGetNumFriends, BNGetNumFriendGameAccounts, C_Timer_After, ChatTypeInfo, GetAchievementLink, GetFriendInfo, GetGuildInfo, GetItemInfo, GetNumFriends, GetPlayerInfoByGUID, GetRealmName, UnitExists, UnitInParty, UnitInRaid = Ambiguate, BNGetFriendGameAccountInfo, BNGetNumFriends, BNGetNumFriendGameAccounts, C_Timer.After, ChatTypeInfo, GetAchievementLink, GetFriendInfo, GetGuildInfo, GetItemInfo, GetNumFriends, GetPlayerInfoByGUID, GetRealmName, UnitExists, UnitInParty, UnitInRaid
 
--- GLOBALS: CUSTOM_CLASS_COLORS, NUM_CHAT_WINDOWS, RAID_CLASS_COLORS
+-- GLOBALS: NUM_CHAT_WINDOWS, RAID_CLASS_COLORS
+
+local playerName = GetUnitName("player")
 
 -- Some UTF-8 symbols that will be auto-changed
 G.UTF8Symbols = {
@@ -87,25 +89,25 @@ end
 
 --Record how many times players are filterd
 local playerCache = {}
-setmetatable(playerCache, {__index=function(self) return 0 end})
+setmetatable(playerCache, {__index=function() return 0 end})
 
 local chatLines = {}
 local chatChannel = {["CHAT_MSG_WHISPER"] = 1, ["CHAT_MSG_SAY"] = 2, ["CHAT_MSG_YELL"] = 2, ["CHAT_MSG_CHANNEL"] = 3, ["CHAT_MSG_PARTY"] = 4, ["CHAT_MSG_PARTY_LEADER"] = 4, ["CHAT_MSG_RAID"] = 4, ["CHAT_MSG_RAID_LEADER"] = 4, ["CHAT_MSG_RAID_WARNING"] = 4, ["CHAT_MSG_INSTANCE_CHAT"] = 4, ["CHAT_MSG_INSTANCE_CHAT_LEADER"] = 4, ["CHAT_MSG_DND"] = 101}
 
 local function ECFfilter(event,msg,player,flags,channelName,IsMyFriend,good)
-
-	local Event = chatChannel[event]
-
 	-- filter MeetingStone(NetEase) broad msg
 	if channelName == "集合石" and msg:find("^[#&$@]") then return "MeetingStone" end
-	-- don't filter player or his friends/BNfriends
-	if UnitIsUnit(player,"player") then return end
 
+	-- don't filter player
+	if player == playerName then return end
 	-- don't filter GM or DEV
 	if flags == "GM" or flags == "DEV" then return end
 
 	-- filter bad players
 	if ecf.db.enableAggressive and not good and playerCache[player] >= 3 then return "Bad Player" end
+
+	local Event = chatChannel[event]
+
 	-- remove color/hypelink
 	local filterString = msg:gsub("|H[^|]+|h([^|]+)|h","%1"):gsub("|c%x%x%x%x%x%x%x%x",""):gsub("|r","")
 	local oriLen = #filterString
@@ -233,17 +235,14 @@ Questf:SetScript("OnEvent", function(self,event,arg1,arg2)
 	if event == "QUEST_REMOVED" and MSFOffQuestT[arg1] then MSFOffQuestFlag = false end
 end)
 
-local monsterLines = {n=1}
-setmetatable(monsterLines,{__newindex=function(self, _, v)
-	rawset(self, self.n, v)
-	self.n = self.n + 1
-	if self.n > 7 then self.n = self.n - 7 end
-end})
+local MSL, MSLPos = {}, 1
 local function monsterFilter(self,_,msg)
 	if (not ecf.db.enableFilter or not ecf.db.enableMSF or MSFOffQuestFlag) then return end
 
-	for _, v in ipairs(monsterLines) do if (v == msg) then return true end end
-	monsterLines[#monsterLines+1] = msg
+	for _, v in ipairs(MSL) do if (v == msg) then return true end end
+	MSL[MSLPos] = msg
+	MSLPos = MSLPos + 1
+	if MSLPos > 7 then MSLPos = MSLPos - 7 end
 end
 ChatFrame_AddMessageEventFilter("CHAT_MSG_MONSTER_SAY", monsterFilter)
 
@@ -280,8 +279,7 @@ local function achievementReady(id)
 		if next(players) ~= nil then -- skip empty
 			local list = {}
 			for name,class in pairs(players) do
-				local color = (CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS)[class]
-				list[#list+1] = format("|cff%02x%02x%02x|Hplayer:%s|h%s|h|r", color.r*255, color.g*255, color.b*255, name, name)
+				list[#list+1] = format("|c%s|Hplayer:%s|h%s|h|r", RAID_CLASS_COLORS[class].colorStr, name, name)
 			end
 			SendMessage(event, format(L["GotAchievement"], tconcat(list, L["And"]), GetAchievementLink(id)))
 		end
