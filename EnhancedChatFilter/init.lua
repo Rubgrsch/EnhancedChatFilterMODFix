@@ -1,9 +1,15 @@
 -- ECF
 local _, ecf = ...
-ecf.ECF = LibStub("AceAddon-3.0"):NewAddon("EnhancedChatFilter")
-ecf.AC, ecf.L, ecf.G = {}, {}, {}
-local ECF, L, G = ecf.ECF, ecf.L, ecf.G
+ecf[1] = {} -- Config
+ecf[2] = {} -- Locales
+ecf[3] = {} -- Globals
+ecf[4] = {} -- AC
+ecf.init = {}
+local ECF = LibStub("AceAddon-3.0"):NewAddon("EnhancedChatFilter")
+local C, L = unpack(ecf)
 
+-- Lua
+local ipairs = ipairs
 -- WoW
 local InCombatLockdown, InterfaceOptionsFrame_OpenToCategory, ShowFriends = InCombatLockdown, InterfaceOptionsFrame_OpenToCategory, ShowFriends
 local LibStub = LibStub
@@ -24,15 +30,13 @@ local ecfLDB = LibStub("LibDataBroker-1.1"):NewDataObject("Enhanced Chat Filter"
 	text = "Enhanced Chat Filter",
 	icon = "Interface\\Icons\\Trade_Archaeology_Orc_BloodText",
 	OnClick = ECFOpen,
-	OnTooltipShow = function(tooltip)
-		tooltip:AddLine("|cffecf0f1Enhanced Chat Filter|r\n"..L["ClickToOpenConfig"])
-	end
+	OnTooltipShow = function(tooltip) tooltip:AddLine(L["ClickToOpenConfig"]) end
 })
 
 --Initialize
 function ECF:OnInitialize()
-	G.DBInitialize()
-	LibStub("LibDBIcon-1.0"):Register("Enhanced Chat Filter", ecfLDB, ecf.db.minimap)
+	for _,f in ipairs(ecf.init) do f() end
+	LibStub("LibDBIcon-1.0"):Register("Enhanced Chat Filter", ecfLDB, C.db.minimap)
 	ShowFriends()
 end
 

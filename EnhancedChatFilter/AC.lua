@@ -30,7 +30,7 @@
 
 -- ECF
 local _, ecf = ...
-local AC = ecf.AC -- Aho-Corasick
+local _, _, _, AC = unpack(ecf)
 
 local char, pairs, ipairs = string.char, pairs, ipairs
 

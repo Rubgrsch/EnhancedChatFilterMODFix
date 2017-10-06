@@ -1,5 +1,5 @@
 local _, ecf = ...
-local L = ecf.L
+local _, L = unpack(ecf)
 
 local locale = GetLocale()
 -----------------------------------------------------------------------
@@ -12,7 +12,7 @@ if (locale == "zhCN") then
 	L["OptimizeForCPU"] = "为CPU优化"
 	L["OptimizeForCPUTooltips"] = "启用后将使用稍多的内存而降低CPU的占用"
 --Minimap Tooltips
-	L["ClickToOpenConfig"] = "点击打开配置界面"
+	L["ClickToOpenConfig"] = "|cffffffffEnhanced Chat Filter|r|n点击打开配置界面"
 --Common in tab
 	L["ClearUp"] = "清空"
 	L["DoYouWantToClear"] = "你确定要清空%s么？"
@@ -92,7 +92,7 @@ elseif (locale == "zhTW") then
 	L["OptimizeForCPU"] = "为CPU优化"
 	L["OptimizeForCPUTooltips"] = "启用后将使用稍多的内存而降低CPU的占用"
 --Minimap Tooltips
-	L["ClickToOpenConfig"] = "點擊打開配置介面"
+	L["ClickToOpenConfig"] = "|cffffffffEnhanced Chat Filter|r|n點擊打開配置介面"
 --Common in tab
 	L["ClearUp"] = "清空"
 	L["DoYouWantToClear"] = "你确定要清空%s么？"
@@ -172,7 +172,7 @@ else
 	L["OptimizeForCPU"] = "Optimize For CPU"
 	L["OptimizeForCPUTooltips"] = "When enabled ECF uses a bit more memory and less CPU"
 --Minimap Tooltips
-	L["ClickToOpenConfig"] = "Click To Open Config"
+	L["ClickToOpenConfig"] = "|cffffffffEnhanced Chat Filter|r|nClick To Open Config"
 --Common in tab
 	L["ClearUp"] = "ClearUp"
 	L["DoYouWantToClear"] = "Do you want to clear %s?"
@@ -243,4 +243,4 @@ else
 	L["DBOutOfDate"] = "Your profile is too old! Your profile version: %d, addon compatibal version: %d."
 end
 
-setmetatable(ecf.L, {__index=function(self, key) return key end})
+setmetatable(L, {__index=function(_, key) return key end})

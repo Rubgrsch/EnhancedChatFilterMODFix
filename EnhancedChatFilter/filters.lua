@@ -1,6 +1,6 @@
 -- ECF
 local _, ecf = ...
-local AC, L, G = ecf.AC, ecf.L, ecf.G -- Aho-Corasick, locales, global variables
+local C, L, G, AC = unpack(ecf)
 
 local _G = _G
 -- Lua
@@ -104,7 +104,7 @@ local function ECFfilter(event,msg,player,flags,channelName,IsMyFriend,good)
 	if flags == "GM" or flags == "DEV" then return end
 
 	-- filter bad players
-	if ecf.db.enableAggressive and not good and playerCache[player] >= 3 then return "Bad Player" end
+	if C.db.enableAggressive and not good and playerCache[player] >= 3 then return "Bad Player" end
 
 	local Event = chatChannel[event]
 
@@ -123,45 +123,45 @@ local function ECFfilter(event,msg,player,flags,channelName,IsMyFriend,good)
 	local msgtable = {player, {}}
 	for idx=1, #msgLine do msgtable[2][idx] = msgLine:byte(idx) end
 
-	if(ecf.db.enableWisper and Event == 1) then --Whisper Whitelist Mode, only whisper
+	if(C.db.enableWisper and Event == 1) then --Whisper Whitelist Mode, only whisper
 		--Don't filter players that are from same guild/raid/party or who you have whispered
 		if not(allowWisper[player] or good) then
 			return "WhiteListMode"
 		end
 	end
 
-	if(ecf.db.enableDND and ((Event <= 3 and flags == "DND") or Event == 101) and not IsMyFriend) then -- DND, whisper/yell/say/channel and auto-reply
+	if(C.db.enableDND and ((Event <= 3 and flags == "DND") or Event == 101) and not IsMyFriend) then -- DND, whisper/yell/say/channel and auto-reply
 		return "DND Filter"
 	end
 
-	if(ecf.db.enableAggressive and Event <= 3 and not IsMyFriend) then --AggressiveFilter
+	if(C.db.enableAggressive and Event <= 3 and not IsMyFriend) then --AggressiveFilter
 		if (annoying >= 0.25 and annoying <= 0.8 and oriLen >= 30) then -- Annoying
 			return "Annoying: "..annoying
 		end
 	end
 
-	if(Event <= (ecf.db.blackWordFilterGroup and 4 or 3) and not IsMyFriend) then --blackWord Filter, whisper/yell/say/channel and party/raid(optional)
+	if(Event <= (C.db.blackWordFilterGroup and 4 or 3) and not IsMyFriend) then --blackWord Filter, whisper/yell/say/channel and party/raid(optional)
 		local count, keyWord = 0
 		if AC.BuiltBlackWordTable then count, keyWord = AC:Match(msgtable[2],AC.BuiltBlackWordTable)
 		else
-			for k,v in pairs(ecf.db.normalWordsList) do
+			for k,v in pairs(C.db.normalWordsList) do
 				if newfilterString:find(k,1,true) then
 					if v.lesser then count = count + 1 else count, keyWord = -1, k;break end
 				end
 			end
 		end
 		if count ~= -1 then -- if no non-lesser word in normalBlackWordList matches
-			for k,v in pairs(ecf.db.regexWordsList) do
+			for k,v in pairs(C.db.regexWordsList) do
 				if filterString:find(k) then
 					if v.lesser then count = count + 1 else count, keyWord = -1, k;break end
 				end
 			end
 		end
 		if count == -1 then return "Keyword: "..keyWord end
-		if count >= ecf.db.lesserBlackWordThreshold then return "LesserKeywords x"..count end
+		if count >= C.db.lesserBlackWordThreshold then return "LesserKeywords x"..count end
 	end
 
-	if (ecf.db.enableRAF and (Event <= 2 or Event == 4)) then -- raid
+	if (C.db.enableRAF and (Event <= 2 or Event == 4)) then -- raid
 		for _,RaidAlertTag in ipairs(RaidAlertTagList) do
 			if msg:find(RaidAlertTag) then
 				return RaidAlertTag.." in RaidAlertTag"
@@ -169,7 +169,7 @@ local function ECFfilter(event,msg,player,flags,channelName,IsMyFriend,good)
 		end
 	end
 
-	if (ecf.db.enableQRF and (Event <= 2 or Event == 4)) then -- quest/party
+	if (C.db.enableQRF and (Event <= 2 or Event == 4)) then -- quest/party
 		for _,QuestReportTag in ipairs(QuestReportTagList) do
 			if msg:find(QuestReportTag) then
 				return QuestReportTag.." in QuestReportTag"
@@ -177,7 +177,7 @@ local function ECFfilter(event,msg,player,flags,channelName,IsMyFriend,good)
 		end
 	end
 
-	if(ecf.db.chatLinesLimit > 0 and Event <= (ecf.db.repeatFilterGroup and 4 or 3) and not IsMyFriend) then --Repeat Filter
+	if(C.db.chatLinesLimit > 0 and Event <= (C.db.repeatFilterGroup and 4 or 3) and not IsMyFriend) then --Repeat Filter
 		local chatLinesSize = #chatLines
 		chatLines[chatLinesSize+1] = msgtable
 		for i=1, chatLinesSize do
@@ -187,14 +187,14 @@ local function ECFfilter(event,msg,player,flags,channelName,IsMyFriend,good)
 				return "Repeat Filter"
 			end
 		end
-		if chatLinesSize >= ecf.db.chatLinesLimit then tremove(chatLines, 1) end
+		if chatLinesSize >= C.db.chatLinesLimit then tremove(chatLines, 1) end
 	end
 end
 
 local prevLineID, filterResult = 0, false
 local function ECFfilterRecord(self,event,msg,player,_,_,_,flags,_,_,channelName,_,lineID)
 	-- do nothing if main filter is off
-	if(not ecf.db.enableFilter) then return end
+	if(not C.db.enableFilter) then return end
 
 	-- if it has been worked then use the worked result
 	if(lineID == prevLineID) then
@@ -212,9 +212,9 @@ local function ECFfilterRecord(self,event,msg,player,_,_,_,flags,_,_,channelName
 
 	if filterResult and not good then playerCache[player] = playerCache[player] + 1 end
 
-	if ecf.db.debugMode then
-		ecf.db.record[ecf.db.recordPos] = {event,msg,player,flags,filterResult,reason}
-		ecf.db.recordPos = (ecf.db.recordPos >= 500 and ecf.db.recordPos - 500 or ecf.db.recordPos) + 1
+	if C.db.debugMode then
+		C.db.record[C.db.recordPos] = {event,msg,player,flags,filterResult,reason}
+		C.db.recordPos = (C.db.recordPos >= 500 and C.db.recordPos - 500 or C.db.recordPos) + 1
 	end
 
 	return filterResult
@@ -237,7 +237,7 @@ end)
 
 local MSL, MSLPos = {}, 1
 local function monsterFilter(self,_,msg)
-	if (not ecf.db.enableFilter or not ecf.db.enableMSF or MSFOffQuestFlag) then return end
+	if (not C.db.enableFilter or not C.db.enableMSF or MSFOffQuestFlag) then return end
 
 	for _, v in ipairs(MSL) do if (v == msg) then return true end end
 	MSL[MSLPos] = msg
@@ -257,7 +257,7 @@ local SSFilterStrings = {
 	(ERR_PET_LEARN_SPELL_S:gsub("%%s","(.*)")),
 }
 local function SSFilter(self,_,msg)
-	if (not ecf.db.enableFilter or not ecf.db.enableDSS) then return end
+	if (not C.db.enableFilter or not C.db.enableDSS) then return end
 
 	for _,s in ipairs(SSFilterStrings) do if msg:find(s) then return true end end
 end
@@ -288,7 +288,7 @@ local function achievementReady(id)
 end
 
 local function achievementFilter(self, event, msg, _, _, _, _, _, _, _, _, _, _, guid)
-	if (not ecf.db.enableCFA or not ecf.db.enableFilter) then return end
+	if (not C.db.enableCFA or not C.db.enableFilter) then return end
 	if (not guid or not guid:find("Player")) then return end
 	local id = tonumber(msg:match("achievement:(%d+)"))
 	if (not id) then return end
@@ -308,17 +308,17 @@ ChatFrame_AddMessageEventFilter("CHAT_MSG_GUILD_ACHIEVEMENT", achievementFilter)
 
 --LootFilter
 local function lootItemFilter(self,_,msg)
-	if (not ecf.db.enableFilter) then return end
+	if (not C.db.enableFilter) then return end
 	local itemID = tonumber(msg:match("|Hitem:(%d+)"))
 	if(not itemID) then return end -- pet cages don't have 'item'
-	if(ecf.db.lootItemFilterList[itemID]) then return true end
-	if(select(3,GetItemInfo(itemID)) < ecf.db.lootQualityMin) then return true end -- ItemQuality is in ascending order
+	if(C.db.lootItemFilterList[itemID]) then return true end
+	if(select(3,GetItemInfo(itemID)) < C.db.lootQualityMin) then return true end -- ItemQuality is in ascending order
 end
 ChatFrame_AddMessageEventFilter("CHAT_MSG_LOOT", lootItemFilter)
 
 local function lootCurrecyFilter(self,_,msg)
-	if (not ecf.db.enableFilter) then return end
+	if (not C.db.enableFilter) then return end
 	local currencyID = tonumber(msg:match("|Hcurrency:(%d+)"))
-	if(ecf.db.lootCurrencyFilterList[currencyID]) then return true end
+	if(C.db.lootCurrencyFilterList[currencyID]) then return true end
 end
 ChatFrame_AddMessageEventFilter("CHAT_MSG_CURRENCY", lootCurrecyFilter)

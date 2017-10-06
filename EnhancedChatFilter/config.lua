@@ -1,6 +1,6 @@
 -- ECF
 local _, ecf = ...
-local AC, L, G = ecf.AC, ecf.L, ecf.G -- Aho-Corasick, locales, global variables
+local C, L, G, AC = unpack(ecf)
 
 local _G = _G
 -- Lua
@@ -97,12 +97,12 @@ ItemCacheFrame:SetScript("OnEvent",function(self,_,Id)
 	local _, link = GetItemInfo(Id)
 	if v == 0 then -- while adding
 		if link then -- if valid
-			ecf.db.lootItemFilterList[Id] = link
+			C.db.lootItemFilterList[Id] = link
 		else
 			print(format(L["NotExists"],ITEMS,Id))
 		end
 	elseif v == 1 then -- change true to link
-		ecf.db.lootItemFilterList[Id] = link
+		C.db.lootItemFilterList[Id] = link
 	end
 	ItemInfoRequested[Id] = nil
 end)
@@ -115,30 +115,30 @@ local function checkBlacklist(blackWord, r)
 end
 
 local function updateBlackWordTable()
-	AC.BuiltBlackWordTable = ecf.db.optimizeForCPU and AC:Build(ecf.db.normalWordsList) or nil
+	AC.BuiltBlackWordTable = C.db.optimizeForCPU and AC:Build(C.db.normalWordsList) or nil
 end
 
 --Initialize and convert old config to new one
-function G.DBInitialize()
+ecf.init[#ecf.init+1] = function()
 	if type(ecfDB) ~= "table" or next(ecfDB) == nil then ecfDB = defaults
 	elseif ecfDB.profiles and ecfDB.profiles.Default then ecfDB = ecfDB.profiles.Default end
-	ecf.db = ecfDB
-	for k,v in pairs(defaults) do if ecf.db[k] == nil then ecf.db[k] = v end end -- fallback to defaults
-	if ecf.db.DBversion < lastCompatibleVer then error(format(L["DBOutOfDate"],ecf.db.DBversion,lastCompatibleVer)) end
+	C.db = ecfDB
+	for k,v in pairs(defaults) do if C.db[k] == nil then C.db[k] = v end end -- fallback to defaults
+	if C.db.DBversion < lastCompatibleVer then error(format(L["DBOutOfDate"],C.db.DBversion,lastCompatibleVer)) end
 	-- Start of DB Conversion
-	if ecf.db.blackWordList then -- Compatible for 1
-		for k,v in pairs(ecf.db.blackWordList) do
-			(v.regex and ecf.db.regexWordsList or ecf.db.normalWordsList)[k] = {lesser = v.lesser}
+	if C.db.blackWordList then -- Compatible for 1
+		for k,v in pairs(C.db.blackWordList) do
+			(v.regex and C.db.regexWordsList or C.db.normalWordsList)[k] = {lesser = v.lesser}
 		end
 	end
 	-- End of DB conversion
-	ecf.db.DBversion = currentVer
-	for k in pairs(ecf.db) do if defaults[k] == nil then ecf.db[k] = nil end end -- remove old keys
-	for Id, info in pairs(ecf.db.lootItemFilterList) do
+	C.db.DBversion = currentVer
+	for k in pairs(C.db) do if defaults[k] == nil then C.db[k] = nil end end -- remove old keys
+	for Id, info in pairs(C.db.lootItemFilterList) do
 		if info == true then ItemInfoRequested[Id] = 1 end
 	end
-	for Id, info in pairs(ecf.db.lootCurrencyFilterList) do
-		if info == true then ecf.db.lootCurrencyFilterList[Id] = GetCurrencyLink(Id) end
+	for Id, info in pairs(C.db.lootCurrencyFilterList) do
+		if info == true then C.db.lootCurrencyFilterList[Id] = GetCurrencyLink(Id) end
 	end
 	updateBlackWordTable()
 end
@@ -161,20 +161,20 @@ local function AddBlackWord(word, r, l)
 		print(format(L["IncludeAutofilteredWord"],word))
 	else
 		if r then
-			ecf.db.regexWordsList[word] = {lesser = l}
+			C.db.regexWordsList[word] = {lesser = l}
 		else
-			ecf.db.normalWordsList[word:upper()] = {lesser = l}
+			C.db.normalWordsList[word:upper()] = {lesser = l}
 		end
 	end
 end
 
-local function adv() return not ecf.db.advancedConfig end
+local function adv() return not C.db.advancedConfig end
 
 local options = {
 	type = "group",
 	name = "EnhancedChatFilter "..GetAddOnMetadata("EnhancedChatFilter", "Version"),
-	get = function(info) return ecf.db[info[#info]] end,
-	set = function(info, value) ecf.db[info[#info]] = value end,
+	get = function(info) return C.db[info[#info]] end,
+	set = function(info, value) C.db[info[#info]] = value end,
 	childGroups = "tab",
 	args = {},
 }
@@ -191,9 +191,9 @@ options.args.General = {
 		MinimapToggle = {
 			type = "toggle",
 			name = L["MinimapIcon"],
-			get = function() return not ecf.db.minimap.hide end,
+			get = function() return not C.db.minimap.hide end,
 			set = function(_,toggle)
-					ecf.db.minimap.hide = not toggle
+					C.db.minimap.hide = not toggle
 					if(toggle) then LibStub("LibDBIcon-1.0"):Show("Enhanced Chat Filter") else LibStub("LibDBIcon-1.0"):Hide("Enhanced Chat Filter") end
 				end,
 			order = 2,
@@ -203,7 +203,7 @@ options.args.General = {
 			name = L["OptimizeForCPU"],
 			desc = L["OptimizeForCPUTooltips"],
 			set = function(_,toggle)
-					ecf.db.optimizeForCPU = toggle
+					C.db.optimizeForCPU = toggle
 					updateBlackWordTable()
 				end,
 			order = 3,
@@ -291,16 +291,16 @@ options.args.General = {
 			name = L["RepeatFilter"],
 			desc = L["RepeatFilterTooltips"],
 			order = 41,
-			get = function() return ecf.db.chatLinesLimit ~= 0 end,
-			set = function(_,value) ecf.db.chatLinesLimit = value and 20 or 0 end,
-			hidden = function() return ecf.db.advancedConfig end,
+			get = function() return C.db.chatLinesLimit ~= 0 end,
+			set = function(_,value) C.db.chatLinesLimit = value and 20 or 0 end,
+			hidden = function() return C.db.advancedConfig end,
 		},
 		repeatFilterGroup = {
 			type = "toggle",
 			name = L["FilterGroup"],
 			desc = L["FilterGroupTooltips"],
 			order = 42,
-			disabled = function() return ecf.db.chatLinesLimit == 0 end,
+			disabled = function() return C.db.chatLinesLimit == 0 end,
 		},
 	},
 }
@@ -314,11 +314,11 @@ options.args.blackListTab = {
 			name = L["BlackwordList"],
 			order = 1,
 			get = function() return wordChosen[3] and "" or wordChosen[1] end,
-			set = function(_,value) wordChosen = {value, not ecf.db.normalWordsList[value], false} end,
+			set = function(_,value) wordChosen = {value, not C.db.normalWordsList[value], false} end,
 			values = function()
 				local blacklistname = {}
-				for key,v in pairs(ecf.db.regexWordsList) do if not v.lesser then blacklistname[key] = key end end
-				for key,v in pairs(ecf.db.normalWordsList) do if not v.lesser then blacklistname[key] = key end end
+				for key,v in pairs(C.db.regexWordsList) do if not v.lesser then blacklistname[key] = key end end
+				for key,v in pairs(C.db.normalWordsList) do if not v.lesser then blacklistname[key] = key end end
 				return blacklistname
 			end,
 		},
@@ -327,11 +327,11 @@ options.args.blackListTab = {
 			name = L["LesserBlackwordList"],
 			order = 2,
 			get = function() return wordChosen[3] and wordChosen[1] or "" end,
-			set = function(_,value) wordChosen = {value, not ecf.db.normalWordsList[value], true} end,
+			set = function(_,value) wordChosen = {value, not C.db.normalWordsList[value], true} end,
 			values = function()
 				local blacklistname = {}
-				for key,v in pairs(ecf.db.regexWordsList) do if v.lesser then blacklistname[key] = key end end
-				for key,v in pairs(ecf.db.normalWordsList) do if v.lesser then blacklistname[key] = key end end
+				for key,v in pairs(C.db.regexWordsList) do if v.lesser then blacklistname[key] = key end end
+				for key,v in pairs(C.db.normalWordsList) do if v.lesser then blacklistname[key] = key end end
 				return blacklistname
 			end,
 			hidden = adv
@@ -341,7 +341,7 @@ options.args.blackListTab = {
 			name = REMOVE,
 			order = 3,
 			func = function()
-				(wordChosen[2] and ecf.db.regexWordsList or ecf.db.normalWordsList)[wordChosen[1]] = nil
+				(wordChosen[2] and C.db.regexWordsList or C.db.normalWordsList)[wordChosen[1]] = nil
 				wordChosen = wordChosenDefault
 				updateBlackWordTable()
 			end,
@@ -352,13 +352,13 @@ options.args.blackListTab = {
 			name = L["ClearUp"],
 			order = 4,
 			func = function()
-				ecf.db.regexWordsList, ecf.db.normalWordsList = {}, {}
+				C.db.regexWordsList, C.db.normalWordsList = {}, {}
 				wordChosen = wordChosenDefault
 				updateBlackWordTable()
 			end,
 			confirm = true,
 			confirmText = format(L["DoYouWantToClear"],L["BlackList"]),
-			disabled = function() return next(ecf.db.regexWordsList) == nil and next(ecf.db.normalWordsList) == nil end,
+			disabled = function() return next(C.db.regexWordsList) == nil and next(C.db.normalWordsList) == nil end,
 		},
 		line1 = {
 			type = "header",
@@ -448,14 +448,14 @@ options.args.blackListTab = {
 			order = 32,
 			func = function()
 				local blackStringList = {}
-				for key,v in pairs(ecf.db.regexWordsList) do
+				for key,v in pairs(C.db.regexWordsList) do
 					if (checkBlacklist(key, true)) then
 						print(format(L["IncludeAutofilteredWord"],key))
 					else
 						blackStringList[#blackStringList+1] = format("%s,%s,%s",key,"r",v.lesser and "l" or "")
 					end
 				end
-				for key,v in pairs(ecf.db.normalWordsList) do
+				for key,v in pairs(C.db.normalWordsList) do
 					if (checkBlacklist(key, false)) then
 						print(format(L["IncludeAutofilteredWord"],key))
 					else
@@ -481,7 +481,7 @@ options.args.lootFilter = {
 			set = function(_,value) lootIDChosen, lootTypeChosen = value, "ITEMS" end,
 			values = function()
 				local itemFilterLinkList = {}
-				for key,v in pairs(ecf.db.lootItemFilterList) do itemFilterLinkList[key] = type(v) == "string" and v or select(2,GetItemInfo(key)) end
+				for key,v in pairs(C.db.lootItemFilterList) do itemFilterLinkList[key] = type(v) == "string" and v or select(2,GetItemInfo(key)) end
 				return itemFilterLinkList
 			end,
 		},
@@ -493,7 +493,7 @@ options.args.lootFilter = {
 			set = function(_,value) lootIDChosen, lootTypeChosen = value, "CURRENCY" end,
 			values = function()
 				local currencyFilterLinkList = {}
-				for key,v in pairs(ecf.db.lootCurrencyFilterList) do currencyFilterLinkList[key] = v end
+				for key,v in pairs(C.db.lootCurrencyFilterList) do currencyFilterLinkList[key] = v end
 				return currencyFilterLinkList
 			end,
 		},
@@ -502,7 +502,7 @@ options.args.lootFilter = {
 			name = REMOVE,
 			order = 3,
 			func = function()
-				(lootTypeChosen == "ITEMS" and ecf.db.lootItemFilterList or ecf.db.lootCurrencyFilterList)[lootIDChosen] = nil
+				(lootTypeChosen == "ITEMS" and C.db.lootItemFilterList or C.db.lootCurrencyFilterList)[lootIDChosen] = nil
 				lootIDChosen = nil
 			end,
 			disabled = function() return not lootIDChosen end,
@@ -511,10 +511,10 @@ options.args.lootFilter = {
 			type = "execute",
 			name = L["ClearUp"],
 			order = 4,
-			func = function() ecf.db.lootItemFilterList, ecf.db.lootCurrencyFilterList, lootIDChosen = {}, {}, nil end,
+			func = function() C.db.lootItemFilterList, C.db.lootCurrencyFilterList, lootIDChosen = {}, {}, nil end,
 			confirm = true,
 			confirmText = format(L["DoYouWantToClear"],L["LootFilter"]),
-			disabled = function() return next(ecf.db.lootItemFilterList) == nil and next(ecf.db.lootCurrencyFilterList) == nil end,
+			disabled = function() return next(C.db.lootItemFilterList) == nil and next(C.db.lootCurrencyFilterList) == nil end,
 		},
 		line1 = {
 			type = "header",
@@ -534,12 +534,12 @@ options.args.lootFilter = {
 					local _, link = GetItemInfo(Id)
 					if link then
 						ItemInfoRequested[Id] = nil
-						ecf.db.lootItemFilterList[Id] = link
+						C.db.lootItemFilterList[Id] = link
 					end
 				else
 					local link = GetCurrencyLink(Id)
 					if link then
-						ecf.db.lootCurrencyFilterList[Id] = link
+						C.db.lootCurrencyFilterList[Id] = link
 					else
 						print(format(L["NotExists"],lootType,Id))
 					end
@@ -583,7 +583,7 @@ options.args.debugWindow = {
 			type = "execute",
 			name = L["ClearRecord"],
 			order = 2,
-			func = function() ecf.db.record, ecf.db.recordPos = {}, 1 end
+			func = function() C.db.record, C.db.recordPos = {}, 1 end
 		},
 		ChatRecordOnlyShow = {
 			type = "select",
@@ -595,14 +595,14 @@ options.args.debugWindow = {
 			type = "input",
 			name = "",
 			get = function()
-				local pos, t, IsMax, showUnfilted, showFilted = ecf.db.recordPos, {}, #ecf.db.record == 500, ecf.db.ChatRecordOnlyShow ~= 2, ecf.db.ChatRecordOnlyShow ~= 3
-				for i = 1, #ecf.db.record do
+				local pos, t, IsMax, showUnfilted, showFilted = C.db.recordPos, {}, #C.db.record == 500, C.db.ChatRecordOnlyShow ~= 2, C.db.ChatRecordOnlyShow ~= 3
+				for i = 1, #C.db.record do
 					local j = i
 					if IsMax then
 						j = pos + j -1
 						if j > 500 then j = j - 500 end
 					end
-					local _,msg,trimmedPlayer,_,filterResult = unpack(ecf.db.record[j])
+					local _,msg,trimmedPlayer,_,filterResult = unpack(C.db.record[j])
 					if (showUnfilted and not filterResult) or (showFilted and filterResult) then
 						t[#t+1] = format("|TInterface\\TargetingFrame\\UI-RaidTargetingIcon_%d:0|t %s: %s",filterResult and 7 or 2,trimmedPlayer,msg)
 					end
@@ -613,7 +613,7 @@ options.args.debugWindow = {
 			multiline = 10,
 			width = "full",
 			order = 10,
-			hidden = function() return not ecf.db.debugMode end,
+			hidden = function() return not C.db.debugMode end,
 		},
 	},
 }
