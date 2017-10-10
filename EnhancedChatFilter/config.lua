@@ -146,10 +146,15 @@ end
 --------------- Options ---------------
 --These settings won't be saved
 local wordChosenDefault = {"", false, false} -- string, regex, lesser
-local wordChosen = wordChosenDefault
-local lootIDChosen, lootTypeChosen = nil, nil
-local stringIO = "" -- blackWord input
-local regexToggle, lesserToggle, lootType = false, false, "ITEMS"
+C.UI = {
+	regexToggle = false,
+	lesserToggle = false,
+	lootType = "ITEMS",
+	stringIO = "",-- blackWord input
+	wordChosen = wordChosenDefault,
+	lootIDChosen = nil,
+	lootTypeChosen = nil,
+}
 
 local colorT = {} -- used in lootFilter
 for i=0, 4 do
@@ -173,8 +178,8 @@ local function adv() return not C.db.advancedConfig end
 local options = {
 	type = "group",
 	name = "EnhancedChatFilter "..GetAddOnMetadata("EnhancedChatFilter", "Version"),
-	get = function(info) return C.db[info[#info]] end,
-	set = function(info, value) C.db[info[#info]] = value end,
+	get = function(info) return C.db[info[#info]] ~= nil and C.db[info[#info]] or C.UI[info[#info]] end,
+	set = function(info, value) (C.db[info[#info]] ~= nil and C.db or C.UI)[info[#info]] = value end,
 	childGroups = "tab",
 	args = {},
 }
@@ -313,8 +318,8 @@ options.args.blackListTab = {
 			type = "select",
 			name = L["BlackwordList"],
 			order = 1,
-			get = function() return wordChosen[3] and "" or wordChosen[1] end,
-			set = function(_,value) wordChosen = {value, not C.db.normalWordsList[value], false} end,
+			get = function() return C.UI.wordChosen[3] and "" or C.UI.wordChosen[1] end,
+			set = function(_,value) C.UI.wordChosen = {value, not C.db.normalWordsList[value], false} end,
 			values = function()
 				local blacklistname = {}
 				for key,v in pairs(C.db.regexWordsList) do if not v.lesser then blacklistname[key] = key end end
@@ -326,8 +331,8 @@ options.args.blackListTab = {
 			type = "select",
 			name = L["LesserBlackwordList"],
 			order = 2,
-			get = function() return wordChosen[3] and wordChosen[1] or "" end,
-			set = function(_,value) wordChosen = {value, not C.db.normalWordsList[value], true} end,
+			get = function() return C.UI.wordChosen[3] and C.UI.wordChosen[1] or "" end,
+			set = function(_,value) C.UI.wordChosen = {value, not C.db.normalWordsList[value], true} end,
 			values = function()
 				local blacklistname = {}
 				for key,v in pairs(C.db.regexWordsList) do if v.lesser then blacklistname[key] = key end end
@@ -341,11 +346,11 @@ options.args.blackListTab = {
 			name = REMOVE,
 			order = 3,
 			func = function()
-				(wordChosen[2] and C.db.regexWordsList or C.db.normalWordsList)[wordChosen[1]] = nil
-				wordChosen = wordChosenDefault
+				(C.UI.wordChosen[2] and C.db.regexWordsList or C.db.normalWordsList)[C.UI.wordChosen[1]] = nil
+				C.UI.wordChosen = wordChosenDefault
 				updateBlackWordTable()
 			end,
-			disabled = function() return wordChosen[1] == "" end,
+			disabled = function() return C.UI.wordChosen[1] == "" end,
 		},
 		ClearUpButton = {
 			type = "execute",
@@ -353,7 +358,7 @@ options.args.blackListTab = {
 			order = 4,
 			func = function()
 				C.db.regexWordsList, C.db.normalWordsList = {}, {}
-				wordChosen = wordChosenDefault
+				C.UI.wordChosen = wordChosenDefault
 				updateBlackWordTable()
 			end,
 			confirm = true,
@@ -371,7 +376,7 @@ options.args.blackListTab = {
 			order = 11,
 			get = nil,
 			set = function(_,value)
-				AddBlackWord(value, regexToggle, lesserToggle)
+				AddBlackWord(value, C.UI.regexToggle, C.UI.lesserToggle)
 				updateBlackWordTable()
 			end,
 		},
@@ -379,8 +384,6 @@ options.args.blackListTab = {
 			type = "toggle",
 			name = L["Regex"],
 			desc = L["RegexTooltip"],
-			get = function() return regexToggle end,
-			set = function(_,value) regexToggle = value end,
 			order = 12,
 			hidden = adv,
 		},
@@ -388,8 +391,6 @@ options.args.blackListTab = {
 			type = "toggle",
 			name = L["LesserBlackWord"],
 			desc = L["LesserBlackWordTooltip"],
-			get = function() return lesserToggle end,
-			set = function(_,value) lesserToggle = value end,
 			order = 13,
 			hidden = adv,
 		},
@@ -419,11 +420,10 @@ options.args.blackListTab = {
 			name = L["StringIO"],
 			order = 30,
 		},
-		stringConfig = {
+		stringIO = {
 			type = "input",
 			name = "",
 			order = 31,
-			get = function() return stringIO end,
 			set = function(_,value)
 				local wordString, HashString = strsplit("@", value)
 				if (tonumber(HashString) ~= StringHash(wordString)) then
@@ -438,7 +438,7 @@ options.args.blackListTab = {
 					end
 					updateBlackWordTable()
 				end
-				stringIO = ""
+				C.UI.stringIO = ""
 			end,
 			width = "full",
 		},
@@ -463,7 +463,7 @@ options.args.blackListTab = {
 					end
 				end
 				local blackString = tconcat(blackStringList,";")
-				stringIO = blackString.."@"..StringHash(blackString)
+				C.UI.stringIO = blackString.."@"..StringHash(blackString)
 			end,
 		},
 	},
@@ -477,8 +477,8 @@ options.args.lootFilter = {
 			type = "select",
 			name = L["ItemFilterList"],
 			order = 1,
-			get = function() return lootTypeChosen == "ITEMS" and lootIDChosen end,
-			set = function(_,value) lootIDChosen, lootTypeChosen = value, "ITEMS" end,
+			get = function() return C.UI.lootTypeChosen == "ITEMS" and C.UI.lootIDChosen end,
+			set = function(_,value) C.UI.lootIDChosen, C.UI.lootTypeChosen = value, "ITEMS" end,
 			values = function()
 				local itemFilterLinkList = {}
 				for key,v in pairs(C.db.lootItemFilterList) do itemFilterLinkList[key] = type(v) == "string" and v or select(2,GetItemInfo(key)) end
@@ -489,8 +489,8 @@ options.args.lootFilter = {
 			type = "select",
 			name = L["CurrencyFilterList"],
 			order = 2,
-			get = function() return lootTypeChosen == "CURRENCY" and lootIDChosen end,
-			set = function(_,value) lootIDChosen, lootTypeChosen = value, "CURRENCY" end,
+			get = function() return C.UI.lootTypeChosen == "CURRENCY" and C.UI.lootIDChosen end,
+			set = function(_,value) C.UI.lootIDChosen, C.UI.lootTypeChosen = value, "CURRENCY" end,
 			values = function()
 				local currencyFilterLinkList = {}
 				for key,v in pairs(C.db.lootCurrencyFilterList) do currencyFilterLinkList[key] = v end
@@ -502,16 +502,16 @@ options.args.lootFilter = {
 			name = REMOVE,
 			order = 3,
 			func = function()
-				(lootTypeChosen == "ITEMS" and C.db.lootItemFilterList or C.db.lootCurrencyFilterList)[lootIDChosen] = nil
-				lootIDChosen = nil
+				(C.UI.lootTypeChosen == "ITEMS" and C.db.lootItemFilterList or C.db.lootCurrencyFilterList)[C.UI.lootIDChosen] = nil
+				C.UI.lootIDChosen = nil
 			end,
-			disabled = function() return not lootIDChosen end,
+			disabled = function() return not C.UI.lootIDChosen end,
 		},
 		ClearUpButton = {
 			type = "execute",
 			name = L["ClearUp"],
 			order = 4,
-			func = function() C.db.lootItemFilterList, C.db.lootCurrencyFilterList, lootIDChosen = {}, {}, nil end,
+			func = function() C.db.lootItemFilterList, C.db.lootCurrencyFilterList, C.UI.lootIDChosen = {}, {}, nil end,
 			confirm = true,
 			confirmText = format(L["DoYouWantToClear"],L["LootFilter"]),
 			disabled = function() return next(C.db.lootItemFilterList) == nil and next(C.db.lootCurrencyFilterList) == nil end,
@@ -529,7 +529,7 @@ options.args.lootFilter = {
 			set = function(_,value)
 				local Id = tonumber(value)
 				if not Id then print(L["BadID"]);return end
-				if(lootType == "ITEMS") then
+				if(C.UI.lootType == "ITEMS") then
 					ItemInfoRequested[Id] = 0
 					local _, link = GetItemInfo(Id)
 					if link then
@@ -541,7 +541,7 @@ options.args.lootFilter = {
 					if link then
 						C.db.lootCurrencyFilterList[Id] = link
 					else
-						print(format(L["NotExists"],lootType,Id))
+						print(format(L["NotExists"],C.UI.lootType,Id))
 					end
 				end
 			end,
@@ -550,8 +550,6 @@ options.args.lootFilter = {
 			type = "select",
 			name = TYPE,
 			order = 12,
-			get = function() return lootType end,
-			set = function(_,value) lootType = value end,
 			values = {["ITEMS"] = ITEMS, ["CURRENCY"] = CURRENCY},
 		},
 		line2 = {
