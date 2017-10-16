@@ -34,27 +34,25 @@ local _, _, _, AC = unpack(ecf)
 
 local char, pairs, ipairs = string.char, pairs, ipairs
 
-local root = ""
-
 function AC:Build(m) -- m: blackwordTable
 	local t = {}
 	-- [1] = to, [2] = fail, [3] = hit, [4] = nil: not blackword, true/false: isLesser
-	t[root] = {{}, root, root, nil}
+	t[""] = {{}, "", "", nil}
 	for k,v in pairs(m) do
-		local current = root
+		local current = ""
 		for j = 1, #k do
 			local c = k:byte(j)
 			local path = current..char(c)
 			if t[current][1][c] == nil then
 				t[current][1][c] = path
-				t[path] = {{}, root, root, nil}
+				t[path] = {{}, "", "", nil}
 			end
 			current = path
 		end
 		t[k][4] = v.lesser
 	end
 
-	local q = {root}
+	local q = {""}
 	while #q > 0 do
 		local path = q[#q]
 		q[#q] = nil
@@ -72,18 +70,20 @@ function AC:Build(m) -- m: blackwordTable
 end
 
 function AC:Match(s, t) -- s: arrays of byte
-	local path, hits = root, 0
+	local path, hits = "", 0
 	for _, c in ipairs(s) do
-		while t[path][1][c] == nil and path ~= root do path = t[path][2] end
+		while t[path][1][c] == nil and path ~= "" do path = t[path][2] end
 		local n = t[path][1][c]
 		if n ~= nil then
 			path = n
-			if t[n][4] ~= nil then hits = hits + 1 end
-			while t[n][3] ~= root do
+			repeat
+				if t[n][4] == true then
+					return -1, n
+				elseif t[n][4] == false then
+					hits = hits + 1
+				end
 				n = t[n][3]
-				hits = hits + 1
-			end
-			if t[n] and t[n][4] == false then return -1, n end
+			until t[n][3] == ""
 		end
 	end
 	return hits
