@@ -11,14 +11,13 @@ local C, L = unpack(ecf)
 -- Lua
 local ipairs = ipairs
 -- WoW
-local InCombatLockdown, InterfaceOptionsFrame_OpenToCategory, ShowFriends = InCombatLockdown, InterfaceOptionsFrame_OpenToCategory, ShowFriends
+local InterfaceOptionsFrame_OpenToCategory, ShowFriends = InterfaceOptionsFrame_OpenToCategory, ShowFriends
 local LibStub = LibStub
 
 -- GLOBALS: SLASH_ECF1
 
 --method run on /ecf
 local function ECFOpen()
-	if(InCombatLockdown()) then return end
 	InterfaceOptionsFrame_OpenToCategory("EnhancedChatFilter")
 end
 SlashCmdList.ECF = ECFOpen
