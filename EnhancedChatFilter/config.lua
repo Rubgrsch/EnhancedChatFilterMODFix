@@ -110,8 +110,8 @@ end)
 --Make sure that blackWord won't be filtered by filterCharList and utf-8 list
 local function checkBlacklist(blackWord, r)
 	local newWord = G.utf8replace(blackWord, G.UTF8Symbols):gsub("%s", "")
-	if (not r) then newWord=newWord:gsub(G.RegexCharList, "") end
-	if(newWord ~= blackWord or blackWord == "") then return true end -- Also report "" as invalid
+	if not r then newWord=newWord:gsub(G.RegexCharList, "") end
+	if newWord ~= blackWord or blackWord == "" then return true end -- Also report "" as invalid
 end
 
 local function updateBlackWordTable()
@@ -162,7 +162,7 @@ for i=0, 4 do
 end
 
 local function AddBlackWord(word, r, l)
-	if (checkBlacklist(word, r)) then
+	if checkBlacklist(word, r) then
 		print(format(L["IncludeAutofilteredWord"],word))
 	else
 		if r then
@@ -178,7 +178,7 @@ local function adv() return not C.db.advancedConfig end
 local options = {
 	type = "group",
 	name = "EnhancedChatFilter "..GetAddOnMetadata("EnhancedChatFilter", "Version"),
-	get = function(info) return C.db[info[#info]] ~= nil and C.db[info[#info]] or C.UI[info[#info]] end,
+	get = function(info) return (C.db[info[#info]] ~= nil and C.db or C.UI)[info[#info]] end,
 	set = function(info, value) (C.db[info[#info]] ~= nil and C.db or C.UI)[info[#info]] = value end,
 	childGroups = "tab",
 	args = {},
@@ -199,7 +199,7 @@ options.args.General = {
 			get = function() return not C.db.minimap.hide end,
 			set = function(_,toggle)
 					C.db.minimap.hide = not toggle
-					if(toggle) then LibStub("LibDBIcon-1.0"):Show("Enhanced Chat Filter") else LibStub("LibDBIcon-1.0"):Hide("Enhanced Chat Filter") end
+					if toggle then LibStub("LibDBIcon-1.0"):Show("Enhanced Chat Filter") else LibStub("LibDBIcon-1.0"):Hide("Enhanced Chat Filter") end
 				end,
 			order = 2,
 		},
@@ -426,11 +426,11 @@ options.args.blackListTab = {
 			order = 31,
 			set = function(_,value)
 				local wordString, HashString = strsplit("@", value)
-				if (tonumber(HashString) ~= StringHash(wordString)) then
+				if tonumber(HashString) ~= StringHash(wordString) then
 					print(L["StringHashMismatch"])
 				else
 					for _, blacklist in ipairs({strsplit(";", wordString)}) do
-						if (blacklist ~= nil) then
+						if blacklist ~= nil then
 							local imNewWord, r, l = strsplit(",",blacklist)
 							r, l = r == "r", l == "l"
 							AddBlackWord(imNewWord, r, l)
@@ -449,14 +449,14 @@ options.args.blackListTab = {
 			func = function()
 				local blackStringList = {}
 				for key,v in pairs(C.db.regexWordsList) do
-					if (checkBlacklist(key, true)) then
+					if checkBlacklist(key, true) then
 						print(format(L["IncludeAutofilteredWord"],key))
 					else
 						blackStringList[#blackStringList+1] = format("%s,%s,%s",key,"r",v.lesser and "l" or "")
 					end
 				end
 				for key,v in pairs(C.db.normalWordsList) do
-					if (checkBlacklist(key, false)) then
+					if checkBlacklist(key, false) then
 						print(format(L["IncludeAutofilteredWord"],key))
 					else
 						blackStringList[#blackStringList+1] = format("%s,%s,%s",key,"",v.lesser and "l" or "")
@@ -529,7 +529,7 @@ options.args.lootFilter = {
 			set = function(_,value)
 				local Id = tonumber(value)
 				if not Id then print(L["BadID"]);return end
-				if(C.UI.lootType == "ITEMS") then
+				if C.UI.lootType == "ITEMS" then
 					ItemInfoRequested[Id] = 0
 					local _, link = GetItemInfo(Id)
 					if link then
