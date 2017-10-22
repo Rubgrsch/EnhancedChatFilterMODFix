@@ -32,38 +32,38 @@
 local _, ecf = ...
 local _, _, _, AC = unpack(ecf)
 
-local char, pairs, ipairs = string.char, pairs, ipairs
+local char, pairs, ipairs, type = string.char, pairs, ipairs, type
 
 function AC:Build(m) -- m: blackwordTable
-	local t = {}
-	-- [1] = to, [2] = fail, [3] = hit, [4] = nil: not blackword, true/false: isLesser
-	t[""] = {{}, "", "", nil}
+	local t = {[""] = {}}
 	for k,v in pairs(m) do
 		local current = ""
 		for j = 1, #k do
 			local c = k:byte(j)
 			local path = current..char(c)
-			if t[current][1][c] == nil then
-				t[current][1][c] = path
-				t[path] = {{}, "", "", nil}
+			if t[current][c] == nil then
+				t[current][c] = path
+				t[path] = {}
 			end
 			current = path
 		end
-		t[k][4] = v.lesser
+		t[k].word = v.lesser -- word = nil: not blackword, true/false: isLesser
 	end
 
 	local q = {""}
 	while #q > 0 do
 		local path = q[#q]
 		q[#q] = nil
-		for _, p in pairs(t[path][1]) do
-			q[#q+1] = p
-			local fail = p:sub(2)
-			while fail ~= "" and t[fail] == nil do fail = fail:sub(2) end
-			t[p][2] = fail
-			local hit = p:sub(2)
-			while hit ~= "" and (t[hit] == nil or t[hit][4] == nil) do hit = hit:sub(2) end
-			t[p][3] = hit
+		for k, p in pairs(t[path]) do
+			if type(k) == "number" then
+				q[#q+1] = p
+				local fail = p:sub(2)
+				while fail ~= "" and t[fail] == nil do fail = fail:sub(2) end
+				if fail ~= "" then t[p].fail = fail end
+				local hit = p:sub(2)
+				while hit ~= "" and (t[hit] == nil or t[hit].word == nil) do hit = hit:sub(2) end
+				if hit ~= "" then t[p].hit = hit end
+			end
 		end
 	end
 	return t
@@ -72,18 +72,18 @@ end
 function AC:Match(s, t) -- s: arrays of byte
 	local path, hits = "", 0
 	for _, c in ipairs(s) do
-		while t[path][1][c] == nil and path ~= "" do path = t[path][2] end
-		local n = t[path][1][c]
+		while t[path][c] == nil and path ~= "" do path = t[path].fail or "" end
+		local n = t[path][c]
 		if n ~= nil then
 			path = n
 			repeat
-				if t[n][4] == false then
+				if t[n].word == false then
 					return -1, n
-				elseif t[n][4] == true then
+				elseif t[n].word == true then
 					hits = hits + 1
 				end
-				n = t[n][3]
-			until n == ""
+				n = t[n].hit
+			until not n
 		end
 	end
 	return hits
