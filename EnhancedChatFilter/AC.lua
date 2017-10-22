@@ -77,13 +77,13 @@ function AC:Match(s, t) -- s: arrays of byte
 		if n ~= nil then
 			path = n
 			repeat
-				if t[n][4] == true then
+				if t[n][4] == false then
 					return -1, n
-				elseif t[n][4] == false then
+				elseif t[n][4] == true then
 					hits = hits + 1
 				end
 				n = t[n][3]
-			until t[n][3] == ""
+			until n == ""
 		end
 	end
 	return hits
