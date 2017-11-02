@@ -15,7 +15,6 @@ local currentVer, lastCompatibleVer = 1, 1
 --Default Options
 local defaults = {
 	enableFilter = true, -- Main Toggle
-	optimizeForCPU = true,
 	enableWisper = false, -- Wisper WhiteMode
 	enableDND = true, -- DND
 	enableCFA = true, -- Achievement Filter
@@ -115,7 +114,7 @@ local function checkBlacklist(blackWord, r)
 end
 
 local function updateBlackWordTable()
-	AC.BuiltBlackWordTable = C.db.optimizeForCPU and AC:Build(C.db.normalWordsList) or nil
+	AC.BuiltBlackWordTable = AC:Build(C.db.normalWordsList)
 end
 
 --Initialize and convert old config to new one
@@ -202,17 +201,6 @@ options.args.General = {
 					if toggle then LibStub("LibDBIcon-1.0"):Show("Enhanced Chat Filter") else LibStub("LibDBIcon-1.0"):Hide("Enhanced Chat Filter") end
 				end,
 			order = 2,
-		},
-		optimizeForCPU = {
-			type = "toggle",
-			name = L["OptimizeForCPU"],
-			desc = L["OptimizeForCPUTooltips"],
-			set = function(_,toggle)
-					C.db.optimizeForCPU = toggle
-					updateBlackWordTable()
-				end,
-			order = 3,
-			hidden = adv,
 		},
 		advancedConfig = {
 			type = "toggle",

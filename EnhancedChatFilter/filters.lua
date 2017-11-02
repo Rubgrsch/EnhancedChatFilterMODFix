@@ -140,15 +140,7 @@ local function ECFfilter(event,msg,player,flags,channelName,IsMyFriend,good)
 
 	--blackWord Filter, whisper/yell/say/channel and party/raid(optional)
 	if Event <= (C.db.blackWordFilterGroup and 4 or 3) and not IsMyFriend then
-		local count, keyWord = 0
-		if AC.BuiltBlackWordTable then count, keyWord = AC:Match(msgtable[2],AC.BuiltBlackWordTable)
-		else
-			for k,v in pairs(C.db.normalWordsList) do
-				if newfilterString:find(k,1,true) then
-					if v.lesser then count = count + 1 else count, keyWord = -1, k;break end
-				end
-			end
-		end
+		local count, keyWord = AC:Match(msgtable[2],AC.BuiltBlackWordTable)
 		if count ~= -1 then -- if no non-lesser word in normalBlackWordList matches
 			for k,v in pairs(C.db.regexWordsList) do
 				if filterString:find(k) then
