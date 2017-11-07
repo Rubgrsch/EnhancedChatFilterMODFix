@@ -4,13 +4,10 @@ local C, L, G, AC = unpack(ecf)
 
 local _G = _G
 -- Lua
-local error, ipairs, format, pairs, print, next, select, strsplit, tconcat, tonumber, type, unpack = error, ipairs, format, pairs, print, next, select, strsplit, table.concat, tonumber, type, unpack
+local ipairs, format, pairs, print, next, select, strsplit, tconcat, tonumber, type, unpack = ipairs, format, pairs, print, next, select, strsplit, table.concat, tonumber, type, unpack
 -- WoW
 local GetCurrencyLink, GetItemInfo, ITEMS = GetCurrencyLink, GetItemInfo, ITEMS
 local LibStub = LibStub
-
--- DB Version Check
-local currentVer, lastCompatibleVer = 1, 1
 
 --Default Options
 local defaults = {
@@ -40,7 +37,6 @@ local defaults = {
 	record = {},
 	recordPos = 1,
 	ChatRecordOnlyShow = 1,
-	DBversion = currentVer,
 }
 
 --------------- Functions from Elsewhere ---------------
@@ -123,15 +119,7 @@ ecf.init[#ecf.init+1] = function()
 	elseif ecfDB.profiles and ecfDB.profiles.Default then ecfDB = ecfDB.profiles.Default end
 	C.db = ecfDB
 	for k,v in pairs(defaults) do if C.db[k] == nil then C.db[k] = v end end -- fallback to defaults
-	if C.db.DBversion < lastCompatibleVer then error(format(L["DBOutOfDate"],C.db.DBversion,lastCompatibleVer)) end
-	-- Start of DB Conversion
-	if C.db.blackWordList then -- Compatible for 1
-		for k,v in pairs(C.db.blackWordList) do
-			(v.regex and C.db.regexWordsList or C.db.normalWordsList)[k] = {lesser = v.lesser}
-		end
-	end
-	-- End of DB conversion
-	C.db.DBversion = currentVer
+	--Insert DBConversion here
 	for k in pairs(C.db) do if defaults[k] == nil then C.db[k] = nil end end -- remove old keys
 	for Id, info in pairs(C.db.lootItemFilterList) do
 		if info == true then ItemInfoRequested[Id] = 1 end
@@ -285,7 +273,7 @@ options.args.General = {
 			desc = L["RepeatFilterTooltips"],
 			order = 41,
 			get = function() return C.db.chatLinesLimit ~= 0 end,
-			set = function(_,value) C.db.chatLinesLimit = value and 20 or 0 end,
+			set = function(_,value) C.db.chatLinesLimit = value and defaults.chatLinesLimit or 0 end,
 			hidden = function() return C.db.advancedConfig end,
 		},
 		repeatFilterGroup = {
@@ -437,18 +425,10 @@ options.args.blackListTab = {
 			func = function()
 				local blackStringList = {}
 				for key,v in pairs(C.db.regexWordsList) do
-					if checkBlacklist(key, true) then
-						print(format(L["IncludeAutofilteredWord"],key))
-					else
-						blackStringList[#blackStringList+1] = format("%s,%s,%s",key,"r",v.lesser and "l" or "")
-					end
+					blackStringList[#blackStringList+1] = format("%s,r,%s",key,v.lesser and "l" or "")
 				end
 				for key,v in pairs(C.db.normalWordsList) do
-					if checkBlacklist(key, false) then
-						print(format(L["IncludeAutofilteredWord"],key))
-					else
-						blackStringList[#blackStringList+1] = format("%s,%s,%s",key,"",v.lesser and "l" or "")
-					end
+					blackStringList[#blackStringList+1] = format("%s,,%s",key,v.lesser and "l" or "")
 				end
 				local blackString = tconcat(blackStringList,";")
 				C.UI.stringIO = blackString.."@"..StringHash(blackString)

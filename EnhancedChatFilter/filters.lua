@@ -6,11 +6,11 @@ local _G = _G
 -- Lua
 local format, ipairs, max, min, next, pairs, select, tconcat, tonumber, tremove = format, ipairs, max, min, next, pairs, select, table.concat, tonumber, tremove
 -- WoW
-local Ambiguate, BNGetFriendGameAccountInfo, BNGetNumFriends, BNGetNumFriendGameAccounts, C_Timer_After, ChatTypeInfo, GetAchievementLink, GetFriendInfo, GetGuildInfo, GetItemInfo, GetNumFriends, GetPlayerInfoByGUID, GetRealmName, UnitExists, UnitInParty, UnitInRaid = Ambiguate, BNGetFriendGameAccountInfo, BNGetNumFriends, BNGetNumFriendGameAccounts, C_Timer.After, ChatTypeInfo, GetAchievementLink, GetFriendInfo, GetGuildInfo, GetItemInfo, GetNumFriends, GetPlayerInfoByGUID, GetRealmName, UnitExists, UnitInParty, UnitInRaid
+local Ambiguate, BNGetFriendGameAccountInfo, BNGetNumFriends, BNGetNumFriendGameAccounts, C_Timer_After, ChatTypeInfo, GetAchievementLink, GetFriendInfo, GetGuildInfo, GetItemInfo, GetNumFriends, GetPlayerInfoByGUID, UnitExists, UnitInParty, UnitInRaid = Ambiguate, BNGetFriendGameAccountInfo, BNGetNumFriends, BNGetNumFriendGameAccounts, C_Timer.After, ChatTypeInfo, GetAchievementLink, GetFriendInfo, GetGuildInfo, GetItemInfo, GetNumFriends, GetPlayerInfoByGUID, UnitExists, UnitInParty, UnitInRaid
 
 -- GLOBALS: NUM_CHAT_WINDOWS, RAID_CLASS_COLORS
 
-local playerName = GetUnitName("player")
+local playerName, playerServer = GetUnitName("player"), GetRealmName()
 
 -- Some UTF-8 symbols that will be auto-changed
 G.UTF8Symbols = {
@@ -288,7 +288,7 @@ local function achievementFilter(self, event, msg, _, _, _, _, _, _, _, _, _, _,
 	if not id then return end
 	local _,class,_,_,_,name,server = GetPlayerInfoByGUID(guid)
 	if not name then return end -- check nil
-	if server ~= "" and server ~= GetRealmName() then name = name.."-"..server end
+	if server ~= "" and server ~= playerServer then name = name.."-"..server end
 	if not achievements[id] then
 		achievements[id] = {}
 		C_Timer_After(0.5, function() achievementReady(id) end)
