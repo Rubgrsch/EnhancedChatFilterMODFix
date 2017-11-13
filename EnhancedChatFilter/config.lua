@@ -4,10 +4,13 @@ local C, L, G, AC = unpack(ecf)
 
 local _G = _G
 -- Lua
-local ipairs, format, pairs, print, next, select, strsplit, tconcat, tonumber, type, unpack = ipairs, format, pairs, print, next, select, strsplit, table.concat, tonumber, type, unpack
+local error, ipairs, format, pairs, print, next, select, strsplit, tconcat, tonumber, type, unpack = error, ipairs, format, pairs, print, next, select, strsplit, table.concat, tonumber, type, unpack
 -- WoW
 local GetCurrencyLink, GetItemInfo, ITEMS = GetCurrencyLink, GetItemInfo, ITEMS
 local LibStub = LibStub
+
+-- DB Version Check
+local currentVer, lastCompatibleVer = 1, 1
 
 --Default Options
 local defaults = {
@@ -37,6 +40,7 @@ local defaults = {
 	record = {},
 	recordPos = 1,
 	ChatRecordOnlyShow = 1,
+	DBversion = currentVer,
 }
 
 --------------- Functions from Elsewhere ---------------
@@ -119,7 +123,15 @@ ecf.init[#ecf.init+1] = function()
 	elseif ecfDB.profiles and ecfDB.profiles.Default then ecfDB = ecfDB.profiles.Default end
 	C.db = ecfDB
 	for k,v in pairs(defaults) do if C.db[k] == nil then C.db[k] = v end end -- fallback to defaults
-	--Insert DBConversion here
+	if C.db.DBversion < lastCompatibleVer then error(format(L["DBOutOfDate"],C.db.DBversion,lastCompatibleVer)) end
+	-- Start of DB Conversion
+	if C.db.blackWordList then -- Compatible for 1
+		for k,v in pairs(C.db.blackWordList) do
+			(v.regex and C.db.regexWordsList or C.db.normalWordsList)[k] = {lesser = v.lesser}
+		end
+	end
+	-- End of DB conversion
+	C.db.DBversion = currentVer
 	for k in pairs(C.db) do if defaults[k] == nil then C.db[k] = nil end end -- remove old keys
 	for Id, info in pairs(C.db.lootItemFilterList) do
 		if info == true then ItemInfoRequested[Id] = 1 end

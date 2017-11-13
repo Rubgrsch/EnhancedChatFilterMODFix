@@ -76,6 +76,8 @@ if (locale == "zhCN") then
 	L["ShowAll"] = "全部显示"
 	L["OnlyFiltered"] = "仅过滤"
 	L["OnlyUnfiltered"] = "仅未过滤"
+--Error
+	L["DBOutOfDate"] = "你的配置文件太旧了！你的配置文件版本:%d，插件最低兼容版本:%d"
 
 -----------------------------------------------------------------------
 -- zhTW -- NEED HELP
@@ -153,6 +155,8 @@ elseif (locale == "zhTW") then
 	L["ShowAll"] = "全部显示"
 	L["OnlyFiltered"] = "仅过滤"
 	L["OnlyUnfiltered"] = "仅未过滤"
+--Error
+	L["DBOutOfDate"] = "你的配置文件太旧了！你的配置文件版本:%d，插件最低兼容版本:%d"
 
 -----------------------------------------------------------------------
 -- Default -- NEED HELP
@@ -229,6 +233,8 @@ else
 	L["ShowAll"] = "ShowAll"
 	L["OnlyFiltered"] = "OnlyFiltered"
 	L["OnlyUnfiltered"] = "OnlyUnfiltered"
+--Error
+	L["DBOutOfDate"] = "Your profile is too old! Your profile version: %d, addon compatibal version: %d."
 end
 
 setmetatable(L, {__index=function(_, key) return key end})
