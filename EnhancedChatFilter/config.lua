@@ -10,7 +10,11 @@ local GetCurrencyLink, GetItemInfo, ITEMS = GetCurrencyLink, GetItemInfo, ITEMS
 local LibStub = LibStub
 
 -- DB Version Check
-local currentVer, lastCompatibleVer = 1, 1
+local currentVer, lastCompatibleVer = 1, 0
+local versionTable = {
+	[0] = "???", -- Too old
+	[1] = "7.3.0-3",
+}
 
 --Default Options
 local defaults = {
@@ -122,8 +126,9 @@ ecf.init[#ecf.init+1] = function()
 	if type(ecfDB) ~= "table" or next(ecfDB) == nil then ecfDB = defaults
 	elseif ecfDB.profiles and ecfDB.profiles.Default then ecfDB = ecfDB.profiles.Default end
 	C.db = ecfDB
+	if not C.db.DBversion then C.db.DBversion = 0 end -- if config is too old then don't even have DBversion
 	for k,v in pairs(defaults) do if C.db[k] == nil then C.db[k] = v end end -- fallback to defaults
-	if C.db.DBversion < lastCompatibleVer then error(format(L["DBOutOfDate"],C.db.DBversion,lastCompatibleVer)) end
+	if C.db.DBversion < lastCompatibleVer then error(format(L["DBOutOfDate"],versionTable[C.db.DBversion],versionTable[lastCompatibleVer])) end
 	-- Start of DB Conversion
 	if C.db.blackWordList then -- Compatible for 1
 		for k,v in pairs(C.db.blackWordList) do
