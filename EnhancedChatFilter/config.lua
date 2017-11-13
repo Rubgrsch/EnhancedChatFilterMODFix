@@ -587,7 +587,7 @@ options.args.debugWindow = {
 				end
 				return tconcat(t,"|n")
 			end,
-			set = nil,
+			set = function() return end,
 			multiline = 10,
 			width = "full",
 			order = 10,
