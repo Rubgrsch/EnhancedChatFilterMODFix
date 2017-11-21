@@ -10,7 +10,7 @@ It is now supporting Legion(7.3.2).
 现已更新至军团再临(7.3.2)。  
 
 NGA Link: <http://bbs.nga.cn/read.php?tid=9277315>  
-Curse Link: <http://mods.curse.com/addons/wow/ecfmodfix>
+Curse Link: <https://www.curseforge.com/wow/addons/ecfmodfix>
 
 [Github Wiki](https://github.com/Rubgrsch/EnhancedChatFilterMODFix/wiki/%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E)
 
