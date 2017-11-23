@@ -187,9 +187,6 @@ end
 
 local prevLineID, filterResult = 0, false
 local function ECFfilterRecord(self,event,msg,player,_,_,_,flags,_,_,channelName,_,lineID)
-	-- do nothing if main filter is off
-	if not C.db.enableFilter then return end
-
 	-- if it has been worked then use the worked result
 	if lineID == prevLineID then
 		return filterResult
@@ -231,7 +228,7 @@ end)
 
 local MSL, MSLPos = {}, 1
 local function monsterFilter(self,_,msg)
-	if not C.db.enableFilter or not C.db.enableMSF or MSFOffQuestFlag then return end
+	if not C.db.enableMSF or MSFOffQuestFlag then return end
 
 	for _, v in ipairs(MSL) do if v == msg then return true end end
 	MSL[MSLPos] = msg
@@ -251,7 +248,7 @@ local SSFilterStrings = {
 	(ERR_PET_LEARN_SPELL_S:gsub("%%s","(.*)")),
 }
 local function SSFilter(self,_,msg)
-	if not C.db.enableFilter or not C.db.enableDSS then return end
+	if not C.db.enableDSS then return end
 
 	for _,s in ipairs(SSFilterStrings) do if msg:find(s) then return true end end
 end
@@ -282,7 +279,7 @@ local function achievementReady(id)
 end
 
 local function achievementFilter(self, event, msg, _, _, _, _, _, _, _, _, _, _, guid)
-	if not C.db.enableCFA or not C.db.enableFilter then return end
+	if not C.db.enableCFA then return end
 	if not guid or not guid:find("Player") then return end
 	local id = tonumber(msg:match("|Hachievement:(%d+)"))
 	if not id then return end
@@ -302,7 +299,6 @@ ChatFrame_AddMessageEventFilter("CHAT_MSG_GUILD_ACHIEVEMENT", achievementFilter)
 
 --LootFilter
 local function lootItemFilter(self,_,msg)
-	if not C.db.enableFilter then return end
 	local itemID = tonumber(msg:match("|Hitem:(%d+)"))
 	if not itemID then return end -- pet cages don't have 'item'
 	if C.db.lootItemFilterList[itemID] then return true end
@@ -311,7 +307,6 @@ end
 ChatFrame_AddMessageEventFilter("CHAT_MSG_LOOT", lootItemFilter)
 
 local function lootCurrecyFilter(self,_,msg)
-	if not C.db.enableFilter then return end
 	local currencyID = tonumber(msg:match("|Hcurrency:(%d+)"))
 	if C.db.lootCurrencyFilterList[currencyID] then return true end
 end

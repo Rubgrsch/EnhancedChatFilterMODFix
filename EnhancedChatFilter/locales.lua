@@ -7,7 +7,6 @@ local locale = GetLocale()
 -----------------------------------------------------------------------
 if (locale == "zhCN") then
 --Titles
-	L["MainFilter"] = "总开关"
 	L["MinimapIcon"] = "小地图图标"
 --Minimap Tooltips
 	L["ClickToOpenConfig"] = "|cffffffffEnhanced Chat Filter|r|n点击打开配置界面"
@@ -85,7 +84,6 @@ if (locale == "zhCN") then
 -----------------------------------------------------------------------
 elseif (locale == "zhTW") then
 --Titles
-	L["MainFilter"] = "總開關"
 	L["MinimapIcon"] = "小地圖圖標"
 --Minimap Tooltips
 	L["ClickToOpenConfig"] = "|cffffffffEnhanced Chat Filter|r|n點擊打開配置介面"
@@ -163,7 +161,6 @@ elseif (locale == "zhTW") then
 -----------------------------------------------------------------------
 else
 --Titles
-	L["MainFilter"] = "Main Filter"
 	L["MinimapIcon"] = "Minimap Button"
 --Minimap Tooltips
 	L["ClickToOpenConfig"] = "|cffffffffEnhanced Chat Filter|r|nClick To Open Config"

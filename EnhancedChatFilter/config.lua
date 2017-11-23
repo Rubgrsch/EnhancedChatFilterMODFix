@@ -18,7 +18,6 @@ local versionTable = {
 
 --Default Options
 local defaults = {
-	enableFilter = true, -- Main Toggle
 	enableWisper = false, -- Wisper WhiteMode
 	enableDND = true, -- DND
 	enableCFA = true, -- Achievement Filter
@@ -192,11 +191,6 @@ options.args.General = {
 	name = L["General"],
 	order = 1,
 	args = {
-		enableFilter = {
-			type = "toggle",
-			name = L["MainFilter"],
-			order = 1,
-		},
 		MinimapToggle = {
 			type = "toggle",
 			name = L["MinimapIcon"],
@@ -205,7 +199,7 @@ options.args.General = {
 					C.db.minimap.hide = not toggle
 					if toggle then LibStub("LibDBIcon-1.0"):Show("Enhanced Chat Filter") else LibStub("LibDBIcon-1.0"):Hide("Enhanced Chat Filter") end
 				end,
-			order = 2,
+			order = 1,
 		},
 		advancedConfig = {
 			type = "toggle",
