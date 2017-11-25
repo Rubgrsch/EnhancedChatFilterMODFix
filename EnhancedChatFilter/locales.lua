@@ -6,8 +6,6 @@ local locale = GetLocale()
 -- zhCN
 -----------------------------------------------------------------------
 if (locale == "zhCN") then
---Titles
-	L["MinimapIcon"] = "小地图图标"
 --Minimap Tooltips
 	L["ClickToOpenConfig"] = "|cffffffffEnhanced Chat Filter|r|n点击打开配置界面"
 --Common in tab
@@ -16,6 +14,7 @@ if (locale == "zhCN") then
 	L["FilterGroup"] = "过滤小队团队"
 	L["FilterGroupTooltips"] = "启用后过滤器也会过滤小队团队中的消息，你可能因此错过有用的消息"
 --General
+	L["MinimapIcon"] = "小地图图标"
 	L["General"] = "常规"
 	L["DND"] = "'忙碌'玩家"
 	L["DNDfilterTooltip"] = "过滤'忙碌'玩家及其自动回复"
@@ -83,8 +82,6 @@ if (locale == "zhCN") then
 -- Contributors: 老虎007@NGA
 -----------------------------------------------------------------------
 elseif (locale == "zhTW") then
---Titles
-	L["MinimapIcon"] = "小地圖圖標"
 --Minimap Tooltips
 	L["ClickToOpenConfig"] = "|cffffffffEnhanced Chat Filter|r|n點擊打開配置介面"
 --Common in tab
@@ -93,6 +90,7 @@ elseif (locale == "zhTW") then
 	L["FilterGroup"] = "过滤小队团队"
 	L["FilterGroupTooltips"] = "启用后过滤器也会过滤小队团队中的消息，你可能因此错过有用的信息"
 --General
+	L["MinimapIcon"] = "小地圖圖標"
 	L["General"] = "常规"
 	L["DND"] = "'忙碌'玩家"
 	L["DNDfilterTooltip"] = "过滤'忙碌'玩家及其自动回复"
@@ -160,8 +158,6 @@ elseif (locale == "zhTW") then
 -- Default -- NEED HELP
 -----------------------------------------------------------------------
 else
---Titles
-	L["MinimapIcon"] = "Minimap Button"
 --Minimap Tooltips
 	L["ClickToOpenConfig"] = "|cffffffffEnhanced Chat Filter|r|nClick To Open Config"
 --Common in tab
@@ -170,6 +166,7 @@ else
 	L["FilterGroup"] = "FilterGroup"
 	L["FilterGroupTooltips"] = "Enable to filter group and raid. This may filter some useful messages."
 --General
+	L["MinimapIcon"] = "Minimap Button"
 	L["General"] = "General"
 	L["DND"] = "DND"
 	L["DNDfilterTooltip"] = "Filter all DND players and their auto reply"

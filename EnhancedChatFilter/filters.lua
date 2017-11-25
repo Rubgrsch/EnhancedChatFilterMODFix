@@ -108,7 +108,7 @@ local function ECFfilter(event,msg,player,flags,channelName,IsMyFriend,good)
 	local Event = chatChannel[event]
 
 	-- remove color/hypelink
-	local filterString = msg:gsub("|H[^|]+|h([^|]+)|h","%1"):gsub("|c%x%x%x%x%x%x%x%x",""):gsub("|r","")
+	local filterString = msg:gsub("|H.-|h(.-)|h","%1"):gsub("|c%x%x%x%x%x%x%x%x",""):gsub("|r","")
 	local oriLen = #filterString
 	-- remove utf-8 chars/raidicon/space/symbols
 	filterString = G.utf8replace(filterString, G.UTF8Symbols):gsub("{rt%d}",""):gsub("%s","")
