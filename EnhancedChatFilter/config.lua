@@ -1,5 +1,5 @@
 -- ECF
-local _, ecf = ...
+local addonName, ecf = ...
 local C, L, G, AC = unpack(ecf)
 
 local _G = _G
@@ -180,7 +180,7 @@ local function adv() return not C.db.advancedConfig end
 
 local options = {
 	type = "group",
-	name = "EnhancedChatFilter "..GetAddOnMetadata("EnhancedChatFilter", "Version"),
+	name = format("%s %s",addonName,GetAddOnMetadata(addonName, "Version")),
 	get = function(info) return (C.db[info[#info]] ~= nil and C.db or C.UI)[info[#info]] end,
 	set = function(info, value) (C.db[info[#info]] ~= nil and C.db or C.UI)[info[#info]] = value end,
 	childGroups = "tab",
@@ -197,7 +197,7 @@ options.args.General = {
 			get = function() return not C.db.minimap.hide end,
 			set = function(_,toggle)
 					C.db.minimap.hide = not toggle
-					if toggle then LibStub("LibDBIcon-1.0"):Show("Enhanced Chat Filter") else LibStub("LibDBIcon-1.0"):Hide("Enhanced Chat Filter") end
+					if toggle then LibStub("LibDBIcon-1.0"):Show(addonName) else LibStub("LibDBIcon-1.0"):Hide(addonName) end
 				end,
 			order = 1,
 		},
@@ -594,5 +594,5 @@ options.args.debugWindow = {
 		},
 	},
 }
-LibStub("AceConfigRegistry-3.0"):RegisterOptionsTable("EnhancedChatFilter", options)
-LibStub("AceConfigDialog-3.0"):AddToBlizOptions("EnhancedChatFilter", "EnhancedChatFilter")
+LibStub("AceConfigRegistry-3.0"):RegisterOptionsTable(addonName, options)
+LibStub("AceConfigDialog-3.0"):AddToBlizOptions(addonName)
