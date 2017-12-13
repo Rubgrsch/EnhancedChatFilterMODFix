@@ -74,7 +74,7 @@ ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER_INFORM", addToAllowWisper)
 --stringDifference for repeatFilter, ranged from 0 to 1, while 0 is absolutely the same
 --This function is not utf8 awared, currently not nessesary
 --strsub(s,i,i) is really SLOW. Don't use it.
-local function stringDifference(sA, sB) -- arrays of byte
+local function strDiff(sA, sB) -- arrays of byte
 	local len_a, len_b = #sA, #sB
 	local last, this = {}, {}
 	for j=0, len_b do last[j+1] = j end
@@ -176,7 +176,7 @@ local function ECFfilter(event,msg,player,flags,channelName,IsMyFriend,good)
 		chatLines[chatLinesSize+1] = msgtable
 		for i=1, chatLinesSize do
 			--if there is not much difference between msgs, filter it
-			if chatLines[i][1] == msgtable[1] and stringDifference(chatLines[i][2],msgtable[2]) <= 0.1 then
+			if chatLines[i][1] == msgtable[1] and strDiff(chatLines[i][2],msgtable[2]) <= 0.1 then
 				tremove(chatLines, i)
 				return "Repeat Filter"
 			end

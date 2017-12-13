@@ -547,18 +547,18 @@ options.args.lootFilter = {
 }
 options.args.debugWindow = {
 	type = "group",
-	name = L["RecordWindow"],
+	name = L["HistoryWindow"],
 	order = 30,
 	args = {
 		debugMode = {
 			type = "toggle",
-			name = L["ChatRecord"],
-			desc = L["ChatRecordTooltips"],
+			name = L["ChatHistory"],
+			desc = L["ChatHistoryTooltips"],
 			order = 1,
 		},
 		clearRecord = {
 			type = "execute",
-			name = L["ClearRecord"],
+			name = L["ClearHistory"],
 			order = 2,
 			func = function() C.db.record, C.db.recordPos = {}, 1 end
 		},
@@ -579,9 +579,9 @@ options.args.debugWindow = {
 						j = pos + j -1
 						if j > 500 then j = j - 500 end
 					end
-					local _,msg,trimmedPlayer,_,filterResult = unpack(C.db.record[j])
-					if (showUnfilted and not filterResult) or (showFilted and filterResult) then
-						t[#t+1] = format("|TInterface\\TargetingFrame\\UI-RaidTargetingIcon_%d:0|t %s: %s",filterResult and 7 or 2,trimmedPlayer,msg)
+					local _,msg,player,_,result = unpack(C.db.record[j])
+					if (showUnfilted and not result) or (showFilted and result) then
+						t[#t+1] = format("|TInterface\\TargetingFrame\\UI-RaidTargetingIcon_%d:0|t %s: %s",result and 7 or 2,player,msg)
 					end
 				end
 				return tconcat(t,"|n")

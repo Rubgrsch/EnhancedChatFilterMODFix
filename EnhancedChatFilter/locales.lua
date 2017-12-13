@@ -66,11 +66,11 @@ if (locale == "zhCN") then
 --AchievementFilter
 	L["GotAchievement"] = "[%s]获得了成就%s！"
 	L["And"] = "、"
---Record
-	L["RecordWindow"] = "聊天记录"
-	L["ChatRecord"] = "开启聊天记录"
-	L["ChatRecordTooltips"] = "开启后将记录系统信息以外的聊天信息，并可以查看哪些信息被过滤"
-	L["ClearRecord"] = "清除聊天记录"
+--History
+	L["HistoryWindow"] = "聊天记录"
+	L["ChatHistory"] = "开启聊天记录"
+	L["ChatHistoryTooltips"] = "开启后将记录系统信息以外的聊天信息，并可以查看哪些信息被过滤"
+	L["ClearHistory"] = "清除聊天记录"
 	L["ShowAll"] = "全部显示"
 	L["OnlyFiltered"] = "仅过滤"
 	L["OnlyUnfiltered"] = "仅未过滤"
@@ -143,11 +143,11 @@ elseif (locale == "zhTW") then
 --AchievementFilter
 	L["GotAchievement"] = "[%s]獲得了成就%s！"
 	L["And"] = "、"
---Record
-	L["RecordWindow"] = "聊天记录"
-	L["ChatRecord"] = "开启聊天记录"
-	L["ChatRecordTooltips"] = "开启后将记录系统信息以外的聊天信息，并可以查看哪些信息被过滤"
-	L["ClearRecord"] = "清除聊天记录"
+--History
+	L["HistoryWindow"] = "聊天记录"
+	L["ChatHistory"] = "开启聊天记录"
+	L["ChatHistoryTooltips"] = "开启后将记录系统信息以外的聊天信息，并可以查看哪些信息被过滤"
+	L["ClearHistory"] = "清除聊天记录"
 	L["ShowAll"] = "全部显示"
 	L["OnlyFiltered"] = "仅过滤"
 	L["OnlyUnfiltered"] = "仅未过滤"
@@ -219,11 +219,11 @@ else
 --AchievementFilter
 	L["GotAchievement"] = "[%s]have earned the achievement%s!"
 	L["And"] = ", "
---Record
-	L["RecordWindow"] = "Chat Record"
-	L["ChatRecord"] = "Enable Chat Record"
-	L["ChatRecordTooltips"] = "Enable chat record. This will record non-system chat msg and you can check whether they are filtered by ECF."
-	L["ClearRecord"] = "ClearRecord"
+--History
+	L["HistoryWindow"] = "Chat History"
+	L["ChatHistory"] = "Enable Chat History"
+	L["ChatHistoryTooltips"] = "Enable chat history. This will record non-system chat msg and you can check whether they are filtered by ECF."
+	L["ClearHistory"] = "ClearHistory"
 	L["ShowAll"] = "ShowAll"
 	L["OnlyFiltered"] = "OnlyFiltered"
 	L["OnlyUnfiltered"] = "OnlyUnfiltered"
