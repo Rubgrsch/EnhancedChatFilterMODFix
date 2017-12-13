@@ -71,7 +71,7 @@ local function addToAllowWisper(self,_,_,player)
 end
 ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER_INFORM", addToAllowWisper)
 
---stringDifference for repeatFilter, ranged from 0 to 1, while 0 is absolutely the same
+--strDiff for repeatFilter, ranged from 0 to 1, while 0 is absolutely the same
 --This function is not utf8 awared, currently not nessesary
 --strsub(s,i,i) is really SLOW. Don't use it.
 local function strDiff(sA, sB) -- arrays of byte
@@ -95,8 +95,8 @@ setmetatable(playerCache, {__index=function() return 0 end})
 local chatLines = {}
 local chatChannel = {["CHAT_MSG_WHISPER"] = 1, ["CHAT_MSG_SAY"] = 2, ["CHAT_MSG_YELL"] = 2, ["CHAT_MSG_CHANNEL"] = 3, ["CHAT_MSG_PARTY"] = 4, ["CHAT_MSG_PARTY_LEADER"] = 4, ["CHAT_MSG_RAID"] = 4, ["CHAT_MSG_RAID_LEADER"] = 4, ["CHAT_MSG_RAID_WARNING"] = 4, ["CHAT_MSG_INSTANCE_CHAT"] = 4, ["CHAT_MSG_INSTANCE_CHAT_LEADER"] = 4, ["CHAT_MSG_DND"] = 101}
 
-local function ECFfilter(event,msg,player,flags,channelName,IsMyFriend,good)
-	-- filter MeetingStone(NetEase) broad msg
+local function ECFfilter(Event,msg,player,flags,channelName,IsMyFriend,good)
+	-- filter MeetingStone(NetEase) broad msg so it will not appear in repeatFilter
 	if channelName == "集合石" and msg:find("^[#&$@]") then return "MeetingStone" end
 
 	-- don't filter player/GM/DEV
@@ -104,8 +104,6 @@ local function ECFfilter(event,msg,player,flags,channelName,IsMyFriend,good)
 
 	-- filter bad players
 	if C.db.enableAggressive and not good and playerCache[player] >= 3 then return "Bad Player" end
-
-	local Event = chatChannel[event]
 
 	-- remove color/hypelink
 	local filterString = msg:gsub("|H.-|h(.-)|h","%1"):gsub("|c%x%x%x%x%x%x%x%x",""):gsub("|r","")
@@ -198,7 +196,7 @@ local function ECFfilterRecord(self,event,msg,player,_,_,_,flags,_,_,channelName
 	player = Ambiguate(player, "none")
 	local IsMyFriend = friends[player]
 	local good = IsMyFriend or GetGuildInfo("player") == GetGuildInfo(player) or UnitInRaid(player) or UnitInParty(player)
-	local reason = ECFfilter(event,msg,player,flags,channelName,IsMyFriend,good)
+	local reason = ECFfilter(chatChannel[event],msg,player,flags,channelName,IsMyFriend,good)
 	filterResult = not not reason
 
 	if filterResult and not good then playerCache[player] = playerCache[player] + 1 end
