@@ -6,9 +6,9 @@ local _G = _G
 -- Lua
 local format, ipairs, max, min, next, pairs, select, tconcat, tonumber, tremove = format, ipairs, max, min, next, pairs, select, table.concat, tonumber, tremove
 -- WoW
-local Ambiguate, BNGetFriendGameAccountInfo, BNGetNumFriends, BNGetNumFriendGameAccounts, C_Timer_After, ChatTypeInfo, GetAchievementLink, GetFriendInfo, GetGuildInfo, GetItemInfo, GetNumFriends, GetPlayerInfoByGUID, UnitExists, UnitInParty, UnitInRaid = Ambiguate, BNGetFriendGameAccountInfo, BNGetNumFriends, BNGetNumFriendGameAccounts, C_Timer.After, ChatTypeInfo, GetAchievementLink, GetFriendInfo, GetGuildInfo, GetItemInfo, GetNumFriends, GetPlayerInfoByGUID, UnitExists, UnitInParty, UnitInRaid
+local Ambiguate, BNGetFriendGameAccountInfo, BNGetNumFriends, BNGetNumFriendGameAccounts, C_Timer_After, ChatTypeInfo, GetAchievementLink, GetFriendInfo, GetGuildInfo, GetItemInfo, GetNumFriends, GetPlayerInfoByGUID, RAID_CLASS_COLORS, UnitExists, UnitInParty, UnitInRaid = Ambiguate, BNGetFriendGameAccountInfo, BNGetNumFriends, BNGetNumFriendGameAccounts, C_Timer.After, ChatTypeInfo, GetAchievementLink, GetFriendInfo, GetGuildInfo, GetItemInfo, GetNumFriends, GetPlayerInfoByGUID, RAID_CLASS_COLORS, UnitExists, UnitInParty, UnitInRaid
 
--- GLOBALS: NUM_CHAT_WINDOWS, RAID_CLASS_COLORS
+-- GLOBALS: NUM_CHAT_WINDOWS
 
 local playerName, playerServer = GetUnitName("player"), GetRealmName()
 
