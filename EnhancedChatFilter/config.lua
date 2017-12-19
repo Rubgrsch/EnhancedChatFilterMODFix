@@ -148,15 +148,15 @@ end
 
 --------------- Options ---------------
 --These settings won't be saved
-local wordChosenDefault = {"", false, false} -- string, regex, lesser
 C.UI = {
 	regexToggle = false,
 	lesserToggle = false,
 	lootType = "ITEMS",
 	stringIO = "",-- blackWord input
-	wordChosen = wordChosenDefault,
 	lootIDChosen = nil,
 	lootTypeChosen = nil,
+	wordChosen = "",
+	wordChosenIsLesser = false,
 }
 
 local colorT = {} -- used in lootFilter
@@ -305,8 +305,11 @@ options.args.blackListTab = {
 			type = "select",
 			name = L["BlackwordList"],
 			order = 1,
-			get = function() return C.UI.wordChosen[3] and "" or C.UI.wordChosen[1] end,
-			set = function(_,value) C.UI.wordChosen = {value, not C.db.normalWordsList[value], false} end,
+			get = function() return not C.UI.wordChosenIsLesser and C.UI.wordChosen end,
+			set = function(_,value)
+				C.UI.wordChosen = value
+				C.UI.wordChosenIsLesser = false
+			end,
 			values = function()
 				local blacklistname = {}
 				for key,v in pairs(C.db.regexWordsList) do if not v.lesser then blacklistname[key] = key end end
@@ -318,8 +321,11 @@ options.args.blackListTab = {
 			type = "select",
 			name = L["LesserBlackwordList"],
 			order = 2,
-			get = function() return C.UI.wordChosen[3] and C.UI.wordChosen[1] or "" end,
-			set = function(_,value) C.UI.wordChosen = {value, not C.db.normalWordsList[value], true} end,
+			get = function() return C.UI.wordChosenIsLesser and C.UI.wordChosen end,
+			set = function(_,value)
+				C.UI.wordChosen = value
+				C.UI.wordChosenIsLesser = true
+			end,
 			values = function()
 				local blacklistname = {}
 				for key,v in pairs(C.db.regexWordsList) do if v.lesser then blacklistname[key] = key end end
@@ -333,11 +339,11 @@ options.args.blackListTab = {
 			name = REMOVE,
 			order = 3,
 			func = function()
-				(C.UI.wordChosen[2] and C.db.regexWordsList or C.db.normalWordsList)[C.UI.wordChosen[1]] = nil
-				C.UI.wordChosen = wordChosenDefault
+				(C.db.regexWordsList[C.UI.wordChosen] and C.db.regexWordsList or C.db.normalWordsList)[C.UI.wordChosen] = nil
+				C.UI.wordChosen = ""
 				updateBlackWordTable()
 			end,
-			disabled = function() return C.UI.wordChosen[1] == "" end,
+			disabled = function() return C.UI.wordChosen == "" end,
 		},
 		ClearUpButton = {
 			type = "execute",
@@ -345,7 +351,7 @@ options.args.blackListTab = {
 			order = 4,
 			func = function()
 				C.db.regexWordsList, C.db.normalWordsList = {}, {}
-				C.UI.wordChosen = wordChosenDefault
+				C.UI.wordChosen = ""
 				updateBlackWordTable()
 			end,
 			confirm = true,
