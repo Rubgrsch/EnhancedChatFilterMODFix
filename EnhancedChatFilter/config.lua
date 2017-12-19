@@ -153,10 +153,10 @@ C.UI = {
 	lesserToggle = false,
 	lootType = "ITEMS",
 	stringIO = "",-- blackWord input
-	lootIDChosen = nil,
-	lootTypeChosen = nil,
 	wordChosen = "",
 	wordChosenIsLesser = false,
+	lootIDChosen = false,
+	lootTypeChosen = "",
 }
 
 local colorT = {} -- used in lootFilter
@@ -488,7 +488,7 @@ options.args.lootFilter = {
 			order = 3,
 			func = function()
 				(C.UI.lootTypeChosen == "ITEMS" and C.db.lootItemFilterList or C.db.lootCurrencyFilterList)[C.UI.lootIDChosen] = nil
-				C.UI.lootIDChosen = nil
+				C.UI.lootIDChosen = false
 			end,
 			disabled = function() return not C.UI.lootIDChosen end,
 		},
@@ -496,7 +496,7 @@ options.args.lootFilter = {
 			type = "execute",
 			name = L["ClearUp"],
 			order = 4,
-			func = function() C.db.lootItemFilterList, C.db.lootCurrencyFilterList, C.UI.lootIDChosen = {}, {}, nil end,
+			func = function() C.db.lootItemFilterList, C.db.lootCurrencyFilterList, C.UI.lootIDChosen = {}, {}, false end,
 			confirm = true,
 			confirmText = format(L["DoYouWantToClear"],L["LootFilter"]),
 			disabled = function() return next(C.db.lootItemFilterList) == nil and next(C.db.lootCurrencyFilterList) == nil end,
