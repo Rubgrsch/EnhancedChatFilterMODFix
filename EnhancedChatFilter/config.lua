@@ -10,10 +10,11 @@ local GetCurrencyLink, GetItemInfo, ITEMS = GetCurrencyLink, GetItemInfo, ITEMS
 local LibStub = LibStub
 
 -- DB Version Check
-local currentVer, lastCompatibleVer = 1, 0
+local currentVer, lastCompatibleVer = 2, 0
 local versionTable = {
 	[0] = "???", -- Too old
 	[1] = "7.3.0-3",
+	[2] = "7.3.2-2",
 }
 
 --Default Options
@@ -26,7 +27,7 @@ local defaults = {
 	enableDSS = true, -- Spec spell Filter
 	enableMSF = false, -- Monster Say Filter
 	enableAggressive = false, -- Aggressive Filter
-	chatLinesLimit = 20, -- also enable repeatFilter
+	enableRepeat = true, -- repeatFilter
 	repeatFilterGroup = true, -- repeatFilter enabled in group and raid
 	regexWordsList = {},
 	normalWordsList = {},
@@ -134,6 +135,7 @@ ecf.init[#ecf.init+1] = function()
 			(v.regex and C.db.regexWordsList or C.db.normalWordsList)[k] = {lesser = v.lesser}
 		end
 	end
+	if C.db.chatLinesLimit then C.db.enableRepeat = C.db.chatLinesLimit > 0 end -- 2
 	-- End of DB conversion
 	C.db.DBversion = currentVer
 	for k in pairs(C.db) do if defaults[k] == nil then C.db[k] = nil end end -- remove old keys
@@ -267,32 +269,18 @@ options.args.General = {
 			name = L["RepeatOptions"],
 			order = 40,
 		},
-		chatLinesLimit = { -- only shown in advanced mode
-			type = "range",
-			name = L["chatLinesLimit"],
-			desc = L["chatLinesLimitTooltips"],
-			order = 41,
-			min = 0,
-			max = 100,
-			step = 1,
-			bigStep = 5,
-			hidden = adv,
-		},
-		repeatToggle = { -- only shown in non-advanced mode
+		enableRepeat = {
 			type = "toggle",
 			name = L["RepeatFilter"],
 			desc = L["RepeatFilterTooltips"],
 			order = 41,
-			get = function() return C.db.chatLinesLimit ~= 0 end,
-			set = function(_,value) C.db.chatLinesLimit = value and defaults.chatLinesLimit or 0 end,
-			hidden = function() return C.db.advancedConfig end,
 		},
 		repeatFilterGroup = {
 			type = "toggle",
 			name = L["FilterGroup"],
 			desc = L["FilterGroupTooltips"],
 			order = 42,
-			disabled = function() return C.db.chatLinesLimit == 0 end,
+			disabled = function() return not C.db.enableRepeat end,
 		},
 	},
 }

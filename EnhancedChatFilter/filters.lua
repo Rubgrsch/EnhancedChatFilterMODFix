@@ -169,7 +169,7 @@ local function ECFfilter(Event,msg,player,flags,channelName,IsMyFriend,good)
 	end
 
 	 --Repeat Filter
-	if C.db.chatLinesLimit > 0 and Event <= (C.db.repeatFilterGroup and 4 or 3) and not IsMyFriend then
+	if C.db.enableRepeat and Event <= (C.db.repeatFilterGroup and 4 or 3) and not IsMyFriend then
 		local chatLinesSize = #chatLines
 		chatLines[chatLinesSize+1] = msgtable
 		for i=1, chatLinesSize do
@@ -179,7 +179,7 @@ local function ECFfilter(Event,msg,player,flags,channelName,IsMyFriend,good)
 				return "Repeat Filter"
 			end
 		end
-		if chatLinesSize >= C.db.chatLinesLimit then tremove(chatLines, 1) end
+		if chatLinesSize >= 30 then tremove(chatLines, 1) end
 	end
 end
 
