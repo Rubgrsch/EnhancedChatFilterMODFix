@@ -4,7 +4,7 @@ local C, L, G, AC = unpack(ecf)
 
 local _G = _G
 -- Lua
-local error, ipairs, format, pairs, print, next, select, strsplit, tconcat, tonumber, type, unpack = error, ipairs, format, pairs, print, next, select, strsplit, table.concat, tonumber, type, unpack
+local error, ipairs, format, pairs, print, next, select, strsplit, tconcat, tonumber, type = error, ipairs, format, pairs, print, next, select, strsplit, table.concat, tonumber, type
 -- WoW
 local GetCurrencyLink, GetItemInfo, ITEMS = GetCurrencyLink, GetItemInfo, ITEMS
 local LibStub = LibStub
@@ -40,10 +40,6 @@ local defaults = {
 		hide = false, -- minimap
 	},
 	advancedConfig = false, -- show advancedConfig
-	debugMode = false, -- now it's the record toggle
-	record = {},
-	recordPos = 1,
-	ChatRecordOnlyShow = 1,
 	DBversion = currentVer,
 }
 
@@ -536,55 +532,6 @@ options.args.lootFilter = {
 			desc = L["LootQualityFilterTooltips"],
 			order = 51,
 			values = colorT,
-		},
-	},
-}
-options.args.debugWindow = {
-	type = "group",
-	name = L["HistoryWindow"],
-	order = 30,
-	args = {
-		debugMode = {
-			type = "toggle",
-			name = L["ChatHistory"],
-			desc = L["ChatHistoryTooltips"],
-			order = 1,
-		},
-		clearRecord = {
-			type = "execute",
-			name = L["ClearHistory"],
-			order = 2,
-			func = function() C.db.record, C.db.recordPos = {}, 1 end
-		},
-		ChatRecordOnlyShow = {
-			type = "select",
-			name = "",
-			order = 3,
-			values = {L["ShowAll"], L["OnlyFiltered"], L["OnlyUnfiltered"]},
-		},
-		recordList = {
-			type = "input",
-			name = "",
-			get = function()
-				local pos, t, IsMax, showUnfilted, showFilted = C.db.recordPos, {}, #C.db.record == 500, C.db.ChatRecordOnlyShow ~= 2, C.db.ChatRecordOnlyShow ~= 3
-				for i = 1, #C.db.record do
-					local j = i
-					if IsMax then
-						j = pos + j -1
-						if j > 500 then j = j - 500 end
-					end
-					local _,msg,player,_,result = unpack(C.db.record[j])
-					if (showUnfilted and not result) or (showFilted and result) then
-						t[#t+1] = format("|TInterface\\TargetingFrame\\UI-RaidTargetingIcon_%d:0|t %s: %s",result and 7 or 2,player,msg)
-					end
-				end
-				return tconcat(t,"|n")
-			end,
-			set = function() return end,
-			multiline = 10,
-			width = "full",
-			order = 10,
-			hidden = function() return not C.db.debugMode end,
 		},
 	},
 }

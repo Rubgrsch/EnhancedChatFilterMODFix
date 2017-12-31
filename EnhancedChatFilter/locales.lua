@@ -64,14 +64,6 @@ if (locale == "zhCN") then
 --AchievementFilter
 	L["GotAchievement"] = "[%s]获得了成就%s！"
 	L["And"] = "、"
---History
-	L["HistoryWindow"] = "聊天记录"
-	L["ChatHistory"] = "开启聊天记录"
-	L["ChatHistoryTooltips"] = "开启后将记录系统信息以外的聊天信息，并可以查看哪些信息被过滤"
-	L["ClearHistory"] = "清除聊天记录"
-	L["ShowAll"] = "全部显示"
-	L["OnlyFiltered"] = "仅过滤"
-	L["OnlyUnfiltered"] = "仅未过滤"
 --Error
 	L["DBOutOfDate"] = "你的配置文件太旧了！你的配置文件版本:%s，插件最低兼容版本:%s"
 
@@ -139,14 +131,6 @@ elseif (locale == "zhTW") then
 --AchievementFilter
 	L["GotAchievement"] = "[%s]獲得了成就%s！"
 	L["And"] = "、"
---History
-	L["HistoryWindow"] = "聊天记录"
-	L["ChatHistory"] = "开启聊天记录"
-	L["ChatHistoryTooltips"] = "开启后将记录系统信息以外的聊天信息，并可以查看哪些信息被过滤"
-	L["ClearHistory"] = "清除聊天记录"
-	L["ShowAll"] = "全部显示"
-	L["OnlyFiltered"] = "仅过滤"
-	L["OnlyUnfiltered"] = "仅未过滤"
 --Error
 	L["DBOutOfDate"] = "你的配置文件太旧了！你的配置文件版本:%s，插件最低兼容版本:%s"
 
@@ -212,14 +196,6 @@ else
 --AchievementFilter
 	L["GotAchievement"] = "[%s]have earned the achievement%s!"
 	L["And"] = ", "
---History
-	L["HistoryWindow"] = "Chat History"
-	L["ChatHistory"] = "Enable Chat History"
-	L["ChatHistoryTooltips"] = "Enable chat history. This will record non-system chat msg and you can check whether they are filtered by ECF."
-	L["ClearHistory"] = "ClearHistory"
-	L["ShowAll"] = "ShowAll"
-	L["OnlyFiltered"] = "OnlyFiltered"
-	L["OnlyUnfiltered"] = "OnlyUnfiltered"
 --Error
 	L["DBOutOfDate"] = "Your profile is too old! Your profile version: %s, addon compatibal version: %s."
 end

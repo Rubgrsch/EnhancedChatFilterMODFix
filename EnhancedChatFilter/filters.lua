@@ -201,11 +201,6 @@ local function ECFfilterRecord(self,event,msg,player,_,_,_,flags,_,_,channelName
 
 	if filterResult and not good then playerCache[player] = playerCache[player] + 1 end
 
-	if C.db.debugMode then
-		C.db.record[C.db.recordPos] = {event,msg,player,flags,filterResult,reason}
-		C.db.recordPos = (C.db.recordPos >= 500 and C.db.recordPos - 500 or C.db.recordPos) + 1
-	end
-
 	return filterResult
 end
 for event in pairs(chatChannel) do ChatFrame_AddMessageEventFilter(event, ECFfilterRecord) end
