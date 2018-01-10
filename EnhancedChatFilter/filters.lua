@@ -95,10 +95,7 @@ setmetatable(playerCache, {__index=function() return 0 end})
 local chatLines = {}
 local chatChannel = {["CHAT_MSG_WHISPER"] = 1, ["CHAT_MSG_SAY"] = 2, ["CHAT_MSG_YELL"] = 2, ["CHAT_MSG_CHANNEL"] = 3, ["CHAT_MSG_PARTY"] = 4, ["CHAT_MSG_PARTY_LEADER"] = 4, ["CHAT_MSG_RAID"] = 4, ["CHAT_MSG_RAID_LEADER"] = 4, ["CHAT_MSG_RAID_WARNING"] = 4, ["CHAT_MSG_INSTANCE_CHAT"] = 4, ["CHAT_MSG_INSTANCE_CHAT_LEADER"] = 4, ["CHAT_MSG_DND"] = 101}
 
-local function ECFfilter(Event,msg,player,flags,channelName,IsMyFriend,good)
-	-- filter MeetingStone(NetEase) broad msg so it will not appear in repeatFilter
-	if channelName == "集合石" and msg:find("^[#&$@]") then return true end
-
+local function ECFfilter(Event,msg,player,flags,IsMyFriend,good)
 	-- don't filter player/GM/DEV
 	if player == playerName or flags == "GM" or flags == "DEV" then return end
 
@@ -182,10 +179,13 @@ local function ECFfilterRecord(self,event,msg,player,_,_,_,flags,_,_,channelName
 		filterResult = false
 	end
 
+	-- filter MeetingStone(NetEase) broad msg so it will not appear in repeatFilter
+	if channelName == "集合石" then return true end
+
 	player = Ambiguate(player, "none")
 	local IsMyFriend = friends[player]
 	local good = IsMyFriend or GetGuildInfo("player") == GetGuildInfo(player) or UnitInRaid(player) or UnitInParty(player)
-	filterResult = ECFfilter(chatChannel[event],msg,player,flags,channelName,IsMyFriend,good)
+	filterResult = ECFfilter(chatChannel[event],msg,player,flags,IsMyFriend,good)
 
 	if filterResult and not good then playerCache[player] = playerCache[player] + 1 end
 
