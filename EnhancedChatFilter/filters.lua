@@ -171,6 +171,9 @@ end
 
 local prevLineID, filterResult = 0, false
 local function ECFfilterRecord(self,event,msg,player,_,_,_,flags,_,_,channelName,_,lineID)
+	-- filter MeetingStone(NetEase) broad msg so it will not trigger any ECFfilters
+	if channelName == "集合石" then return true end
+
 	-- if it has been worked then use the worked result
 	if lineID == prevLineID then
 		return filterResult
@@ -178,9 +181,6 @@ local function ECFfilterRecord(self,event,msg,player,_,_,_,flags,_,_,channelName
 		prevLineID = lineID
 		filterResult = false
 	end
-
-	-- filter MeetingStone(NetEase) broad msg so it will not appear in repeatFilter
-	if channelName == "集合石" then return true end
 
 	player = Ambiguate(player, "none")
 	local IsMyFriend = friends[player]
