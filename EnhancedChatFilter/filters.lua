@@ -97,13 +97,13 @@ local chatChannel = {["CHAT_MSG_WHISPER"] = 1, ["CHAT_MSG_SAY"] = 2, ["CHAT_MSG_
 
 local function ECFfilter(Event,msg,player,flags,channelName,IsMyFriend,good)
 	-- filter MeetingStone(NetEase) broad msg so it will not appear in repeatFilter
-	if channelName == "集合石" and msg:find("^[#&$@]") then return "MeetingStone" end
+	if channelName == "集合石" and msg:find("^[#&$@]") then return true end
 
 	-- don't filter player/GM/DEV
 	if player == playerName or flags == "GM" or flags == "DEV" then return end
 
 	-- filter bad players
-	if C.db.enableAggressive and not good and playerCache[player] >= 3 then return "Bad Player" end
+	if C.db.enableAggressive and not good and playerCache[player] >= 3 then return true end
 
 	-- remove color/hypelink
 	local filterString = msg:gsub("|H.-|h(.-)|h","%1"):gsub("|c%x%x%x%x%x%x%x%x",""):gsub("|r","")
@@ -122,49 +122,38 @@ local function ECFfilter(Event,msg,player,flags,channelName,IsMyFriend,good)
 
 	--Whisper Whitelist Mode, only whisper
 	--Don't filter players from same guild/raid/party or who you have whispered
-	if C.db.enableWisper and Event == 1 and not(allowWisper[player] or good) then
-		return "WhiteListMode"
-	end
+	if C.db.enableWisper and Event == 1 and not(allowWisper[player] or good) then return true end
 
 	-- DND, whisper/yell/say/channel and auto-reply
-	if C.db.enableDND and ((Event <= 3 and flags == "DND") or Event == 101) and not IsMyFriend then
-		return "DND Filter"
-	end
+	if C.db.enableDND and ((Event <= 3 and flags == "DND") or Event == 101) and not IsMyFriend then return true end
 
 	-- Annoying Filter in AggressiveFilter
-	if C.db.enableAggressive and Event <= 3 and not IsMyFriend and (annoying >= 0.25 and annoying <= 0.8 and oriLen >= 30) then
-		return "Annoying: "..annoying
-	end
+	if C.db.enableAggressive and Event <= 3 and not IsMyFriend and (annoying >= 0.25 and annoying <= 0.8 and oriLen >= 30) then return true end
 
 	--blackWord Filter, whisper/yell/say/channel and party/raid(optional)
 	if Event <= (C.db.blackWordFilterGroup and 4 or 3) and not IsMyFriend then
-		local count, keyWord = AC:Match(msgtable[2],AC.BuiltBlackWordTable)
+		local count = AC:Match(msgtable[2],AC.BuiltBlackWordTable)
 		if count ~= -1 then -- if no non-lesser word in normalBlackWordList matches
 			for k,v in pairs(C.db.regexWordsList) do
 				if filterString:find(k) then
-					if v.lesser then count = count + 1 else count, keyWord = -1, k;break end
+					if v.lesser then count = count + 1 else count = -1;break end
 				end
 			end
 		end
-		if count == -1 then return "Keyword: "..keyWord end
-		if count >= C.db.lesserBlackWordThreshold then return "LesserKeywords x"..count end
+		if count == -1 or count >= C.db.lesserBlackWordThreshold then return true end
 	end
 
 	-- raidAlert
 	if C.db.enableRAF and (Event <= 2 or Event == 4) then
 		for _,RaidAlertTag in ipairs(RaidAlertTagList) do
-			if msg:find(RaidAlertTag) then
-				return RaidAlertTag.." in RaidAlertTag"
-			end
+			if msg:find(RaidAlertTag) then return true end
 		end
 	end
 
 	-- questReport and partyAnnounce
 	if C.db.enableQRF and (Event <= 2 or Event == 4) then
 		for _,QuestReportTag in ipairs(QuestReportTagList) do
-			if msg:find(QuestReportTag) then
-				return QuestReportTag.." in QuestReportTag"
-			end
+			if msg:find(QuestReportTag) then return true end
 		end
 	end
 
@@ -176,7 +165,7 @@ local function ECFfilter(Event,msg,player,flags,channelName,IsMyFriend,good)
 			--if there is not much difference between msgs, filter it
 			if chatLines[i][1] == msgtable[1] and strDiff(chatLines[i][2],msgtable[2]) <= 0.1 then
 				tremove(chatLines, i)
-				return "Repeat Filter"
+				return true
 			end
 		end
 		if chatLinesSize >= 30 then tremove(chatLines, 1) end
@@ -196,8 +185,7 @@ local function ECFfilterRecord(self,event,msg,player,_,_,_,flags,_,_,channelName
 	player = Ambiguate(player, "none")
 	local IsMyFriend = friends[player]
 	local good = IsMyFriend or GetGuildInfo("player") == GetGuildInfo(player) or UnitInRaid(player) or UnitInParty(player)
-	local reason = ECFfilter(chatChannel[event],msg,player,flags,channelName,IsMyFriend,good)
-	filterResult = not not reason
+	filterResult = ECFfilter(chatChannel[event],msg,player,flags,channelName,IsMyFriend,good)
 
 	if filterResult and not good then playerCache[player] = playerCache[player] + 1 end
 
