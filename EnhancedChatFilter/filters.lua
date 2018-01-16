@@ -125,7 +125,7 @@ local function ECFfilter(Event,msg,player,flags,IsMyFriend,good)
 	if C.db.enableDND and ((Event <= 3 and flags == "DND") or Event == 101) and not IsMyFriend then return true end
 
 	-- Annoying Filter in AggressiveFilter
-	if C.db.enableAggressive and Event <= 3 and not IsMyFriend and (annoying >= 0.25 and annoying <= 0.8 and oriLen >= 30) then return true end
+	if C.db.enableAggressive and Event <= 3 and not IsMyFriend and (annoying >= 0.25 and oriLen >= 30) then return true end
 
 	--blackWord Filter, whisper/yell/say/channel and party/raid(optional)
 	if Event <= (C.db.blackWordFilterGroup and 4 or 3) and not IsMyFriend then
