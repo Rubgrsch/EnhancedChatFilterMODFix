@@ -93,7 +93,7 @@ local playerCache = {}
 setmetatable(playerCache, {__index=function() return 0 end})
 
 local chatLines = {}
-local chatChannel = {["CHAT_MSG_WHISPER"] = 1, ["CHAT_MSG_SAY"] = 2, ["CHAT_MSG_YELL"] = 2, ["CHAT_MSG_CHANNEL"] = 3, ["CHAT_MSG_PARTY"] = 4, ["CHAT_MSG_PARTY_LEADER"] = 4, ["CHAT_MSG_RAID"] = 4, ["CHAT_MSG_RAID_LEADER"] = 4, ["CHAT_MSG_RAID_WARNING"] = 4, ["CHAT_MSG_INSTANCE_CHAT"] = 4, ["CHAT_MSG_INSTANCE_CHAT_LEADER"] = 4, ["CHAT_MSG_DND"] = 101}
+local chatChannel = {["CHAT_MSG_WHISPER"] = 1, ["CHAT_MSG_SAY"] = 2, ["CHAT_MSG_YELL"] = 2, ["CHAT_MSG_CHANNEL"] = 3, ["CHAT_MSG_PARTY"] = 4, ["CHAT_MSG_PARTY_LEADER"] = 4, ["CHAT_MSG_RAID"] = 4, ["CHAT_MSG_RAID_LEADER"] = 4, ["CHAT_MSG_RAID_WARNING"] = 4, ["CHAT_MSG_INSTANCE_CHAT"] = 4, ["CHAT_MSG_INSTANCE_CHAT_LEADER"] = 4, ["CHAT_MSG_DND"] = 101, ["CHAT_MSG_EMOTE"] = 102}
 
 local function ECFfilter(Event,msg,player,flags,IsMyFriend,good)
 	-- don't filter player/GM/DEV
@@ -125,10 +125,10 @@ local function ECFfilter(Event,msg,player,flags,IsMyFriend,good)
 	if C.db.enableDND and ((Event <= 3 and flags == "DND") or Event == 101) and not IsMyFriend then return true end
 
 	-- Annoying Filter in AggressiveFilter
-	if C.db.enableAggressive and Event <= 3 and not IsMyFriend and (annoying >= 0.25 and oriLen >= 30) then return true end
+	if C.db.enableAggressive and (Event <= 3 or Event == 102) and not IsMyFriend and (annoying >= 0.25 and oriLen >= 30) then return true end
 
 	--blackWord Filter, whisper/yell/say/channel and party/raid(optional)
-	if Event <= (C.db.blackWordFilterGroup and 4 or 3) and not IsMyFriend then
+	if (Event <= (C.db.blackWordFilterGroup and 4 or 3) or Event == 102) and not IsMyFriend then
 		local count = AC:Match(msgtable[2],AC.BuiltBlackWordTable)
 		if count ~= -1 then -- if no non-lesser word in normalBlackWordList matches
 			for k,v in pairs(C.db.regexWordsList) do
@@ -155,7 +155,7 @@ local function ECFfilter(Event,msg,player,flags,IsMyFriend,good)
 	end
 
 	 --Repeat Filter
-	if C.db.enableRepeat and Event <= (C.db.repeatFilterGroup and 4 or 3) and not IsMyFriend then
+	if C.db.enableRepeat and (Event <= (C.db.repeatFilterGroup and 4 or 3) or Event == 102) and not IsMyFriend then
 		local chatLinesSize = #chatLines
 		chatLines[chatLinesSize+1] = msgtable
 		for i=1, chatLinesSize do
