@@ -13,21 +13,14 @@ local ipairs = ipairs
 local InterfaceOptionsFrame_OpenToCategory, ShowFriends = InterfaceOptionsFrame_OpenToCategory, ShowFriends
 local LibStub = LibStub
 
--- GLOBALS: SLASH_ECF1
-
---method run on /ecf
-local function ECFOpen()
-	InterfaceOptionsFrame_OpenToCategory(addonName)
-end
-SlashCmdList.ECF = ECFOpen
-SLASH_ECF1 = "/ecf"
-
 --MinimapIcon
 local ecfLDB = LibStub("LibDataBroker-1.1"):NewDataObject(addonName, {
 	type = "data source",
 	text = addonName,
 	icon = "Interface\\Icons\\Trade_Archaeology_Orc_BloodText",
-	OnClick = ECFOpen,
+	OnClick = function()
+		InterfaceOptionsFrame_OpenToCategory(addonName)
+	end,
 	OnTooltipShow = function(tooltip) tooltip:AddLine(L["ClickToOpenConfig"]) end
 })
 
