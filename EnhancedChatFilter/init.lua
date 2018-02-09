@@ -30,6 +30,7 @@ frame:SetScript("OnEvent", function(self,event,name)
 	if name == addonName then
 		self:UnregisterEvent(event)
 		for _,f in ipairs(ecf.init) do f() end
+		ecf.init = nil
 		LibStub("LibDBIcon-1.0"):Register(addonName, ecfLDB, C.db.minimap)
 		ShowFriends()
 	end
