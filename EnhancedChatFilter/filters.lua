@@ -1,6 +1,6 @@
 -- ECF
 local _, ecf = ...
-local C, L, G, AC = unpack(ecf)
+local C, L, G = unpack(ecf)
 
 local _G = _G
 -- Lua
@@ -129,15 +129,13 @@ local function ECFfilter(Event,msg,player,flags,IsMyFriend,good)
 
 	--blackWord Filter, whisper/yell/say/channel and party/raid(optional)
 	if Event <= (C.db.blackWordFilterGroup and 4 or 3) and not IsMyFriend then
-		local count = AC:Match(msgtable[2],AC.BuiltBlackWordTable)
-		if count ~= -1 then -- if no non-lesser word in normalBlackWordList matches
-			for k,v in pairs(C.db.regexWordsList) do
-				if filterString:find(k) then
-					if v.lesser then count = count + 1 else count = -1;break end
-				end
+		local count = 0
+		for k,v in pairs(C.db.blackWordList) do
+			if filterString:find(k) then
+				if v.lesser then count = count + 1 else return true end
 			end
 		end
-		if count == -1 or count >= C.db.lesserBlackWordThreshold then return true end
+		if count >= C.db.lesserBlackWordThreshold then return true end
 	end
 
 	-- raidAlert

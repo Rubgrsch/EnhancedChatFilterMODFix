@@ -1,6 +1,6 @@
 -- ECF
 local addonName, ecf = ...
-local C, L, G, AC = unpack(ecf)
+local C, L, G = unpack(ecf)
 
 local _G = _G
 -- Lua
@@ -10,11 +10,12 @@ local GetCurrencyLink, GetItemInfo, ITEMS = GetCurrencyLink, GetItemInfo, ITEMS
 local LibStub = LibStub
 
 -- DB Version Check
-local currentVer, lastCompatibleVer = 2, 0
+local currentVer, lastCompatibleVer = 3, 0
 local versionTable = {
 	[0] = "???", -- Too old
 	[1] = "7.3.0-3",
 	[2] = "7.3.2-2",
+	[3] = "7.3.5-1",
 }
 
 --Default Options
@@ -29,8 +30,7 @@ local defaults = {
 	enableAggressive = false, -- Aggressive Filter
 	enableRepeat = true, -- repeatFilter
 	repeatFilterGroup = true, -- repeatFilter enabled in group and raid
-	regexWordsList = {},
-	normalWordsList = {},
+	blackWordList = {},
 	lesserBlackWordThreshold = 3, -- in lesserBlackWord
 	blackWordFilterGroup = false, -- blackWord enabled in group and raid
 	lootItemFilterList = {[118043] = true, [71096] = true, [49655] = true}, -- item list, [id] = true
@@ -113,10 +113,6 @@ local function checkBlacklist(blackWord, r)
 	if newWord ~= blackWord or blackWord == "" then return true end -- Also report "" as invalid
 end
 
-local function updateBlackWordTable()
-	AC.BuiltBlackWordTable = AC:Build(C.db.normalWordsList)
-end
-
 --Initialize and convert old config to new one
 ecf.init[#ecf.init+1] = function()
 	if type(ecfDB) ~= "table" or next(ecfDB) == nil then ecfDB = defaults
@@ -126,12 +122,15 @@ ecf.init[#ecf.init+1] = function()
 	for k,v in pairs(defaults) do if C.db[k] == nil then C.db[k] = v end end -- fallback to defaults
 	if C.db.DBversion < lastCompatibleVer then error(format(L["DBOutOfDate"],versionTable[C.db.DBversion],versionTable[lastCompatibleVer])) end
 	-- Start of DB Conversion
-	if C.db.blackWordList then -- Compatible for 1
-		for k,v in pairs(C.db.blackWordList) do
-			(v.regex and C.db.regexWordsList or C.db.normalWordsList)[k] = {lesser = v.lesser}
+	if C.db.chatLinesLimit then C.db.enableRepeat = C.db.chatLinesLimit > 0 end -- Compatible for 2
+	if C.db.normalWordsList then -- 3
+		for k,v in pairs(C.db.normalWordsList) do
+			C.db.blackWordList[k] = {lesser = v.lesser, regex = false}
+		end
+		for k,v in pairs(C.db.regexWordsList) do
+			C.db.blackWordList[k] = {lesser = v.lesser, regex = true}
 		end
 	end
-	if C.db.chatLinesLimit then C.db.enableRepeat = C.db.chatLinesLimit > 0 end -- 2
 	-- End of DB conversion
 	C.db.DBversion = currentVer
 	for k in pairs(C.db) do if defaults[k] == nil then C.db[k] = nil end end -- remove old keys
@@ -141,7 +140,6 @@ ecf.init[#ecf.init+1] = function()
 	for Id, info in pairs(C.db.lootCurrencyFilterList) do
 		if info == true then C.db.lootCurrencyFilterList[Id] = GetCurrencyLink(Id) end
 	end
-	updateBlackWordTable()
 end
 
 --------------- Options ---------------
@@ -166,11 +164,7 @@ local function AddBlackWord(word, r, l)
 	if checkBlacklist(word, r) then
 		print(format(L["IncludeAutofilteredWord"],word))
 	else
-		if r then
-			C.db.regexWordsList[word] = {lesser = l}
-		else
-			C.db.normalWordsList[word:upper()] = {lesser = l}
-		end
+		C.db.blackWordList[r and word or word:upper()] = {lesser = l, regex = not not r}
 	end
 end
 
@@ -296,8 +290,7 @@ options.args.blackListTab = {
 			end,
 			values = function()
 				local blacklistname = {}
-				for key,v in pairs(C.db.regexWordsList) do if not v.lesser then blacklistname[key] = key end end
-				for key,v in pairs(C.db.normalWordsList) do if not v.lesser then blacklistname[key] = key end end
+				for key,v in pairs(C.db.blackWordList) do if not v.lesser then blacklistname[key] = key end end
 				return blacklistname
 			end,
 		},
@@ -312,8 +305,7 @@ options.args.blackListTab = {
 			end,
 			values = function()
 				local blacklistname = {}
-				for key,v in pairs(C.db.regexWordsList) do if v.lesser then blacklistname[key] = key end end
-				for key,v in pairs(C.db.normalWordsList) do if v.lesser then blacklistname[key] = key end end
+				for key,v in pairs(C.db.blackWordList) do if v.lesser then blacklistname[key] = key end end
 				return blacklistname
 			end,
 			hidden = adv
@@ -323,9 +315,8 @@ options.args.blackListTab = {
 			name = REMOVE,
 			order = 3,
 			func = function()
-				(C.db.regexWordsList[C.UI.wordChosen] and C.db.regexWordsList or C.db.normalWordsList)[C.UI.wordChosen] = nil
+				C.db.blackWordList[C.UI.wordChosen] = nil
 				C.UI.wordChosen = ""
-				updateBlackWordTable()
 			end,
 			disabled = function() return C.UI.wordChosen == "" end,
 		},
@@ -334,13 +325,12 @@ options.args.blackListTab = {
 			name = L["ClearUp"],
 			order = 4,
 			func = function()
-				C.db.regexWordsList, C.db.normalWordsList = {}, {}
+				C.db.blackWordList = {}
 				C.UI.wordChosen = ""
-				updateBlackWordTable()
 			end,
 			confirm = true,
 			confirmText = format(L["DoYouWantToClear"],L["BlackList"]),
-			disabled = function() return next(C.db.regexWordsList) == nil and next(C.db.normalWordsList) == nil end,
+			disabled = function() return next(C.db.blackWordList) == nil end,
 		},
 		line1 = {
 			type = "header",
@@ -352,10 +342,7 @@ options.args.blackListTab = {
 			name = L["AddBlackWordTitle"],
 			order = 11,
 			get = nil,
-			set = function(_,value)
-				AddBlackWord(value, C.UI.regexToggle, C.UI.lesserToggle)
-				updateBlackWordTable()
-			end,
+			set = function(_,value) AddBlackWord(value, C.UI.regexToggle, C.UI.lesserToggle) end,
 		},
 		regexToggle = {
 			type = "toggle",
@@ -409,11 +396,9 @@ options.args.blackListTab = {
 					for _, blacklist in ipairs({strsplit(";", wordString)}) do
 						if blacklist ~= nil then
 							local imNewWord, r, l = strsplit(",",blacklist)
-							r, l = r == "r", l == "l"
-							AddBlackWord(imNewWord, r, l)
+							AddBlackWord(imNewWord, r == "r", l == "l")
 						end
 					end
-					updateBlackWordTable()
 				end
 				C.UI.stringIO = ""
 			end,
@@ -425,11 +410,8 @@ options.args.blackListTab = {
 			order = 32,
 			func = function()
 				local blackStringList = {}
-				for key,v in pairs(C.db.regexWordsList) do
-					blackStringList[#blackStringList+1] = format("%s,r,%s",key,v.lesser and "l" or "")
-				end
-				for key,v in pairs(C.db.normalWordsList) do
-					blackStringList[#blackStringList+1] = format("%s,,%s",key,v.lesser and "l" or "")
+				for key,v in pairs(C.db.blackWordList) do
+					blackStringList[#blackStringList+1] = format("%s,%s,%s",key,v.regex and "r" or "",v.lesser and "l" or "")
 				end
 				local blackString = tconcat(blackStringList,";")
 				C.UI.stringIO = blackString.."@"..StringHash(blackString)

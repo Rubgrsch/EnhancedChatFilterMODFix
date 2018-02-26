@@ -3,7 +3,6 @@ local addonName, ecf = ...
 ecf[1] = {} -- Config
 ecf[2] = {} -- Locales
 ecf[3] = {} -- Globals
-ecf[4] = {} -- AC
 ecf.init = {}
 local C, L = unpack(ecf)
 

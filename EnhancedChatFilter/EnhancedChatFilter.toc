@@ -17,4 +17,3 @@ init.lua
 locales.lua
 config.lua
 filters.lua
-AC.lua
