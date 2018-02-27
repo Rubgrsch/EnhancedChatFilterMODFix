@@ -48,13 +48,13 @@ local defaults = {
 local function utf8charbytes(s, i)
 	local c = s:byte(i or 1)
 	-- determine bytes needed for character, based on RFC 3629
-	if c > 0 and c <= 127 then
+	if c <= 127 then
 		return 1
-	elseif c >= 194 and c <= 223 then
+	elseif c <= 223 then
 		return 2
-	elseif c >= 224 and c <= 239 then
+	elseif c <= 239 then
 		return 3
-	elseif c >= 240 and c <= 244 then
+	elseif c <= 244 then
 		return 4
 	end
 end
@@ -157,7 +157,7 @@ C.UI = {
 
 local colorT = {} -- used in lootFilter
 for i=0, 4 do
-	colorT[i]=format("%s%s|r",ITEM_QUALITY_COLORS[i].hex,_G["ITEM_QUALITY"..i.."_DESC"])
+	colorT[i]=ITEM_QUALITY_COLORS[i].hex.._G["ITEM_QUALITY"..i.."_DESC"].."|r"
 end
 
 local function AddBlackWord(word, r, l)
@@ -172,7 +172,7 @@ local function adv() return not C.db.advancedConfig end
 
 local options = {
 	type = "group",
-	name = format("%s %s",addonName,GetAddOnMetadata(addonName, "Version")),
+	name = addonName.." "..GetAddOnMetadata(addonName, "Version"),
 	get = function(info) return (C.db[info[#info]] ~= nil and C.db or C.UI)[info[#info]] end,
 	set = function(info, value) (C.db[info[#info]] ~= nil and C.db or C.UI)[info[#info]] = value end,
 	childGroups = "tab",
@@ -284,10 +284,7 @@ options.args.blackListTab = {
 			name = L["BlackwordList"],
 			order = 1,
 			get = function() return not C.UI.wordChosenIsLesser and C.UI.wordChosen end,
-			set = function(_,value)
-				C.UI.wordChosen = value
-				C.UI.wordChosenIsLesser = false
-			end,
+			set = function(_,value) C.UI.wordChosen, C.UI.wordChosenIsLesser = value, false end,
 			values = function()
 				local blacklistname = {}
 				for key,v in pairs(C.db.blackWordList) do if not v.lesser then blacklistname[key] = key end end
@@ -299,10 +296,7 @@ options.args.blackListTab = {
 			name = L["LesserBlackwordList"],
 			order = 2,
 			get = function() return C.UI.wordChosenIsLesser and C.UI.wordChosen end,
-			set = function(_,value)
-				C.UI.wordChosen = value
-				C.UI.wordChosenIsLesser = true
-			end,
+			set = function(_,value) C.UI.wordChosen, C.UI.wordChosenIsLesser = value, true end,
 			values = function()
 				local blacklistname = {}
 				for key,v in pairs(C.db.blackWordList) do if v.lesser then blacklistname[key] = key end end
