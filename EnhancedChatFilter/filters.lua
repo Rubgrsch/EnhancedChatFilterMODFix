@@ -4,7 +4,7 @@ local C, L, G = unpack(ecf)
 
 local _G = _G
 -- Lua
-local format, ipairs, max, min, next, pairs, select, tconcat, tonumber, tremove = format, ipairs, max, min, next, pairs, select, table.concat, tonumber, tremove
+local format, ipairs, max, min, next, pairs, select, tconcat, tonumber, tremove, twipe = format, ipairs, max, min, next, pairs, select, table.concat, tonumber, tremove, table.wipe
 -- WoW
 local Ambiguate, BNGetFriendGameAccountInfo, BNGetNumFriends, BNGetNumFriendGameAccounts, C_Timer_After, ChatTypeInfo, GetAchievementLink, GetFriendInfo, GetGuildInfo, GetItemInfo, GetNumFriends, GetPlayerInfoByGUID, RAID_CLASS_COLORS, UnitExists, UnitInParty, UnitInRaid = Ambiguate, BNGetFriendGameAccountInfo, BNGetNumFriends, BNGetNumFriendGameAccounts, C_Timer.After, ChatTypeInfo, GetAchievementLink, GetFriendInfo, GetGuildInfo, GetItemInfo, GetNumFriends, GetPlayerInfoByGUID, RAID_CLASS_COLORS, UnitExists, UnitInParty, UnitInRaid
 
@@ -51,7 +51,7 @@ local friendFrame = CreateFrame("Frame")
 friendFrame:RegisterEvent("FRIENDLIST_UPDATE")
 friendFrame:RegisterEvent("BN_FRIEND_INFO_CHANGED")
 friendFrame:SetScript("OnEvent", function(self)
-	friends = {}
+	twipe(friends)
 	--Add WoW friends
 	for i = 1, GetNumFriends() do
 		local name = GetFriendInfo(i)
@@ -75,9 +75,11 @@ ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER_INFORM", addToAllowWisper)
 --strDiff for repeatFilter, ranged from 0 to 1, while 0 is absolutely the same
 --This function is not utf8 awared, currently not nessesary
 --strsub(s,i,i) is really SLOW. Don't use it.
+local last, this = {}, {}
 local function strDiff(sA, sB) -- arrays of byte
 	local len_a, len_b = #sA, #sB
-	local last, this = {}, {}
+	twipe(last)
+	twipe(this)
 	for j=0, len_b do last[j+1] = j end
 	for i=1, len_a do
 		this[1] = i
