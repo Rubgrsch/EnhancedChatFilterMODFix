@@ -30,8 +30,9 @@ G.UTF8Symbols = {
 	['|']='',['@']='',['!']='',['/']='',['<']='',['>']='',['"']='',['`']='',['_']='',["'"]='',
 	['#']='',['&']='',[';']='',[':']='',['~']='',['\\']='',['=']='',
 }
-local RaidAlertTagList = {"%*%*.+%*%*", "EUI[:_]", "PS 死亡: .+>", "|Hspell.+ [=%-]> ", "受伤源自 |Hspell", "Fatality:.+> ", "已打断.*|Hspell", "打断→|Hspell", "打断：.+|Hspell", "成功打断>.+<的%-"}  -- RaidAlert Tag
-local QuestReportTagList = {"任务进度提示", "%(任务完成%)", "<大脚", "接受任务[%]:]", "进度:.+: %d+/%d+", "【网%.易%.有%.爱】", "任务.*%[%d+%].+ 已完成!"} -- QuestReport Tag
+local RaidAlertTagList = {"%*%*.+%*%*", "EUI[:_]", "PS 死亡: .+>", "|Hspell.+ [=%-]> ", "受伤源自 |Hspell", "Fatality:.+> ", "已打断.*|Hspell", "打断→|Hspell", "打断：.+|Hspell", "成功打断>.+<的%-"}
+local QuestReportTagList = {"任务进度提示", "%(任务完成%)", "<大脚", "接受任务[%]:]", "进度:.+: %d+/%d+", "【网%.易%.有%.爱】", "任务.*%[%d+%].+ 已完成!"}
+local AggressiveTagList = {"|Hjournal"}
 G.RegexCharList = "[().%%%+%-%*?%[%]$^{}]" -- won't work on regex blackWord, but works on others
 
 local function SendMessage(event, msg)
@@ -128,7 +129,12 @@ local function ECFfilter(Event,msg,player,flags,IsMyFriend,good)
 	if C.db.enableDND and ((Event <= 3 and flags == "DND") or Event == 101) and not IsMyFriend then return true end
 
 	-- Annoying Filter in AggressiveFilter
-	if C.db.enableAggressive and (Event <= 3) and not IsMyFriend and (annoying >= 0.25 and oriLen >= 30) then return true end
+	if C.db.enableAggressive and (Event <= 3) and not IsMyFriend then
+		if (annoying >= 0.25 and oriLen >= 30) then return true end
+		for tag in ipairs(AggressiveTagList) do
+			if msg:find(tag) then return true end
+		end
+	end
 
 	--blackWord Filter, whisper/yell/say/channel and party/raid(optional)
 	if Event <= (C.db.blackWordFilterGroup and 4 or 3) and not IsMyFriend then
