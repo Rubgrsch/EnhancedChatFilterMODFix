@@ -10,12 +10,13 @@ local GetCurrencyLink, GetItemInfo, ITEMS = GetCurrencyLink, GetItemInfo, ITEMS
 local LibStub = LibStub
 
 -- DB Version Check
-local currentVer, lastCompatibleVer = 3, 0
+local currentVer, lastCompatibleVer = 4, 0
 local versionTable = {
 	[0] = "???", -- Too old
 	[1] = "7.3.0-3",
 	[2] = "7.3.2-2",
 	[3] = "7.3.5-1",
+	[4] = "7.3.5-2",
 }
 
 --Default Options
@@ -23,13 +24,14 @@ local defaults = {
 	enableWisper = false, -- Wisper WhiteMode
 	enableDND = true, -- DND
 	enableCFA = true, -- Achievement Filter
-	enableRAF = false, -- RaidAlert Filter
-	enableQRF = false, -- Quest/Group Report Filter
 	enableDSS = true, -- Spec spell Filter
 	enableMSF = false, -- Monster Say Filter
 	enableAggressive = false, -- Aggressive Filter
 	enableRepeat = true, -- repeatFilter
 	repeatFilterGroup = true, -- repeatFilter enabled in group and raid
+	addonRAF = false, -- RaidAlert Filter
+	addonQRF = false, -- Quest/Group Report Filter
+	addonItemLvl = false, -- iLvl announcement Filter
 	blackWordList = {},
 	lesserBlackWordThreshold = 3, -- in lesserBlackWord
 	blackWordFilterGroup = false, -- blackWord enabled in group and raid
@@ -131,6 +133,10 @@ ecf.init[#ecf.init+1] = function()
 			C.db.blackWordList[k] = {lesser = v.lesser, regex = true}
 		end
 	end
+	if C.db.enableRAF ~= nil then -- 4
+		C.db.addonRAF = C.db.enableRAF
+		C.db.addonQRF = C.db.enableQRF
+	end
 	-- End of DB conversion
 	C.db.DBversion = currentVer
 	for k in pairs(C.db) do if defaults[k] == nil then C.db[k] = nil end end -- remove old keys
@@ -217,18 +223,6 @@ options.args.General = {
 			desc = L["AchievementFilterTooltip"],
 			order = 12,
 		},
-		enableRAF = {
-			type = "toggle",
-			name = L["RaidAlert"],
-			desc = L["RaidAlertFilterTooltip"],
-			order = 13,
-		},
-		enableQRF = {
-			type = "toggle",
-			name = L["QuestReport"],
-			desc = L["QuestReportFilterTooltip"],
-			order = 14,
-		},
 		enableDSS = {
 			type = "toggle",
 			name = L["SpecSpell"],
@@ -271,6 +265,31 @@ options.args.General = {
 			desc = L["FilterGroupTooltips"],
 			order = 42,
 			disabled = function() return not C.db.enableRepeat end,
+		},
+	},
+}
+options.args.addons = {
+	type = "group",
+	name = L["Addons"],
+	order = 2,
+	args = {
+		addonRAF = {
+			type = "toggle",
+			name = L["RaidAlert"],
+			desc = L["RaidAlertFilterTooltip"],
+			order = 1,
+		},
+		addonQRF = {
+			type = "toggle",
+			name = L["QuestReport"],
+			desc = L["QuestReportFilterTooltip"],
+			order = 2,
+		},
+		addonItemLvl = {
+			type = "toggle",
+			name = L["iLvlAnnounce"],
+			desc = L["iLvlAnnounceTooltip"],
+			order = 3,
 		},
 	},
 }

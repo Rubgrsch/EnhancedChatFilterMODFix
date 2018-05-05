@@ -32,6 +32,7 @@ G.UTF8Symbols = {
 }
 local RaidAlertTagList = {"%*%*.+%*%*", "EUI[:_]", "PS 死亡: .+>", "|Hspell.+ [=%-]> ", "受伤源自 |Hspell", "Fatality:.+> ", "已打断.*|Hspell", "打断→|Hspell", "打断：.+|Hspell", "成功打断>.+<的%-"}
 local QuestReportTagList = {"任务进度提示", "%(任务完成%)", "<大脚", "接受任务[%]:]", "进度:.+: %d+/%d+", "【网%.易%.有%.爱】", "任务.*%[%d+%].+ 已完成!"}
+local iLvlTagList = {"<iLvl>", "^%-+$"}
 local AggressiveTagList = {"|Hjournal"}
 G.RegexCharList = "[().%%%+%-%*?%[%]$^{}]" -- won't work on regex blackWord, but works on others
 
@@ -148,16 +149,23 @@ local function ECFfilter(Event,msg,player,flags,IsMyFriend,good)
 	end
 
 	-- raidAlert
-	if C.db.enableRAF and (Event <= 2 or Event == 4) then
-		for _,RaidAlertTag in ipairs(RaidAlertTagList) do
-			if msg:find(RaidAlertTag) then return true end
+	if C.db.addonRAF and (Event <= 2 or Event == 4) then
+		for _,tag in ipairs(RaidAlertTagList) do
+			if msg:find(tag) then return true end
+		end
+	end
+
+	-- iLvl Announcement
+	if C.db.addonILvl and (Event <= 2 or Event == 4) then
+		for _,tag in ipairs(iLvlTagList) do
+			if msg:find(tag) then return true end
 		end
 	end
 
 	-- questReport and partyAnnounce
-	if C.db.enableQRF and (Event <= 2 or Event == 4) then
-		for _,QuestReportTag in ipairs(QuestReportTagList) do
-			if msg:find(QuestReportTag) then return true end
+	if C.db.addonQRF and (Event <= 2 or Event == 4) then
+		for _,tag in ipairs(QuestReportTagList) do
+			if msg:find(tag) then return true end
 		end
 	end
 
