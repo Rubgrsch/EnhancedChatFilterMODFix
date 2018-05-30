@@ -132,7 +132,7 @@ local function ECFfilter(Event,msg,player,flags,IsMyFriend,good)
 	-- Annoying Filter in AggressiveFilter
 	if C.db.enableAggressive and (Event <= 3) and not IsMyFriend then
 		if (annoying >= 0.25 and oriLen >= 30) then return true end
-		for tag in ipairs(AggressiveTagList) do
+		for _,tag in ipairs(AggressiveTagList) do
 			if msg:find(tag) then return true end
 		end
 	end
