@@ -29,6 +29,7 @@ G.UTF8Symbols = {
 	['▲']='',
 	['|']='',['@']='',['!']='',['/']='',['<']='',['>']='',['"']='',['`']='',['_']='',["'"]='',
 	['#']='',['&']='',[';']='',[':']='',['~']='',['\\']='',['=']='',
+	["\t"]='',["\n"]='',["\r"]='',[" "]='',
 }
 local RaidAlertTagList = {"%*%*.+%*%*", "EUI[:_]", "PS 死亡: .+>", "|Hspell.+ [=%-]> ", "受伤源自 |Hspell", "Fatality:.+> ", "已打断.*|Hspell", "打断→|Hspell", "打断：.+|Hspell", "成功打断>.+<的%-", "|Hspell.+>>"}
 local QuestReportTagList = {"任务进度提示", "%(任务完成%)", "<大脚", "接受任务[%]:]", "进度:.+: %d+/%d+", "【网%.易%.有%.爱】", "任务.*%[%d+%].+ 已完成!"}
@@ -52,7 +53,7 @@ local friends, allowWisper = {}, {}
 local friendFrame = CreateFrame("Frame")
 friendFrame:RegisterEvent("FRIENDLIST_UPDATE")
 friendFrame:RegisterEvent("BN_FRIEND_INFO_CHANGED")
-friendFrame:SetScript("OnEvent", function(self)
+friendFrame:SetScript("OnEvent", function()
 	twipe(friends)
 	--Add WoW friends
 	for i = 1, GetNumFriends() do
@@ -111,11 +112,10 @@ local function ECFfilter(Event,msg,player,flags,IsMyFriend,good)
 	local filterString = msg:gsub("|H.-|h(.-)|h","%1"):gsub("|c%x%x%x%x%x%x%x%x",""):gsub("|r","")
 	local oriLen = #filterString
 	-- remove utf-8 chars/raidicon/space/symbols
-	filterString = G.utf8replace(filterString, G.UTF8Symbols):gsub("{rt%d}",""):gsub("%s","")
-	local newfilterString = filterString:gsub(G.RegexCharList, ""):upper()
-	local annoying = (oriLen - #newfilterString) / oriLen
+	filterString = G.utf8replace(filterString, G.UTF8Symbols):gsub("{rt%d}","")
+	local msgLine = filterString:gsub(G.RegexCharList, ""):upper()
+	local annoying = (oriLen - #msgLine) / oriLen
 
-	local msgLine = newfilterString
 	if msgLine == "" then msgLine = msg end --If it has only symbols, don't change it
 
 	--msgdata
@@ -130,8 +130,8 @@ local function ECFfilter(Event,msg,player,flags,IsMyFriend,good)
 	if C.db.enableDND and ((Event <= 3 and flags == "DND") or Event == 101) and not IsMyFriend then return true end
 
 	-- Annoying Filter in AggressiveFilter
-	if C.db.enableAggressive and (Event <= 3) and not IsMyFriend then
-		if (annoying >= 0.25 and oriLen >= 30) then return true end
+	if C.db.enableAggressive and Event <= 3 and not IsMyFriend then
+		if annoying >= 0.25 and oriLen >= 30 then return true end
 		for _,tag in ipairs(AggressiveTagList) do
 			if msg:find(tag) then return true end
 		end
@@ -148,28 +148,28 @@ local function ECFfilter(Event,msg,player,flags,IsMyFriend,good)
 		if count >= C.db.lesserBlackWordThreshold then return true end
 	end
 
-	-- raidAlert
-	if C.db.addonRAF and (Event <= 2 or Event == 4) then
-		for _,tag in ipairs(RaidAlertTagList) do
-			if msg:find(tag) then return true end
+	if Event <= 2 or Event == 4 then
+		-- raidAlert
+		if C.db.addonRAF then
+			for _,tag in ipairs(RaidAlertTagList) do
+				if msg:find(tag) then return true end
+			end
+		end
+		-- iLvl Announcement
+		if C.db.addonILvl then
+			for _,tag in ipairs(iLvlTagList) do
+				if msg:find(tag) then return true end
+			end
+		end
+		-- questReport and partyAnnounce
+		if C.db.addonQRF then
+			for _,tag in ipairs(QuestReportTagList) do
+				if msg:find(tag) then return true end
+			end
 		end
 	end
 
-	-- iLvl Announcement
-	if C.db.addonILvl and (Event <= 2 or Event == 4) then
-		for _,tag in ipairs(iLvlTagList) do
-			if msg:find(tag) then return true end
-		end
-	end
-
-	-- questReport and partyAnnounce
-	if C.db.addonQRF and (Event <= 2 or Event == 4) then
-		for _,tag in ipairs(QuestReportTagList) do
-			if msg:find(tag) then return true end
-		end
-	end
-
-	 --Repeat Filter
+	--Repeat Filter
 	if C.db.enableRepeat and Event <= (C.db.repeatFilterGroup and 4 or 3) and not IsMyFriend then
 		local chatLinesSize = #chatLines
 		chatLines[chatLinesSize+1] = msgtable
@@ -190,12 +190,8 @@ local function ECFfilterRecord(self,event,msg,player,_,_,_,flags,_,_,channelName
 	if channelName == "集合石" then return true end
 
 	-- if it has been worked then use the worked result
-	if lineID == prevLineID then
-		return filterResult
-	else
-		prevLineID = lineID
-		filterResult = false
-	end
+	if lineID == prevLineID then return filterResult end
+	prevLineID = lineID
 
 	player = Ambiguate(player, "none")
 	local IsMyFriend = friends[player]
