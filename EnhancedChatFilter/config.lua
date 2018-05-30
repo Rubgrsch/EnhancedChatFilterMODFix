@@ -250,6 +250,29 @@ options.args.General = {
 		},
 		line2 = {
 			type = "header",
+			name = L["Addons"],
+			order = 30,
+		},
+		addonRAF = {
+			type = "toggle",
+			name = L["RaidAlert"],
+			desc = L["RaidAlertFilterTooltip"],
+			order = 31,
+		},
+		addonQRF = {
+			type = "toggle",
+			name = L["QuestReport"],
+			desc = L["QuestReportFilterTooltip"],
+			order = 32,
+		},
+		addonItemLvl = {
+			type = "toggle",
+			name = L["iLvlAnnounce"],
+			desc = L["iLvlAnnounceTooltip"],
+			order = 33,
+		},
+		line3 = {
+			type = "header",
 			name = L["RepeatOptions"],
 			order = 40,
 		},
@@ -265,31 +288,6 @@ options.args.General = {
 			desc = L["FilterGroupTooltips"],
 			order = 42,
 			disabled = function() return not C.db.enableRepeat end,
-		},
-	},
-}
-options.args.addons = {
-	type = "group",
-	name = L["Addons"],
-	order = 2,
-	args = {
-		addonRAF = {
-			type = "toggle",
-			name = L["RaidAlert"],
-			desc = L["RaidAlertFilterTooltip"],
-			order = 1,
-		},
-		addonQRF = {
-			type = "toggle",
-			name = L["QuestReport"],
-			desc = L["QuestReportFilterTooltip"],
-			order = 2,
-		},
-		addonItemLvl = {
-			type = "toggle",
-			name = L["iLvlAnnounce"],
-			desc = L["iLvlAnnounceTooltip"],
-			order = 3,
 		},
 	},
 }
