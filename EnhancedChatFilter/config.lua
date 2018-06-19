@@ -45,36 +45,6 @@ local defaults = {
 	DBversion = currentVer,
 }
 
---------------- Functions from Elsewhere ---------------
--- utf8 functions are taken from utf8replace from @Phanx @Pastamancer
-local function utf8charbytes(s, i)
-	local c = s:byte(i or 1)
-	-- determine bytes needed for character, based on RFC 3629
-	if c <= 127 then
-		return 1
-	elseif c <= 223 then
-		return 2
-	elseif c <= 239 then
-		return 3
-	elseif c <= 244 then
-		return 4
-	end
-end
-
--- replace UTF-8 characters based on a mapping table
-function G.utf8replace(s, mapping)
-	local t, pos = {}, 1
-
-	while pos <= #s do
-		local charbytes = utf8charbytes(s, pos)
-		local c = s:sub(pos, pos + charbytes - 1)
-		t[#t+1] = (mapping[c] or c)
-		pos = pos + charbytes
-	end
-
-	return tconcat(t)
-end
-
 --http://www.wowwiki.com/USERAPI_StringHash
 local function StringHash(text)
 	local counter, len = 1, #text
@@ -110,7 +80,7 @@ end)
 
 --Make sure that blackWord won't be filtered by filterCharList and utf-8 list
 local function checkBlacklist(blackWord, r)
-	local newWord = G.utf8replace(blackWord, G.UTF8Symbols)
+	local newWord = G.utf8replace(blackWord)
 	if not r then newWord=newWord:gsub(G.RegexCharList, "") end
 	if newWord ~= blackWord or blackWord == "" then return true end -- Also report "" as invalid
 end

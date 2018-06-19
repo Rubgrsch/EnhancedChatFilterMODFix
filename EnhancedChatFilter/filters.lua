@@ -13,7 +13,7 @@ local Ambiguate, BNGetFriendGameAccountInfo, BNGetNumFriends, BNGetNumFriendGame
 local playerName, playerServer = GetUnitName("player"), GetRealmName()
 
 -- Some UTF-8 symbols that will be auto-changed
-G.UTF8Symbols = {
+local UTF8Symbols = {
 	['１']='1',['２']='2',['３']='3',['４']='4',['５']='5',['６']='6',['７']='7',['８']='8',
 	['９']='9',['０']='0',['⒈']='1',['⒉']='2',['⒊']='3',['⒋']='4',['⒌']='5',['⒍']='6',
 	['⒎']='7',['⒏']='8',['⒐']='9',['Ａ']='A',['Ｂ']='B',['Ｃ']='C',['Ｄ']='D',['Ｅ']='E',
@@ -36,6 +36,32 @@ local QuestReportTagList = {"任务进度提示", "%(任务完成%)", "<大脚",
 local iLvlTagList = {"<iLvl>", "^%-+$"}
 local AggressiveTagList = {"|Hjournal"}
 G.RegexCharList = "[().%%%+%-%*?%[%]$^{}]" -- won't work on regex blackWord, but works on others
+
+-- utf8 functions are taken and modified from utf8replace from @Phanx @Pastamancer
+-- replace UTF-8 characters based on a mapping table
+function G.utf8replace(s)
+	local t, pos = {}, 1
+	local mapping = UTF8Symbols
+
+	while pos <= #s do
+		local b = s:byte(pos)
+		local charbytes
+		if b <= 127 then
+			charbytes = 1
+		elseif b <= 223 then
+			charbytes = 2
+		elseif b <= 239 then
+			charbytes = 3
+		else
+			charbytes = 4
+		end
+		local c = s:sub(pos, pos + charbytes - 1)
+		t[#t+1] = (mapping[c] or c)
+		pos = pos + charbytes
+	end
+
+	return tconcat(t)
+end
 
 local function SendMessage(event, msg)
 	local info = ChatTypeInfo[event:sub(10)]
@@ -112,7 +138,7 @@ local function ECFfilter(Event,msg,player,flags,IsMyFriend,good)
 	local filterString = msg:gsub("|H.-|h(.-)|h","%1"):gsub("|c%x%x%x%x%x%x%x%x",""):gsub("|r","")
 	local oriLen = #filterString
 	-- remove utf-8 chars/raidicon/space/symbols
-	filterString = G.utf8replace(filterString, G.UTF8Symbols):gsub("{rt%d}","")
+	filterString = G.utf8replace(filterString):gsub("{rt%d}","")
 	local msgLine = filterString:gsub(G.RegexCharList, ""):upper()
 	local annoying = (oriLen - #msgLine) / oriLen
 
