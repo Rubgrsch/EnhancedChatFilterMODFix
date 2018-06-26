@@ -145,7 +145,7 @@ local function ECFfilter(Event,msg,player,flags,IsMyFriend,good)
 	if msgLine == "" then msgLine = msg end --If it has only symbols, don't change it
 
 	--msgdata
-	local msgtable = {player, {}}
+	local msgtable = {player, {}, GetTime()}
 	for idx=1, #msgLine do msgtable[2][idx] = msgLine:byte(idx) end
 
 	--Whisper Whitelist Mode, only whisper
@@ -201,7 +201,7 @@ local function ECFfilter(Event,msg,player,flags,IsMyFriend,good)
 		chatLines[chatLinesSize+1] = msgtable
 		for i=1, chatLinesSize do
 			--if there is not much difference between msgs, filter it
-			if chatLines[i][1] == msgtable[1] and strDiff(chatLines[i][2],msgtable[2]) <= 0.1 then
+			if chatLines[i][1] == msgtable[1] and ((Event == 3 and msgtable[3] - chatLines[i][3] < 0.6) or strDiff(chatLines[i][2],msgtable[2]) <= 0.1) then
 				tremove(chatLines, i)
 				return true
 			end
