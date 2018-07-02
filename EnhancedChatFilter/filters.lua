@@ -142,7 +142,8 @@ local function ECFfilter(Event,msg,player,flags,IsMyFriend,good)
 	local msgLine = filterString:gsub(G.RegexCharList, ""):upper()
 	local annoying = (oriLen - #msgLine) / oriLen
 
-	if msgLine == "" then msgLine = msg end --If it has only symbols, don't change it
+	--If it has only symbols, don't change it
+	if msgLine == "" then msgLine = msg end
 
 	--msgdata
 	local msgtable = {player, {}, GetTime()}
@@ -155,7 +156,8 @@ local function ECFfilter(Event,msg,player,flags,IsMyFriend,good)
 	-- DND, whisper/yell/say/channel and auto-reply
 	if C.db.enableDND and ((Event <= 3 and flags == "DND") or Event == 101) and not IsMyFriend then return true end
 
-	-- Annoying Filter in AggressiveFilter
+	-- AggressiveFilter: Filter strings that has too much symbols
+	-- AggressiveFilter: Filter AggressiveTags, currently only journal link
 	if C.db.enableAggressive and Event <= 3 and not IsMyFriend then
 		if annoying >= 0.25 and oriLen >= 30 then return true end
 		for _,tag in ipairs(AggressiveTagList) do
@@ -201,6 +203,7 @@ local function ECFfilter(Event,msg,player,flags,IsMyFriend,good)
 		chatLines[chatLinesSize+1] = msgtable
 		for i=1, chatLinesSize do
 			--if there is not much difference between msgs, filter it
+			--if multiple msgs in 0.6s, filter it (channel & emote only)
 			if chatLines[i][1] == msgtable[1] and ((Event == 3 and msgtable[3] - chatLines[i][3] < 0.6) or strDiff(chatLines[i][2],msgtable[2]) <= 0.1) then
 				tremove(chatLines, i)
 				return true
