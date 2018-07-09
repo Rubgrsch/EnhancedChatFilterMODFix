@@ -35,8 +35,8 @@ local defaults = {
 	blackWordList = {},
 	lesserBlackWordThreshold = 3, -- in lesserBlackWord
 	blackWordFilterGroup = false, -- blackWord enabled in group and raid
-	lootItemFilterList = {[118043] = true, [71096] = true, [49655] = true}, -- item list, [id] = true
-	lootCurrencyFilterList = {[944] = true, [1268] = true}, -- Currency list, [id] = true
+	lootItemFilterList = {[71096] = true, [49655] = true}, -- item list, [id] = true
+	lootCurrencyFilterList = {}, -- Currency list, [id] = true
 	lootQualityMin = 0, -- loot quality filter, 0..4 = poor..epic
 	minimap = {
 		hide = false, -- minimap
