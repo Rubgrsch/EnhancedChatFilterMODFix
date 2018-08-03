@@ -6,7 +6,7 @@ local _G = _G
 -- Lua
 local format, ipairs, max, min, next, pairs, select, tconcat, tonumber, tremove, twipe = format, ipairs, max, min, next, pairs, select, table.concat, tonumber, tremove, table.wipe
 -- WoW
-local Ambiguate, BNGetFriendGameAccountInfo, BNGetNumFriends, BNGetNumFriendGameAccounts, C_Timer_After, ChatTypeInfo, GetAchievementLink, GetFriendInfo, GetGuildInfo, GetItemInfo, GetNumFriends, GetPlayerInfoByGUID, RAID_CLASS_COLORS, UnitExists, UnitInParty, UnitInRaid = Ambiguate, BNGetFriendGameAccountInfo, BNGetNumFriends, BNGetNumFriendGameAccounts, C_Timer.After, ChatTypeInfo, GetAchievementLink, GetFriendInfo, GetGuildInfo, GetItemInfo, GetNumFriends, GetPlayerInfoByGUID, RAID_CLASS_COLORS, UnitExists, UnitInParty, UnitInRaid
+local Ambiguate, BNGetFriendGameAccountInfo, BNGetNumFriends, BNGetNumFriendGameAccounts, C_Timer_After, ChatTypeInfo, GetAchievementLink, GetFriendInfo, GetGuildInfo, GetItemInfo, GetNumFriends, GetPlayerInfoByGUID, GetTime, RAID_CLASS_COLORS, UnitExists, UnitInParty, UnitInRaid = Ambiguate, BNGetFriendGameAccountInfo, BNGetNumFriends, BNGetNumFriendGameAccounts, C_Timer.After, ChatTypeInfo, GetAchievementLink, GetFriendInfo, GetGuildInfo, GetItemInfo, GetNumFriends, GetPlayerInfoByGUID, GetTime, RAID_CLASS_COLORS, UnitExists, UnitInParty, UnitInRaid
 
 -- GLOBALS: NUM_CHAT_WINDOWS
 
