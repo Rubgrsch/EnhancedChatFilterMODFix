@@ -26,15 +26,15 @@ local UTF8Symbols = {
 	['【']='',['】']='',['『']='',['』']='',['《']='',['》']='',['（']='',['）']='',['〔']='',
 	['〕']='',['〈']='',['〉']='',['＇']='',['＂']='',['’']='',['‘']='',['“']='',['”']='',
 	['≈']='',['︾']='',['．']='',["∴"]='',['灬']='',['━']='',['↑']='',['↓']='',['→']='',['←']='',
-	['▲']='',
+	['▲']='',['丨'] = '',
 	['|']='',['@']='',['!']='',['/']='',['<']='',['>']='',['"']='',['`']='',['_']='',["'"]='',
 	['#']='',['&']='',[';']='',[':']='',['~']='',['\\']='',['=']='',
 	["\t"]='',["\n"]='',["\r"]='',[" "]='',
 }
 local RaidAlertTagList = {"%*%*.+%*%*", "EUI[:_]", "PS 死亡: .+>", "|Hspell.+ [=%-]> ", "受伤源自 |Hspell", "Fatality:.+> ", "已打断.*|Hspell", "打断→|Hspell", "打断：.+|Hspell", "成功打断>.+<的%-", "|Hspell.+>>"}
-local QuestReportTagList = {"任务进度提示", "%(任务完成%)", "<大脚", "接受任务[%]:]", "进度:.+: %d+/%d+", "【网%.易%.有%.爱】", "任务.*%[%d+%].+ 已完成!"}
+local QuestReportTagList = {"任务进度提示", "%(任务完成%)", "<大脚", "接受任务[%]:]", "进度:.+: %d+/%d+", "【爱不易】", "任务.*%[%d+%].+ 已完成!"}
 local iLvlTagList = {"<iLvl>", "^%-+$"}
-local LFGTagList = {"<LFG>"}
+local NormalTagList = {"<LFG>"}
 local AggressiveTagList = {"|Hjournal"}
 G.RegexCharList = "[().%%%+%-%*?%[%]$^{}]" -- won't work on regex blackWord, but works on others
 
@@ -200,7 +200,7 @@ local function ECFfilter(Event,msg,player,flags,IsMyFriend,good)
 
 	-- Fk LFG
 	if Event == 1 then
-		for _,tag in ipairs(LFGTagList) do
+		for _,tag in ipairs(NormalTagList) do
 			if msg:find(tag) then return true end
 		end
 	end
