@@ -40,8 +40,10 @@ G.RegexCharList = "[().%%%+%-%*?%[%]$^{}]" -- won't work on regex blackWord, but
 
 -- utf8 functions are taken and modified from utf8replace from @Phanx @Pastamancer
 -- replace UTF-8 characters based on a mapping table
+local utf8tbl = {}
 function G.utf8replace(s)
-	local t, pos = {}, 1
+	local pos = 1
+	twipe(utf8tbl)
 	local mapping = UTF8Symbols
 
 	while pos <= #s do
@@ -57,11 +59,11 @@ function G.utf8replace(s)
 			charbytes = 4
 		end
 		local c = s:sub(pos, pos + charbytes - 1)
-		t[#t+1] = (mapping[c] or c)
+		utf8tbl[#utf8tbl+1] = (mapping[c] or c)
 		pos = pos + charbytes
 	end
 
-	return tconcat(t)
+	return tconcat(utf8tbl)
 end
 
 local function SendMessage(event, msg)
