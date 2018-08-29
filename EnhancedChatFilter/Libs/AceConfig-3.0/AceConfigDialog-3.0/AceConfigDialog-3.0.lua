@@ -1,13 +1,13 @@
 --- AceConfigDialog-3.0 generates AceGUI-3.0 based windows based on option tables.
 -- @class file
 -- @name AceConfigDialog-3.0
--- @release $Id: AceConfigDialog-3.0.lua 1193 2018-08-02 12:24:37Z funkydude $
+-- @release $Id: AceConfigDialog-3.0.lua 1194 2018-08-25 07:59:05Z nevcairiel $
 
 local LibStub = LibStub
 local gui = LibStub("AceGUI-3.0")
 local reg = LibStub("AceConfigRegistry-3.0")
 
-local MAJOR, MINOR = "AceConfigDialog-3.0", 66
+local MAJOR, MINOR = "AceConfigDialog-3.0", 67
 local AceConfigDialog, oldminor = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not AceConfigDialog then return end
@@ -1504,10 +1504,6 @@ local function GroupSelected(widget, event, uniquevalue)
 	end
 
 	BuildPath(feedpath, ("\001"):split(uniquevalue))
-	local group = options
-	for i = 1, #feedpath do
-		group = GetSubOption(group, feedpath[i])
-	end
 	widget:ReleaseChildren()
 	AceConfigDialog:FeedGroup(user.appName,options,widget,rootframe,feedpath)
 
