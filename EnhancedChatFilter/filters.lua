@@ -187,7 +187,7 @@ local function ECFfilter(Event,msg,player,flags,IsMyFriend,good)
 			end
 		end
 		-- iLvl Announcement
-		if C.db.addonILvl then
+		if C.db.addonItemLvl then
 			for _,tag in ipairs(iLvlTagList) do
 				if msg:find(tag) then return true end
 			end
