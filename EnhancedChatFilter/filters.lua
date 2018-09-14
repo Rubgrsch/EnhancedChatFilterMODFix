@@ -32,7 +32,7 @@ local UTF8Symbols = {
 	["\t"]='',["\n"]='',["\r"]='',[" "]='',
 }
 local RaidAlertTagList = {"%*%*.+%*%*", "EUI[:_]", "PS 死亡: .+>", "|Hspell.+ [=%-]> ", "受伤源自 |Hspell", "Fatality:.+> ", "已打断.*|Hspell", "打断→|Hspell", "打断：.+|Hspell", "成功打断>.+<的%-", "|Hspell.+>>"}
-local QuestReportTagList = {"任务进度提示", "%(任务完成%)", "<大脚", "接受任务[%]:]", "进度:.+: %d+/%d+", "【爱不易】", "任务.*%[%d+%].+ 已完成!"}
+local QuestReportTagList = {"任务进度提示", "任务完成[%)%-]", "<大脚", "接受任务[%]:]", "进度:.+: %d+/%d+", "【爱不易】", "任务.*%[%d+%].+ 已完成!", "%[World Quest Tracker%]", "一起来做世界任务<"}
 local iLvlTagList = {"<iLvl>", "^%-+$"}
 local NormalTagList = {"<LFG>"}
 local AggressiveTagList = {"|Hjournal"}
