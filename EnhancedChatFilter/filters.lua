@@ -268,22 +268,29 @@ local function monsterFilter(self,_,msg)
 end
 ChatFrame_AddMessageEventFilter("CHAT_MSG_MONSTER_SAY", monsterFilter)
 
---SpecSpellFilter
-local SSFilterStrings = {
-	(ERR_LEARN_ABILITY_S:gsub("%%s","(.*)")),
-	(ERR_LEARN_SPELL_S:gsub("%%s","(.*)")),
-	(ERR_SPELL_UNLEARNED_S:gsub("%%s","(.*)")),
-	(ERR_LEARN_PASSIVE_S:gsub("%%s","(.*)")),
-	(ERR_PET_SPELL_UNLEARNED_S:gsub("%%s","(.*)")),
-	(ERR_PET_LEARN_ABILITY_S:gsub("%%s","(.*)")),
-	(ERR_PET_LEARN_SPELL_S:gsub("%%s","(.*)")),
+--SystemMessage
+local SystemFilterTag = {
+	AZERITE_ISLANDS_XP_GAIN:gsub("|c.-|r",".+"):gsub("%%.-d","%%d+"),
 }
-local function SSFilter(self,_,msg)
-	if not C.db.enableDSS then return end
-
-	for _,s in ipairs(SSFilterStrings) do if msg:find(s) then return true end end
+ecf.init[#ecf.init+1] = function()
+	if UnitLevel("player") == GetMaxPlayerLevel() and C.db.enableDSS then
+		local SSFilterStrings = {
+			(ERR_LEARN_ABILITY_S:gsub("%%s","(.*)")),
+			(ERR_LEARN_SPELL_S:gsub("%%s","(.*)")),
+			(ERR_SPELL_UNLEARNED_S:gsub("%%s","(.*)")),
+			(ERR_LEARN_PASSIVE_S:gsub("%%s","(.*)")),
+			(ERR_PET_SPELL_UNLEARNED_S:gsub("%%s","(.*)")),
+			(ERR_PET_LEARN_ABILITY_S:gsub("%%s","(.*)")),
+			(ERR_PET_LEARN_SPELL_S:gsub("%%s","(.*)")),
+		}
+		local i = #SystemFilterTag
+		for j, s in ipairs(SSFilterStrings) do SystemFilterTag[i+j] = s end
+	end
 end
-if UnitLevel("player") == GetMaxPlayerLevel() then ChatFrame_AddMessageEventFilter("CHAT_MSG_SYSTEM", SSFilter) end
+local function systemMsgFilter(self,_,msg)
+	for _, s in ipairs(SystemFilterTag) do if msg:find(s) then return true end end
+end
+ChatFrame_AddMessageEventFilter("CHAT_MSG_SYSTEM", systemMsgFilter)
 
 --AchievementFilter
 local achievements = {}
