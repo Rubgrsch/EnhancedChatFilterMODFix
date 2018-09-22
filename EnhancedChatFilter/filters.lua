@@ -270,7 +270,7 @@ ChatFrame_AddMessageEventFilter("CHAT_MSG_MONSTER_SAY", monsterFilter)
 
 --SystemMessage
 local SystemFilterTag = {
-	AZERITE_ISLANDS_XP_GAIN:gsub("|c.-|r",".+"):gsub("%%.-d","%%d+"),
+	(AZERITE_ISLANDS_XP_GAIN:gsub("%%.-s",".+"):gsub("%%.-d","%%d+")),
 }
 ecf.init[#ecf.init+1] = function()
 	if UnitLevel("player") == GetMaxPlayerLevel() and C.db.enableDSS then
