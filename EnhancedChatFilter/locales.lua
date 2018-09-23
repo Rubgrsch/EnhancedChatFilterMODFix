@@ -68,8 +68,6 @@ if (locale == "zhCN") then
 --AchievementFilter
 	L["GotAchievement"] = "[%s]获得了成就%s！"
 	L["And"] = "、"
---Error
-	L["DBOutOfDate"] = "你的配置文件太旧了！你的配置文件版本:%s，插件最低兼容版本:%s"
 
 -----------------------------------------------------------------------
 -- zhTW -- NEED HELP
@@ -139,8 +137,6 @@ elseif (locale == "zhTW") then
 --AchievementFilter
 	L["GotAchievement"] = "[%s]獲得了成就%s！"
 	L["And"] = "、"
---Error
-	L["DBOutOfDate"] = "你的配置文件太旧了！你的配置文件版本:%s，插件最低兼容版本:%s"
 
 -----------------------------------------------------------------------
 -- Default -- NEED HELP
@@ -208,8 +204,6 @@ else
 --AchievementFilter
 	L["GotAchievement"] = "[%s]have earned the achievement%s!"
 	L["And"] = ", "
---Error
-	L["DBOutOfDate"] = "Your profile is too old! Your profile version: %s, addon compatibal version: %s."
 end
 
 setmetatable(L, {__index=function(_, key) return key end})

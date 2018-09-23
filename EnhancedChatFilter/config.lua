@@ -4,20 +4,10 @@ local C, L, G = unpack(ecf)
 
 local _G = _G
 -- Lua
-local error, ipairs, format, pairs, print, next, select, strsplit, tconcat, tonumber, type = error, ipairs, format, pairs, print, next, select, strsplit, table.concat, tonumber, type
+local ipairs, format, pairs, print, next, select, strsplit, tconcat, tonumber, type = ipairs, format, pairs, print, next, select, strsplit, table.concat, tonumber, type
 -- WoW
 local GetCurrencyLink, GetItemInfo, ITEMS = GetCurrencyLink, GetItemInfo, ITEMS
 local LibStub = LibStub
-
--- DB Version Check
-local currentVer, lastCompatibleVer = 4, 0
-local versionTable = {
-	[0] = "???", -- Too old
-	[1] = "7.3.0-3",
-	[2] = "7.3.2-2",
-	[3] = "7.3.5-1",
-	[4] = "7.3.5-2",
-}
 
 --Default Options
 local defaults = {
@@ -42,7 +32,6 @@ local defaults = {
 		hide = false, -- minimap
 	},
 	advancedConfig = false, -- show advancedConfig
-	DBversion = currentVer,
 }
 
 --http://www.wowwiki.com/USERAPI_StringHash
@@ -87,28 +76,10 @@ end
 
 --Initialize and convert old config to new one
 ecf.init[#ecf.init+1] = function()
-	if type(ecfDB) ~= "table" or next(ecfDB) == nil then ecfDB = defaults
-	elseif ecfDB.profiles and ecfDB.profiles.Default then ecfDB = ecfDB.profiles.Default end
+	if type(ecfDB) ~= "table" or next(ecfDB) == nil then ecfDB = defaults end
 	C.db = ecfDB
-	if not C.db.DBversion then C.db.DBversion = 0 end -- if config is too old then don't even have DBversion
-	for k,v in pairs(defaults) do if C.db[k] == nil then C.db[k] = v end end -- fallback to defaults
-	if C.db.DBversion < lastCompatibleVer then error(format(L["DBOutOfDate"],versionTable[C.db.DBversion],versionTable[lastCompatibleVer])) end
 	-- Start of DB Conversion
-	if C.db.chatLinesLimit then C.db.enableRepeat = C.db.chatLinesLimit > 0 end -- Compatible for 2
-	if C.db.normalWordsList then -- 3
-		for k,v in pairs(C.db.normalWordsList) do
-			C.db.blackWordList[k] = {lesser = v.lesser, regex = false}
-		end
-		for k,v in pairs(C.db.regexWordsList) do
-			C.db.blackWordList[k] = {lesser = v.lesser, regex = true}
-		end
-	end
-	if C.db.enableRAF ~= nil then -- 4
-		C.db.addonRAF = C.db.enableRAF
-		C.db.addonQRF = C.db.enableQRF
-	end
 	-- End of DB conversion
-	C.db.DBversion = currentVer
 	for k in pairs(C.db) do if defaults[k] == nil then C.db[k] = nil end end -- remove old keys
 	for Id, info in pairs(C.db.lootItemFilterList) do
 		if info == true then ItemInfoRequested[Id] = 1 end
