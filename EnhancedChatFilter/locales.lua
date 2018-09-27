@@ -27,8 +27,6 @@ if (locale == "zhCN") then
 	L["RepeatFilterTooltips"] = "过滤内容相近的信息"
 	L["DisplayAdvancedConfig"] = "显示高级选项"
 	L["DisplayAdvancedConfigTooltips"] = "如果你是正常人请不要接受，不然你很有可能会把ECF玩坏！如果你同意你不是正常人的话请继续..."
-	L["WhisperWhitelistMode"] = "密语白名单模式"
-	L["WhisperWhitelistModeTooltip"] = "除了工会、团队、小队、好友发送的密语外，只允许你发送过密语的对方才能对你发起密语|n|cffE2252D慎用！"
 	L["Aggressive"] = "额外过滤器"
 	L["AggressiveTooltip"] = "一些会极大提高过滤效果和|cffE2252D误伤机率|r的过滤器集合"
 --Addon
@@ -93,8 +91,6 @@ elseif (locale == "zhTW") then
 	L["RepeatFilterTooltips"] = "过滤内容相近的信息"
 	L["DisplayAdvancedConfig"] = "显示高级选项"
 	L["DisplayAdvancedConfigTooltips"] = "如果你是正常人请不要接受，不然你很有可能会把ECF玩坏！如果你同意你不是正常人的话请继续..."
-	L["WhisperWhitelistMode"] = "密語白名單模式"
-	L["WhisperWhitelistModeTooltip"] = "除了工会、团队、小队、好友发送的密语外，只允许你发送过密语的对方才能对你发起密语|n|cffE2252D慎用！"
 	L["Aggressive"] = "额外过滤器"
 	L["AggressiveTooltip"] = "一些会极大提高过滤效果和|cffE2252D误伤机率|r的过滤器集合"
 --Addon
@@ -158,8 +154,6 @@ else
 	L["RepeatFilterTooltips"] = "Filter similar messages."
 	L["DisplayAdvancedConfig"] = "Display Advanced Config"
 	L["DisplayAdvancedConfigTooltips"] = "Please do NOT change any options that you don't understand, or you may mess ECF up. If you DO know the risk, you may continue..."
-	L["WhisperWhitelistMode"] = "Whisper Whitelist Mode"
-	L["WhisperWhitelistModeTooltip"] = "Filter all whisper unless it's from guild/group/raid/friends or you have just whisper them|n|cffE2252DUse with care!"
 	L["Aggressive"] = "Aggressive Filters"
 	L["AggressiveTooltip"] = "Some aggressive but effective Filters."
 --Addon

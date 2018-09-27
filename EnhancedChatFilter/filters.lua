@@ -78,7 +78,7 @@ end
 
 --------------- Filters ---------------
 --Update friends whenever login/friendlist updates
-local friends, allowWisper = {}, {}
+local friends = {}
 local friendFrame = CreateFrame("Frame")
 friendFrame:RegisterEvent("FRIENDLIST_UPDATE")
 friendFrame:RegisterEvent("BN_FRIEND_INFO_CHANGED")
@@ -97,12 +97,6 @@ friendFrame:SetScript("OnEvent", function()
 		end
 	end
 end)
-
---Add players you wispered into allowWisper list
-local function addToAllowWisper(self,_,_,player)
-	allowWisper[Ambiguate(player, "none")] = true
-end
-ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER_INFORM", addToAllowWisper)
 
 --strDiff for repeatFilter, ranged from 0 to 1, while 0 is absolutely the same
 --This function is not utf8 awared, currently not nessesary
@@ -151,10 +145,6 @@ local function ECFfilter(Event,msg,player,flags,IsMyFriend,good)
 	--msgdata
 	local msgtable = {player, {}, GetTime()}
 	for idx=1, #msgLine do msgtable[2][idx] = msgLine:byte(idx) end
-
-	--Whisper Whitelist Mode, only whisper
-	--Don't filter players from same guild/raid/party or who you have whispered
-	if C.db.enableWisper and Event == 1 and not(allowWisper[player] or good) then return true end
 
 	-- DND, whisper/yell/say/channel and auto-reply
 	if C.db.enableDND and ((Event <= 3 and flags == "DND") or Event == 101) and not IsMyFriend then return true end

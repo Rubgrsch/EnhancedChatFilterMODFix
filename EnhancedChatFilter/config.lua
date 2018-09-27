@@ -11,7 +11,6 @@ local LibStub = LibStub
 
 --Default Options
 local defaults = {
-	enableWisper = false, -- Wisper WhiteMode
 	enableDND = true, -- DND
 	enableCFA = true, -- Achievement Filter
 	enableMSF = false, -- Monster Say Filter
@@ -167,20 +166,13 @@ options.args.General = {
 			type = "toggle",
 			name = L["MonsterSay"],
 			desc = L["MonsterSayFilterTooltip"],
-			order = 16,
+			order = 13,
 		},
 		enableAggressive = {
 			type = "toggle",
 			name = L["Aggressive"],
 			desc = L["AggressiveTooltip"],
-			order = 17,
-		},
-		enableWisper = {
-			type = "toggle",
-			name = L["WhisperWhitelistMode"],
-			desc = L["WhisperWhitelistModeTooltip"],
-			order = 18,
-			hidden = adv,
+			order = 14,
 		},
 		line2 = {
 			type = "header",
