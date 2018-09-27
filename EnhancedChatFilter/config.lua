@@ -26,9 +26,6 @@ local defaults = {
 	lootItemFilterList = {[71096] = true, [49655] = true}, -- item list, [id] = true
 	lootCurrencyFilterList = {}, -- Currency list, [id] = true
 	lootQualityMin = 0, -- loot quality filter, 0..4 = poor..epic
-	minimap = {
-		hide = false, -- minimap
-	},
 	advancedConfig = false, -- show advancedConfig
 }
 
@@ -128,21 +125,11 @@ options.args.General = {
 	name = L["General"],
 	order = 1,
 	args = {
-		MinimapToggle = {
-			type = "toggle",
-			name = L["MinimapIcon"],
-			get = function() return not C.db.minimap.hide end,
-			set = function(_,toggle)
-					C.db.minimap.hide = not toggle
-					if toggle then LibStub("LibDBIcon-1.0"):Show(addonName) else LibStub("LibDBIcon-1.0"):Hide(addonName) end
-				end,
-			order = 1,
-		},
 		advancedConfig = {
 			type = "toggle",
 			name = L["DisplayAdvancedConfig"],
 			desc = L["DisplayAdvancedConfigTooltips"],
-			order = 9,
+			order = 1,
 			confirm = adv,
 		},
 		line1 = {
