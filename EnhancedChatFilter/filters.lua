@@ -272,21 +272,20 @@ ChatFrame_AddMessageEventFilter("CHAT_MSG_MONSTER_SAY", monsterFilter)
 local SystemFilterTag = {
 	(AZERITE_ISLANDS_XP_GAIN:gsub("%%.-s",".+"):gsub("%%.-d","%%d+")),
 }
-ecf.init[#ecf.init+1] = function()
-	if UnitLevel("player") == GetMaxPlayerLevel() and C.db.enableDSS then
-		local SSFilterStrings = {
-			(ERR_LEARN_ABILITY_S:gsub("%%s","(.*)")),
-			(ERR_LEARN_SPELL_S:gsub("%%s","(.*)")),
-			(ERR_SPELL_UNLEARNED_S:gsub("%%s","(.*)")),
-			(ERR_LEARN_PASSIVE_S:gsub("%%s","(.*)")),
-			(ERR_PET_SPELL_UNLEARNED_S:gsub("%%s","(.*)")),
-			(ERR_PET_LEARN_ABILITY_S:gsub("%%s","(.*)")),
-			(ERR_PET_LEARN_SPELL_S:gsub("%%s","(.*)")),
-		}
-		local i = #SystemFilterTag
-		for j, s in ipairs(SSFilterStrings) do SystemFilterTag[i+j] = s end
-	end
+if UnitLevel("player") == GetMaxPlayerLevel() then
+	local SSFilterStrings = {
+		(ERR_LEARN_ABILITY_S:gsub("%%s","(.*)")),
+		(ERR_LEARN_SPELL_S:gsub("%%s","(.*)")),
+		(ERR_SPELL_UNLEARNED_S:gsub("%%s","(.*)")),
+		(ERR_LEARN_PASSIVE_S:gsub("%%s","(.*)")),
+		(ERR_PET_SPELL_UNLEARNED_S:gsub("%%s","(.*)")),
+		(ERR_PET_LEARN_ABILITY_S:gsub("%%s","(.*)")),
+		(ERR_PET_LEARN_SPELL_S:gsub("%%s","(.*)")),
+	}
+	local i = #SystemFilterTag
+	for j, s in ipairs(SSFilterStrings) do SystemFilterTag[i+j] = s end
 end
+
 local function systemMsgFilter(self,_,msg)
 	for _, s in ipairs(SystemFilterTag) do if msg:find(s) then return true end end
 end

@@ -14,7 +14,6 @@ local defaults = {
 	enableWisper = false, -- Wisper WhiteMode
 	enableDND = true, -- DND
 	enableCFA = true, -- Achievement Filter
-	enableDSS = true, -- Spec spell Filter
 	enableMSF = false, -- Monster Say Filter
 	enableAggressive = false, -- Aggressive Filter
 	enableRepeat = true, -- repeatFilter
@@ -163,12 +162,6 @@ options.args.General = {
 			name = L["Achievement"],
 			desc = L["AchievementFilterTooltip"],
 			order = 12,
-		},
-		enableDSS = {
-			type = "toggle",
-			name = L["SpecSpell"],
-			desc = L["SpecSpellFilterTooltip"],
-			order = 15,
 		},
 		enableMSF = {
 			type = "toggle",
