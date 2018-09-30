@@ -1,11 +1,8 @@
 local _, ecf = ...
 local _, L = unpack(ecf)
 
-local locale = GetLocale()
------------------------------------------------------------------------
--- zhCN
------------------------------------------------------------------------
-if (locale == "zhCN") then
+-- zhCN Only --
+
 --Common in tab
 	L["ClearUp"] = "清空"
 	L["DoYouWantToClear"] = "你确定要清空%s么？"
@@ -54,6 +51,7 @@ if (locale == "zhCN") then
 	L["LootFilter"] = "拾取过滤器"
 	L["AddItemWithID"] = "添加ID"
 	L["BadID"] = "错误的ID"
+	L["NotExists"] = "%s(ID=%d)不存在"
 	L["ItemFilterList"] = "物品屏蔽列表"
 	L["CurrencyFilterList"] = "货币屏蔽列表"
 	L["LootQualityFilter"] = "拾取物品质量"
@@ -61,128 +59,5 @@ if (locale == "zhCN") then
 --AchievementFilter
 	L["GotAchievement"] = "[%s]获得了成就%s！"
 	L["And"] = "、"
-
------------------------------------------------------------------------
--- zhTW -- NEED HELP
--- Contributors: 老虎007@NGA
------------------------------------------------------------------------
-elseif (locale == "zhTW") then
---Common in tab
-	L["ClearUp"] = "清空"
-	L["DoYouWantToClear"] = "你确定要清空%s么？"
-	L["FilterGroup"] = "过滤小队团队"
-	L["FilterGroupTooltips"] = "启用后过滤器也会过滤小队团队中的消息，你可能因此错过有用的信息"
---General
-	L["General"] = "常规"
-	L["DND"] = "'忙碌'玩家"
-	L["DNDfilterTooltip"] = "过滤'忙碌'玩家及其自动回复"
-	L["Achievement"] = "成就刷屏"
-	L["AchievementFilterTooltip"] = "合并显示多个玩家获得同一成就"
-	L["MonsterSay"] = "怪物说话"
-	L["MonsterSayFilterTooltip"] = "用一个重复过滤器减少NPC说话的刷屏。这不会影响施放技能时的喊话。"
-	L["RepeatOptions"] = "重复信息设置"
-	L["RepeatFilter"] = "重复过滤器"
-	L["RepeatFilterTooltips"] = "过滤内容相近的信息"
-	L["DisplayAdvancedConfig"] = "显示高级选项"
-	L["DisplayAdvancedConfigTooltips"] = "如果你是正常人请不要接受，不然你很有可能会把ECF玩坏！如果你同意你不是正常人的话请继续..."
-	L["Aggressive"] = "额外过滤器"
-	L["AggressiveTooltip"] = "一些会极大提高过滤效果和|cffE2252D误伤机率|r的过滤器集合"
---Addon
-	L["Addons"] = "插件通告过滤"
-	L["RaidAlert"] = "團隊警報"
-	L["RaidAlertFilterTooltip"] = "过滤各类技能/打断喊话提醒"
-	L["QuestReport"] = "任務組隊"
-	L["QuestReportFilterTooltip"] = "过滤各类组队任务喊话提醒"
-	L["iLvlAnnounce"] = "装等通告"
-	L["iLvlAnnounceTooltip"] = "过滤TinyInspect等插件的装等提示"
---BlackwordFilter
-	L["BlackwordFilter"] = "关键词过滤"
-	L["BlackwordList"] = "黑名单关键词列表"
-	L["AddBlackWordTitle"] = "添加新黑名單關鍵詞"
-	L["IncludeAutofilteredWord"] = "%s包含會被自動過濾的字符，蔣忽略該關鍵詞！"
-	L["Regex"] = "正規"
-	L["RegexTooltip"] = "标记添加的关键词为正则表达式|n仅对该次添加的关键词有效"
-	L["LesserBlackWord"] = "次级关键词"
-	L["LesserBlackWordTooltip"] = "标记添加的关键词为次级关键词，仅对该次添加的关键词有效|n当一个信息匹配多个次级关键词时才会被屏蔽。|n|n你应该只在添加那些日常交流会用到，但你希望屏蔽的对方会大量同时使用的词汇时勾选。|n下列情况不建议勾选：各种利用异体字/同音字防屏蔽的词汇、单个汉字。"
-	L["LesserBlackwordList"] = "次级黑名单关键词"
-	L["LesserBlackWordThreshold"] = "次级关键词阈值"
-	L["LesserBlackWordThresholdTooltips"] = "过滤包含至少阈值数目的次级关键词的信息"
-	L["BlackList"] = "关键词列表"
-	L["StringIO"] = "字符串導入導出"
-	L["StringHashMismatch"] = "字符串校驗錯誤"
-	L["Export"] = "導出"
---LootFilter
-	L["LootFilter"] = "拾取过滤器"
-	L["AddItemWithID"] = "添加ID"
-	L["BadID"] = "错误的ID"
-	L["NotExists"] = "%s(ID=%d)不存在"
-	L["ItemFilterList"] = "物品屏蔽列表"
-	L["CurrencyFilterList"] = "货币屏蔽列表"
-	L["LootQualityFilter"] = "拾取物品质量"
-	L["LootQualityFilterTooltips"] = "显示拾取物品所需要的最低质量，低于此质量的物品将被过滤"
---AchievementFilter
-	L["GotAchievement"] = "[%s]獲得了成就%s！"
-	L["And"] = "、"
-
------------------------------------------------------------------------
--- Default -- NEED HELP
------------------------------------------------------------------------
-else
---Common in tab
-	L["ClearUp"] = "ClearUp"
-	L["DoYouWantToClear"] = "Do you want to clear %s?"
-	L["FilterGroup"] = "FilterGroup"
-	L["FilterGroupTooltips"] = "Enable to filter group and raid. This may filter some useful messages."
---General
-	L["General"] = "General"
-	L["DND"] = "DND"
-	L["DNDfilterTooltip"] = "Filter all DND players and their auto reply"
-	L["Achievement"] = "Achievement"
-	L["AchievementFilterTooltip"] = "Filter achievement spam"
-	L["MonsterSay"] = "MonsterSay"
-	L["MonsterSayFilterTooltip"] = "Use a repeat filter to reduce monster say msg in chat. This will not filter monster yell msg while it cast spells."
-	L["RepeatFilter"] = "RepeatFilter"
-	L["RepeatFilterTooltips"] = "Filter similar messages."
-	L["DisplayAdvancedConfig"] = "Display Advanced Config"
-	L["DisplayAdvancedConfigTooltips"] = "Please do NOT change any options that you don't understand, or you may mess ECF up. If you DO know the risk, you may continue..."
-	L["Aggressive"] = "Aggressive Filters"
-	L["AggressiveTooltip"] = "Some aggressive but effective Filters."
---Addon
-	L["Addons"] = "AddonFilters"
-	L["RaidAlert"] = "RaidAlert"
-	L["RaidAlertFilterTooltip"] = "Filter raid alert from other players"
-	L["QuestReport"] = "QuestReport"
-	L["QuestReportFilterTooltip"] = "Filter many kind of grouping messages"
-	L["iLvlAnnounce"] = "iLvlAnnounce"
-	L["iLvlAnnounceTooltip"] = "Filter item level announcement, e.g. TinyInspect"
---BlackwordFilter
-	L["BlackwordFilter"] = "BlackwordFilter"
-	L["BlackwordList"] = "BlackwordList"
-	L["AddBlackWordTitle"] = "Add Blackword"
-	L["IncludeAutofilteredWord"] = "%s includes symbels to be filtered. It will be ignored."
-	L["Regex"] = "Regex"
-	L["RegexTooltip"] = "Blackword that will be added should be a regex expression. Only works for this blackword."
-	L["LesserBlackWord"] = "LesserBlackWord"
-	L["LesserBlackWordTooltip"] = "Blackword that will be added should be a lesser blackword. Only works for this blackword.|nA message will be filtered when contains multiple lesser blackwords.|n|nYou should only add words which are used by everyone, but the spam will have much more at the same time.|nDon't add words that are too short."
-	L["LesserBlackwordList"] = "LesserBlackwordList"
-	L["LesserBlackWordThreshold"] = "LesserBlackWordThreshold"
-	L["LesserBlackWordThresholdTooltips"] = "Filter msgs contained many lesser blackwords"
-	L["BlackList"] = "BlackList"
-	L["StringIO"] = "Import/Export"
-	L["StringHashMismatch"] = "String Hash Mismatch"
-	L["Export"] = "Export"
---LootFilter
-	L["LootFilter"] = "LootFilter"
-	L["AddItemWithID"] = "Add With ID"
-	L["BadID"] = "Bad ID"
-	L["NotExists"] = "%s(ID = %d) doesn't exist"
-	L["ItemFilterList"] = "ItemFilterList"
-	L["CurrencyFilterList"] = "CurrencyFilterList"
-	L["LootQualityFilter"] = "LootItemQuality"
-	L["LootQualityFilterTooltips"] = "Filter any loot that is poorer than you choose"
---AchievementFilter
-	L["GotAchievement"] = "[%s]have earned the achievement%s!"
-	L["And"] = ", "
-end
 
 setmetatable(L, {__index=function(_, key) return key end})
