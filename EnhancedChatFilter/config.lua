@@ -4,7 +4,7 @@ local C, L, G = unpack(ecf)
 
 local _G = _G
 -- Lua
-local ipairs, format, pairs, print, next, select, strsplit, tconcat, tonumber, type = ipairs, format, pairs, print, next, select, strsplit, table.concat, tonumber, type
+local format, pairs, print, next, select, tconcat, tonumber, type = format, pairs, print, next, select, table.concat, tonumber, type
 -- WoW
 local GetCurrencyLink, GetItemInfo, ITEMS = GetCurrencyLink, GetItemInfo, ITEMS
 local LibStub = LibStub
@@ -313,15 +313,12 @@ options.args.blackListTab = {
 			name = "",
 			order = 31,
 			set = function(_,value)
-				local wordString, HashString = strsplit("@", value)
+				local wordString, HashString = value:match("([^@]*)@([^@]+)")
 				if tonumber(HashString) ~= StringHash(wordString) then
 					print(L["StringHashMismatch"])
 				else
-					for _, blacklist in ipairs({strsplit(";", wordString)}) do
-						if blacklist ~= nil then
-							local imNewWord, r, l = strsplit(",",blacklist)
-							AddBlackWord(imNewWord, r == "r", l == "l")
-						end
+					for newWord, r, l in wordString:gmatch("([^;,]+),(r?),(l?)") do
+						AddBlackWord(newWord, r == "r", l == "l")
 					end
 				end
 				C.UI.stringIO = ""
