@@ -6,7 +6,7 @@ local _G = _G
 -- Lua
 local format, ipairs, max, min, next, pairs, select, tconcat, tonumber, tremove, twipe = format, ipairs, max, min, next, pairs, select, table.concat, tonumber, tremove, table.wipe
 -- WoW
-local Ambiguate, BNGetFriendGameAccountInfo, BNGetNumFriends, BNGetNumFriendGameAccounts, C_Timer_After, ChatTypeInfo, GetAchievementLink, GetFriendInfo, GetGuildInfo, GetItemInfo, GetNumFriends, GetPlayerInfoByGUID, GetTime, RAID_CLASS_COLORS, UnitExists, UnitInParty, UnitInRaid = Ambiguate, BNGetFriendGameAccountInfo, BNGetNumFriends, BNGetNumFriendGameAccounts, C_Timer.After, ChatTypeInfo, GetAchievementLink, GetFriendInfo, GetGuildInfo, GetItemInfo, GetNumFriends, GetPlayerInfoByGUID, GetTime, RAID_CLASS_COLORS, UnitExists, UnitInParty, UnitInRaid
+local Ambiguate, BNGetGameAccountInfoByGUID, C_Timer_After, ChatTypeInfo, GetAchievementLink, GetGuildInfo, GetItemInfo, GetPlayerInfoByGUID, GetTime, IsCharacterFriend, RAID_CLASS_COLORS, UnitExists, UnitInParty, UnitInRaid = Ambiguate, BNGetGameAccountInfoByGUID, C_Timer.After, ChatTypeInfo, GetAchievementLink, GetGuildInfo, GetItemInfo, GetPlayerInfoByGUID, GetTime, IsCharacterFriend, RAID_CLASS_COLORS, UnitExists, UnitInParty, UnitInRaid
 
 -- GLOBALS: NUM_CHAT_WINDOWS
 
@@ -77,27 +77,6 @@ local function SendMessage(event, msg)
 end
 
 --------------- Filters ---------------
---Update friends whenever login/friendlist updates
-local friends = {}
-local friendFrame = CreateFrame("Frame")
-friendFrame:RegisterEvent("FRIENDLIST_UPDATE")
-friendFrame:RegisterEvent("BN_FRIEND_INFO_CHANGED")
-friendFrame:SetScript("OnEvent", function()
-	twipe(friends)
-	--Add WoW friends
-	for i = 1, GetNumFriends() do
-		local name = GetFriendInfo(i)
-		if name then friends[Ambiguate(name, "none")] = true end
-	end
-	--And battlenet friends
-	for i = 1, select(2, BNGetNumFriends()) do
-		for j = 1, BNGetNumFriendGameAccounts(i) do
-			local _, characterName, client, realmName = BNGetFriendGameAccountInfo(i, j)
-			if client == "WoW" then friends[Ambiguate(characterName.."-"..realmName, "none")] = true end
-		end
-	end
-end)
-
 --strDiff for repeatFilter, ranged from 0 to 1, while 0 is absolutely the same
 --This function is not utf8 awared, currently not nessesary
 --strsub(s,i,i) is really SLOW. Don't use it.
@@ -214,7 +193,7 @@ local function ECFfilter(Event,msg,player,flags,IsMyFriend,good)
 end
 
 local prevLineID, filterResult = 0, false
-local function ECFfilterRecord(self,event,msg,player,_,_,_,flags,_,_,channelName,_,lineID)
+local function ECFfilterRecord(self,event,msg,player,_,_,_,flags,_,_,channelName,_,lineID,guid)
 	-- filter MeetingStone(NetEase) broad msg so it will not trigger any ECFfilters
 	if channelName == "集合石" then return true end
 
@@ -223,7 +202,7 @@ local function ECFfilterRecord(self,event,msg,player,_,_,_,flags,_,_,channelName
 	prevLineID = lineID
 
 	player = Ambiguate(player, "none")
-	local IsMyFriend = friends[player]
+	local IsMyFriend = BNGetGameAccountInfoByGUID(guid) or IsCharacterFriend(guid)
 	local good = IsMyFriend or GetGuildInfo("player") == GetGuildInfo(player) or UnitInRaid(player) or UnitInParty(player)
 	filterResult = ECFfilter(chatChannel[event],msg,player,flags,IsMyFriend,good)
 
