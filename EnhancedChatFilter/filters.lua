@@ -81,7 +81,7 @@ end
 --This function is not utf8 awared, currently not nessesary
 --strsub(s,i,i) is really SLOW. Don't use it.
 local last, this = {}, {}
-local function strDiff(sA, sB) -- arrays of byte
+local function strDiff(sA, sB) -- arrays of bytes
 	local len_a, len_b = #sA, #sB
 	twipe(last)
 	twipe(this)
@@ -239,9 +239,10 @@ ChatFrame_AddMessageEventFilter("CHAT_MSG_MONSTER_SAY", monsterFilter)
 
 --SystemMessage
 local SystemFilterTag = {
-	(AZERITE_ISLANDS_XP_GAIN:gsub("%%.-s",".+"):gsub("%%.-d","%%d+")),
+	-- !!! Always add parentheses since gsub() has two return values !!!
+	(AZERITE_ISLANDS_XP_GAIN:gsub("%%.-s",".+"):gsub("%%.-d","%%d+")), -- Azerite gain in islands
 }
-if UnitLevel("player") == GetMaxPlayerLevel() then
+if UnitLevel("player") == GetMaxPlayerLevel() then -- spell learn, only when max level
 	local SSFilterStrings = {
 		(ERR_LEARN_ABILITY_S:gsub("%%s","(.*)")),
 		(ERR_LEARN_SPELL_S:gsub("%%s","(.*)")),
