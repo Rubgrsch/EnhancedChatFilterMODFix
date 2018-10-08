@@ -101,7 +101,37 @@ local playerCache = {}
 setmetatable(playerCache, {__index=function() return 0 end})
 
 local chatLines = {}
-local chatChannel = {["CHAT_MSG_WHISPER"] = 1, ["CHAT_MSG_SAY"] = 2, ["CHAT_MSG_YELL"] = 2, ["CHAT_MSG_CHANNEL"] = 3, ["CHAT_MSG_EMOTE"] = 3, ["CHAT_MSG_TEXT_EMOTE"] = 3, ["CHAT_MSG_PARTY"] = 4, ["CHAT_MSG_PARTY_LEADER"] = 4, ["CHAT_MSG_RAID"] = 4, ["CHAT_MSG_RAID_LEADER"] = 4, ["CHAT_MSG_RAID_WARNING"] = 4, ["CHAT_MSG_INSTANCE_CHAT"] = 4, ["CHAT_MSG_INSTANCE_CHAT_LEADER"] = 4, ["CHAT_MSG_DND"] = 101}
+local chatChannels = {["CHAT_MSG_WHISPER"] = 1, ["CHAT_MSG_SAY"] = 2, ["CHAT_MSG_YELL"] = 2, ["CHAT_MSG_CHANNEL"] = 3, ["CHAT_MSG_EMOTE"] = 3, ["CHAT_MSG_PARTY"] = 4, ["CHAT_MSG_PARTY_LEADER"] = 4, ["CHAT_MSG_RAID"] = 4, ["CHAT_MSG_RAID_LEADER"] = 4, ["CHAT_MSG_RAID_WARNING"] = 4, ["CHAT_MSG_INSTANCE_CHAT"] = 4, ["CHAT_MSG_INSTANCE_CHAT_LEADER"] = 4, ["CHAT_MSG_TEXT_EMOTE"] = 5, ["CHAT_MSG_DND"] = 6}
+
+--Store which type of channels have which filters enabled
+local channelFilter = {
+--			aggr, 	dnd,	black,	raid,	ilvl,	quest,	normal,	repeat
+	[1] = {false,	false,	true,	false,	false,	false,	true,	false},
+	[2] = {false,	false,	true,	false,	false,	false,	false,	false},
+	[3] = {false,	false,	true,	false,	false,	false,	false,	false},
+	[4] = {false,	false,	false,	false,	false,	false,	false,	false},
+	[5] = {false,	false,	false,	false,	false,	false,	false,	false},
+	[6] = {false,	false,	false,	false,	false,	false,	false,	false},
+}
+
+--Config enabled filters
+local optionFilters = {
+	enableAggressive = {1, {1,2,3}},
+	enableDND = {2, {1,2,3}},
+	blackWordFilterGroup = {3, {4}},
+	addonRAF = {4, {1,2,4}},
+	addonItemLvl = {5, {4}},
+	addonQRF = {6, {1,2,4}},
+	enableRepeat = {8, {1,2,3,5}},
+	repeatFilterGroup = {8, {4}},
+}
+
+function C:SetupEvent()
+	for opt, v in pairs(optionFilters) do
+		local status, filterIdx = C.db[opt], v[1]
+		for _, idx in ipairs(v[2]) do channelFilter[idx][filterIdx] = status end
+	end
+end
 
 local function ECFfilter(Event,msg,player,flags,IsMyFriend,good)
 	-- don't filter player/GM/DEV
@@ -117,7 +147,6 @@ local function ECFfilter(Event,msg,player,flags,IsMyFriend,good)
 	filterString = G.utf8replace(filterString):gsub("{rt%d}","")
 	local msgLine = filterString:gsub(G.RegexCharList, ""):upper()
 	local annoying = (oriLen - #msgLine) / oriLen
-
 	--If it has only symbols, don't change it
 	if msgLine == "" then msgLine = msg end
 
@@ -125,20 +154,23 @@ local function ECFfilter(Event,msg,player,flags,IsMyFriend,good)
 	local msgtable = {player, {}, GetTime()}
 	for idx=1, #msgLine do msgtable[2][idx] = msgLine:byte(idx) end
 
-	-- DND, whisper/yell/say/channel and auto-reply
-	if C.db.enableDND and ((Event <= 3 and flags == "DND") or Event == 101) and not IsMyFriend then return true end
+	--filter status for each channel
+	local filtersStatus = channelFilter[Event]
 
 	-- AggressiveFilter: Filter strings that has too much symbols
 	-- AggressiveFilter: Filter AggressiveTags, currently only journal link
-	if C.db.enableAggressive and Event <= 3 and not IsMyFriend then
+	if filtersStatus[1] and not IsMyFriend then
 		if annoying >= 0.25 and oriLen >= 30 then return true end
 		for _,tag in ipairs(AggressiveTagList) do
 			if msg:find(tag) then return true end
 		end
 	end
 
+	-- DND, whisper/yell/say/channel and auto-reply
+	if ((filtersStatus[2] and flags == "DND") or Event == 6) and not IsMyFriend then return true end
+
 	--blackWord Filter, whisper/yell/say/channel and party/raid(optional)
-	if Event <= (C.db.blackWordFilterGroup and 4 or 3) and not IsMyFriend then
+	if filtersStatus[3] and not IsMyFriend then
 		local count = 0
 		for k,v in pairs(C.db.blackWordList) do
 			if filterString:find(k) then
@@ -148,36 +180,34 @@ local function ECFfilter(Event,msg,player,flags,IsMyFriend,good)
 		if count >= C.db.lesserBlackWordThreshold then return true end
 	end
 
-	if Event <= 2 or Event == 4 then
-		-- raidAlert
-		if C.db.addonRAF then
-			for _,tag in ipairs(RaidAlertTagList) do
-				if msg:find(tag) then return true end
-			end
+	-- raidAlert
+	if filtersStatus[4] then
+		for _,tag in ipairs(RaidAlertTagList) do
+			if msg:find(tag) then return true end
 		end
-		-- iLvl Announcement
-		if C.db.addonItemLvl then
-			for _,tag in ipairs(iLvlTagList) do
-				if msg:find(tag) then return true end
-			end
+	end
+	-- iLvl Announcement
+	if filtersStatus[5] then
+		for _,tag in ipairs(iLvlTagList) do
+			if msg:find(tag) then return true end
 		end
-		-- questReport and partyAnnounce
-		if C.db.addonQRF then
-			for _,tag in ipairs(QuestReportTagList) do
-				if msg:find(tag) then return true end
-			end
+	end
+	-- questReport and partyAnnounce
+	if filtersStatus[6] then
+		for _,tag in ipairs(QuestReportTagList) do
+			if msg:find(tag) then return true end
 		end
 	end
 
 	-- Fk LFG
-	if Event == 1 then
+	if filtersStatus[7] then
 		for _,tag in ipairs(NormalTagList) do
 			if msg:find(tag) then return true end
 		end
 	end
 
 	--Repeat Filter
-	if C.db.enableRepeat and Event <= (C.db.repeatFilterGroup and 4 or 3) and not IsMyFriend then
+	if filtersStatus[8] and not IsMyFriend then
 		local chatLinesSize = #chatLines
 		chatLines[chatLinesSize+1] = msgtable
 		for i=1, chatLinesSize do
@@ -204,13 +234,13 @@ local function ECFfilterRecord(self,event,msg,player,_,_,_,flags,_,_,channelName
 	player = Ambiguate(player, "none")
 	local IsMyFriend = BNGetGameAccountInfoByGUID(guid) or IsCharacterFriend(guid)
 	local good = IsMyFriend or GetGuildInfo("player") == GetGuildInfo(player) or UnitInRaid(player) or UnitInParty(player)
-	filterResult = ECFfilter(chatChannel[event],msg,player,flags,IsMyFriend,good)
+	filterResult = ECFfilter(chatChannels[event],msg,player,flags,IsMyFriend,good)
 
 	if filterResult and not good then playerCache[player] = playerCache[player] + 1 end
 
 	return filterResult
 end
-for event in pairs(chatChannel) do ChatFrame_AddMessageEventFilter(event, ECFfilterRecord) end
+for event in pairs(chatChannels) do ChatFrame_AddMessageEventFilter(event, ECFfilterRecord) end
 
 --MonsterSayFilter
 --Turn off MSF in certain quests. Chat msg are repeated but important in these quests.

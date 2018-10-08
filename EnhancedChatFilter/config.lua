@@ -82,6 +82,7 @@ ecf.init[#ecf.init+1] = function()
 	for Id, info in pairs(C.db.lootCurrencyFilterList) do
 		if info == true then C.db.lootCurrencyFilterList[Id] = GetCurrencyLink(Id) end
 	end
+	C:SetupEvent()
 end
 
 --------------- Options ---------------
@@ -124,6 +125,7 @@ options.args.General = {
 	type = "group",
 	name = L["General"],
 	order = 1,
+	set = function(info, value) C.db[info[#info]] = value; C:SetupEvent() end,
 	args = {
 		advancedConfig = {
 			type = "toggle",
@@ -292,6 +294,7 @@ options.args.blackListTab = {
 			name = L["FilterGroup"],
 			desc = L["FilterGroupTooltips"],
 			order = 21,
+			set = function(info, value) C.db[info[#info]] = value; C:SetupEvent() end,
 		},
 		lesserBlackWordThreshold = {
 			type = "range",
