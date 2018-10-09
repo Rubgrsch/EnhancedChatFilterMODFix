@@ -232,7 +232,7 @@ local function ECFfilterRecord(self,event,msg,player,_,_,_,flags,_,_,channelName
 	prevLineID = lineID
 
 	player = Ambiguate(player, "none")
-	local IsMyFriend = BNGetGameAccountInfoByGUID(guid) or IsCharacterFriend(guid)
+	local IsMyFriend = guid and (BNGetGameAccountInfoByGUID(guid) or IsCharacterFriend(guid))
 	local good = IsMyFriend or GetGuildInfo("player") == GetGuildInfo(player) or UnitInRaid(player) or UnitInParty(player)
 	filterResult = ECFfilter(chatChannels[event],msg,player,flags,IsMyFriend,good)
 
