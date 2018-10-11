@@ -19,7 +19,6 @@ local defaults = {
 	repeatFilterGroup = true, -- repeatFilter enabled in group and raid
 	addonRAF = false, -- RaidAlert Filter
 	addonQRF = false, -- Quest/Group Report Filter
-	addonItemLvl = false, -- iLvl announcement Filter
 	blackWordList = {},
 	lesserBlackWordThreshold = 3, -- in lesserBlackWord
 	blackWordFilterGroup = false, -- blackWord enabled in group and raid
@@ -179,12 +178,6 @@ options.args.General = {
 			name = L["QuestReport"],
 			desc = L["QuestReportFilterTooltip"],
 			order = 32,
-		},
-		addonItemLvl = {
-			type = "toggle",
-			name = L["iLvlAnnounce"],
-			desc = L["iLvlAnnounceTooltip"],
-			order = 33,
 		},
 		line3 = {
 			type = "header",

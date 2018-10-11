@@ -31,9 +31,8 @@ local UTF8Symbols = {
 	['#']='',['&']='',[';']='',[':']='',['~']='',['\\']='',['=']='',
 	["\t"]='',["\n"]='',["\r"]='',[" "]='',
 }
-local RaidAlertTagList = {"%*%*.+%*%*", "EUI[:_]", "PS 死亡: .+>", "|Hspell.+ [=%-]> ", "受伤源自 |Hspell", "Fatality:.+> ", "已打断.*|Hspell", "打断→|Hspell", "打断：.+|Hspell", "成功打断>.+<的%-", "|Hspell.+>>"}
+local RaidAlertTagList = {"%*%*.+%*%*", "EUI[:_]", "PS 死亡: .+>", "|Hspell.+ [=%-]> ", "受伤源自 |Hspell", "Fatality:.+> ", "已打断.*|Hspell", "打断→|Hspell", "打断：.+|Hspell", "成功打断>.+<的%-", "|Hspell.+>>", "<iLvl>", "^%-+$"}
 local QuestReportTagList = {"任务进度提示", "任务完成[%)%-]", "<大脚", "接受任务[%]:]", "进度:.+: %d+/%d+", "【爱不易】", "任务.*%[%d+%].+ 已完成!", "%[World Quest Tracker%]", "一起来做世界任务<"}
-local iLvlTagList = {"<iLvl>", "^%-+$"}
 local NormalTagList = {"<LFG>"}
 local AggressiveTagList = {"|Hjournal"}
 G.RegexCharList = "[().%%%+%-%*?%[%]$^{}]" -- won't work on regex blackWord, but works on others
@@ -105,13 +104,13 @@ local chatChannels = {["CHAT_MSG_WHISPER"] = 1, ["CHAT_MSG_SAY"] = 2, ["CHAT_MSG
 
 --Store which type of channels have which filters enabled
 local channelFilter = {
---			aggr, 	dnd,	black,	raid,	ilvl,	quest,	normal,	repeat
-	[1] = {false,	false,	true,	false,	false,	false,	true,	false},
-	[2] = {false,	false,	true,	false,	false,	false,	false,	false},
-	[3] = {false,	false,	true,	false,	false,	false,	false,	false},
-	[4] = {false,	false,	false,	false,	false,	false,	false,	false},
-	[5] = {false,	false,	false,	false,	false,	false,	false,	false},
-	[6] = {false,	false,	false,	false,	false,	false,	false,	false},
+--			aggr, 	dnd,	black,	raid,	quest,	normal,	repeat
+	[1] = {false,	false,	true,	false,	false,	true,	false},
+	[2] = {false,	false,	true,	false,	false,	false,	false},
+	[3] = {false,	false,	true,	false,	false,	false,	false},
+	[4] = {false,	false,	false,	false,	false,	false,	false},
+	[5] = {false,	false,	false,	false,	false,	false,	false},
+	[6] = {false,	false,	false,	false,	false,	false,	false},
 }
 
 --Config enabled filters
@@ -120,10 +119,9 @@ local optionFilters = {
 	enableDND = {2, {1,2,3}},
 	blackWordFilterGroup = {3, {4}},
 	addonRAF = {4, {1,2,4}},
-	addonItemLvl = {5, {4}},
-	addonQRF = {6, {1,2,4}},
-	enableRepeat = {8, {1,2,3,5}},
-	repeatFilterGroup = {8, {4}},
+	addonQRF = {5, {1,2,4}},
+	enableRepeat = {7, {1,2,3,5}},
+	repeatFilterGroup = {7, {4}},
 }
 
 function C:SetupEvent()
@@ -186,28 +184,22 @@ local function ECFfilter(Event,msg,player,flags,IsMyFriend,good)
 			if msg:find(tag) then return true end
 		end
 	end
-	-- iLvl Announcement
-	if filtersStatus[5] then
-		for _,tag in ipairs(iLvlTagList) do
-			if msg:find(tag) then return true end
-		end
-	end
 	-- questReport and partyAnnounce
-	if filtersStatus[6] then
+	if filtersStatus[5] then
 		for _,tag in ipairs(QuestReportTagList) do
 			if msg:find(tag) then return true end
 		end
 	end
 
 	-- Fk LFG
-	if filtersStatus[7] then
+	if filtersStatus[6] then
 		for _,tag in ipairs(NormalTagList) do
 			if msg:find(tag) then return true end
 		end
 	end
 
 	--Repeat Filter
-	if filtersStatus[8] and not IsMyFriend then
+	if filtersStatus[7] and not IsMyFriend then
 		local chatLinesSize = #chatLines
 		chatLines[chatLinesSize+1] = msgtable
 		for i=1, chatLinesSize do
