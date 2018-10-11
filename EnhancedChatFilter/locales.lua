@@ -26,11 +26,9 @@ local _, L = unpack(ecf)
 --Addon
 	L["Addons"] = "插件通告过滤"
 	L["RaidAlert"] = "团队警报"
-	L["RaidAlertFilterTooltip"] = "过滤各类技能/打断喊话提醒"
+	L["RaidAlertFilterTooltip"] = "过滤副本中各类技能/喊话提醒"
 	L["QuestReport"] = "任务组队"
-	L["QuestReportFilterTooltip"] = "过滤各类组队任务喊话提醒"
-	L["iLvlAnnounce"] = "装等通告"
-	L["iLvlAnnounceTooltip"] = "过滤TinyInspect等插件的装等提示"
+	L["QuestReportFilterTooltip"] = "过滤各类任务组队喊话提醒"
 --BlackwordFilter
 	L["BlackwordFilter"] = "关键词过滤"
 	L["BlackwordList"] = "黑名单关键词列表"
