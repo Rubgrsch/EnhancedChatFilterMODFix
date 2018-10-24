@@ -116,7 +116,7 @@ local channelFilter = {
 --Config enabled filters
 local optionFilters = {
 	enableAggressive = {1, {1,2,3}},
-	enableDND = {2, {1,2,3}},
+	enableDND = {2, {1,2,3,6}},
 	blackWordFilterGroup = {3, {4}},
 	addonRAF = {4, {1,2,4}},
 	addonQRF = {5, {1,2,4}},
@@ -165,7 +165,7 @@ local function ECFfilter(Event,msg,player,flags,IsMyFriend,good)
 	end
 
 	-- DND, whisper/yell/say/channel and auto-reply
-	if ((filtersStatus[2] and flags == "DND") or Event == 6) and not IsMyFriend then return true end
+	if filtersStatus[2] and (flags == "DND" or Event == 6) and not IsMyFriend then return true end
 
 	--blackWord Filter, whisper/yell/say/channel and party/raid(optional)
 	if filtersStatus[3] and not IsMyFriend then
