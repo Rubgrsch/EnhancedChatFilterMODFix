@@ -106,7 +106,10 @@ local function AddBlackWord(word, r, l)
 	if checkBlacklist(word, r) then
 		print(format(L["IncludeAutofilteredWord"],word))
 	else
-		C.db.blackWordList[r and word or word:upper()] = {lesser = l, regex = not not r}
+		local tbl = {}
+		if l then tbl.lesser = l end
+		if r then tbl.regex = not not r end
+		C.db.blackWordList[r and word or word:upper()] = tbl
 	end
 end
 
