@@ -104,13 +104,13 @@ local chatChannels = {["CHAT_MSG_WHISPER"] = 1, ["CHAT_MSG_SAY"] = 2, ["CHAT_MSG
 
 --Store which type of channels have which filters enabled
 local channelFilter = {
---			aggr, 	dnd,	black,	raid,	quest,	normal,	repeat
-	[1] = {false,	false,	true,	false,	false,	true,	false},
-	[2] = {false,	false,	true,	false,	false,	false,	false},
-	[3] = {false,	false,	true,	false,	false,	false,	false},
-	[4] = {false,	false,	false,	false,	false,	false,	false},
-	[5] = {false,	false,	false,	false,	false,	false,	false},
-	[6] = {false,	false,	false,	false,	false,	false,	false},
+--	aggr, 	dnd,	black,	raid,	quest,	normal,	repeat
+	{false,	false,	true,	false,	false,	true,	false},
+	{false,	false,	true,	false,	false,	false,	false},
+	{false,	false,	true,	false,	false,	false,	false},
+	{false,	false,	false,	false,	false,	false,	false},
+	{false,	false,	false,	false,	false,	false,	false},
+	{false,	false,	false,	false,	false,	false,	false},
 }
 
 --Config enabled filters
