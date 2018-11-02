@@ -11,7 +11,7 @@ It is now supporting Battle for Azeroth(8.0.1).
 
 Curse Link: <https://www.curseforge.com/wow/addons/ecfmodfix>
 
-[Github Wiki](https://github.com/Rubgrsch/EnhancedChatFilterMODFix/wiki/%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E)
+[Manual/使用说明](https://github.com/Rubgrsch/EnhancedChatFilterMODFix/wiki/Manual)
 
 Main Features
 -------------
