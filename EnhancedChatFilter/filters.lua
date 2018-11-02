@@ -287,12 +287,9 @@ ChatFrame_AddMessageEventFilter("CHAT_MSG_SYSTEM", systemMsgFilter)
 local achievements = {}
 local function achievementReady(id)
 	local area, guild = achievements[id].CHAT_MSG_ACHIEVEMENT, achievements[id].CHAT_MSG_GUILD_ACHIEVEMENT
-	local myGuild = GetGuildInfo("player")
-	if area and guild and myGuild then -- merge area to guild
-		for name in pairs(area) do
-			if UnitExists(name) and myGuild == GetGuildInfo(name) then
-				guild[name], area[name] = area[name], nil
-			end
+	if area and guild then -- merge area to guild
+		for name,class in pairs(area) do
+			if guild[name] == class then area[name] = nil end
 		end
 	end
 	for event,players in pairs(achievements[id]) do
