@@ -6,7 +6,7 @@ local _G = _G
 -- Lua
 local format, ipairs, max, min, next, pairs, select, tconcat, tonumber, tremove, twipe = format, ipairs, max, min, next, pairs, select, table.concat, tonumber, tremove, table.wipe
 -- WoW
-local Ambiguate, BNGetGameAccountInfoByGUID, C_Timer_After, ChatTypeInfo, GetAchievementLink, GetGuildInfo, GetItemInfo, GetPlayerInfoByGUID, GetTime, IsCharacterFriend, RAID_CLASS_COLORS, UnitExists, UnitInParty, UnitInRaid = Ambiguate, BNGetGameAccountInfoByGUID, C_Timer.After, ChatTypeInfo, GetAchievementLink, GetGuildInfo, GetItemInfo, GetPlayerInfoByGUID, GetTime, IsCharacterFriend, RAID_CLASS_COLORS, UnitExists, UnitInParty, UnitInRaid
+local Ambiguate, BNGetGameAccountInfoByGUID, C_Timer_After, ChatTypeInfo, GetAchievementLink, GetItemInfo, GetPlayerInfoByGUID, GetTime, IsCharacterFriend, IsGUIDInGroup, IsGuildMember, RAID_CLASS_COLORS = Ambiguate, BNGetGameAccountInfoByGUID, C_Timer.After, ChatTypeInfo, GetAchievementLink, GetItemInfo, GetPlayerInfoByGUID, GetTime, IsCharacterFriend, IsGUIDInGroup, IsGuildMember, RAID_CLASS_COLORS
 
 -- GLOBALS: NUM_CHAT_WINDOWS
 
@@ -225,7 +225,7 @@ local function ECFfilterRecord(self,event,msg,player,_,_,_,flags,_,_,channelName
 
 	player = Ambiguate(player, "none")
 	local IsMyFriend = guid and (BNGetGameAccountInfoByGUID(guid) or IsCharacterFriend(guid))
-	local good = IsMyFriend or GetGuildInfo("player") == GetGuildInfo(player) or UnitInRaid(player) or UnitInParty(player)
+	local good = IsMyFriend or IsGuildMember(guid) or IsGUIDInGroup(guid)
 	filterResult = ECFfilter(chatChannels[event],msg,player,flags,IsMyFriend,good)
 
 	if filterResult and not good then playerCache[player] = playerCache[player] + 1 end
