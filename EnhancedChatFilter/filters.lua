@@ -121,13 +121,13 @@ local optionFilters = {
 	addonRAF = {4, {1,2,4}},
 	addonQRF = {5, {1,2,4}},
 	enableRepeat = {7, {1,2,3,5}},
-	repeatFilterGroup = {7, {4}},
+	repeatFilterGroup = {7, {4}, "enableRepeat"},
 }
 
 function C:SetupEvent()
 	for opt, v in pairs(optionFilters) do
-		local status, filterIdx = C.db[opt], v[1]
-		for _, idx in ipairs(v[2]) do channelFilter[idx][filterIdx] = status end
+		local status, filterIdx, meetRequested = C.db[opt], v[1], not v[3] or C.db[v[3]]
+		for _, idx in ipairs(v[2]) do channelFilter[idx][filterIdx] = meetRequested and status end
 	end
 end
 
