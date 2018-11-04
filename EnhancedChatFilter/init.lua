@@ -7,8 +7,6 @@ ecf.init = {}
 
 -- Lua
 local ipairs = ipairs
--- WoW
-local ShowFriends = ShowFriends
 
 local frame = CreateFrame("Frame")
 frame:RegisterEvent("ADDON_LOADED")
@@ -17,7 +15,6 @@ frame:SetScript("OnEvent", function(self,event,name)
 		self:UnregisterEvent(event)
 		for _,f in ipairs(ecf.init) do f() end
 		ecf.init = nil
-		ShowFriends()
 	end
 end)
 
