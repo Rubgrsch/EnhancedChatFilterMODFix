@@ -215,10 +215,7 @@ local function ECFfilter(Event,msg,player,flags,IsMyFriend,good)
 end
 
 local prevLineID, filterResult = 0, false
-local function ECFfilterRecord(self,event,msg,player,_,_,_,flags,_,_,channelName,_,lineID,guid)
-	-- filter MeetingStone(NetEase) broad msg so it will not trigger any ECFfilters
-	if channelName == "集合石" then return true end
-
+local function ECFfilterRecord(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID,guid)
 	-- if it has been worked then use the worked result
 	if lineID == prevLineID then return filterResult end
 	prevLineID = lineID
