@@ -7,7 +7,6 @@ local _G = _G
 local format, pairs, print, next, select, tconcat, tonumber, type = format, pairs, print, next, select, table.concat, tonumber, type
 -- WoW
 local GetCurrencyLink, GetItemInfo, ITEMS = GetCurrencyLink, GetItemInfo, ITEMS
-local LibStub = LibStub
 
 --Default Options
 local defaults = {
