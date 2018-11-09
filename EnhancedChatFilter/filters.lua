@@ -221,8 +221,11 @@ local function ECFfilterRecord(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID,
 	prevLineID = lineID
 
 	player = Ambiguate(player, "none")
-	local IsMyFriend = guid and (BNGetGameAccountInfoByGUID(guid) or IsCharacterFriend(guid))
-	local good = IsMyFriend or IsGuildMember(guid) or IsGUIDInGroup(guid)
+	local IsMyFriend, good
+	if guid then
+		IsMyFriend = BNGetGameAccountInfoByGUID(guid) or IsCharacterFriend(guid)
+		good = IsMyFriend or IsGuildMember(guid) or IsGUIDInGroup(guid)
+	end
 	filterResult = ECFfilter(chatChannels[event],msg,player,flags,IsMyFriend,good)
 
 	if filterResult and not good then playerCache[player] = playerCache[player] + 1 end
