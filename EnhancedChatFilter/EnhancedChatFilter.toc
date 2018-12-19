@@ -1,4 +1,4 @@
-## Interface: 80000
+## Interface: 80100
 ## Title: Enhanced Chat Filter MOD Fix
 ## Notes: A chat filter based on blackwords and other triggers
 ## Notes-zhCN: 基于关键词的聊天过滤插件，包含了更多过滤器
