@@ -82,8 +82,7 @@ end
 local last, this = {}, {}
 local function strDiff(sA, sB) -- arrays of bytes
 	local len_a, len_b = #sA, #sB
-	twipe(last)
-	twipe(this)
+	local last, this = last, this
 	for j=0, len_b do last[j+1] = j end
 	for i=1, len_a do
 		this[1] = i
@@ -200,6 +199,7 @@ local function ECFfilter(Event,msg,player,flags,IsMyFriend,good)
 
 	--Repeat Filter
 	if filtersStatus[7] and not IsMyFriend then
+		local chatLines = chatLines
 		local chatLinesSize = #chatLines
 		chatLines[chatLinesSize+1] = msgtable
 		for i=1, chatLinesSize do
@@ -217,19 +217,19 @@ end
 local prevLineID, filterResult = 0, false
 local function ECFfilterRecord(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID,guid)
 	-- if it has been worked then use the worked result
-	if lineID == prevLineID then return filterResult end
-	prevLineID = lineID
+	if lineID ~= prevLineID then
+		prevLineID = lineID
 
-	player = Ambiguate(player, "none")
-	local IsMyFriend, good
-	if guid then
-		IsMyFriend = BNGetGameAccountInfoByGUID(guid) or C_FriendList_IsFriend(guid)
-		good = IsMyFriend or IsGuildMember(guid) or IsGUIDInGroup(guid)
+		player = Ambiguate(player, "none")
+		local IsMyFriend, good
+		if guid then
+			IsMyFriend = BNGetGameAccountInfoByGUID(guid) or C_FriendList_IsFriend(guid)
+			good = IsMyFriend or IsGuildMember(guid) or IsGUIDInGroup(guid)
+		end
+		filterResult = ECFfilter(chatChannels[event],msg,player,flags,IsMyFriend,good)
+
+		if filterResult and not good then playerCache[player] = playerCache[player] + 1 end
 	end
-	filterResult = ECFfilter(chatChannels[event],msg,player,flags,IsMyFriend,good)
-
-	if filterResult and not good then playerCache[player] = playerCache[player] + 1 end
-
 	return filterResult
 end
 for event in pairs(chatChannels) do ChatFrame_AddMessageEventFilter(event, ECFfilterRecord) end
