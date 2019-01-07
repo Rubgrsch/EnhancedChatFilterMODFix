@@ -140,14 +140,14 @@ local function ECFfilter(Event,msg,player,flags,IsMyFriend,good)
 	-- remove color/hypelink
 	local filterString = msg:gsub("|H.-|h(.-)|h","%1"):gsub("|c%x%x%x%x%x%x%x%x",""):gsub("|r","")
 	local oriLen = #filterString
-	-- remove utf-8 chars/raidicon/space/symbols
+	-- remove utf-8 chars/raidicon/symbols
 	filterString = G.utf8replace(filterString):gsub("{rt%d}","")
 	local msgLine = filterString:gsub(G.RegexCharList, ""):upper()
 	local annoying = (oriLen - #msgLine) / oriLen
 	--If it has only symbols, don't change it
 	if msgLine == "" then msgLine = msg end
 
-	--msgdata
+	--msgdata for repeatFilter
 	local msgtable = {player, {}, GetTime()}
 	for idx=1, #msgLine do msgtable[2][idx] = msgLine:byte(idx) end
 
@@ -163,10 +163,10 @@ local function ECFfilter(Event,msg,player,flags,IsMyFriend,good)
 		end
 	end
 
-	-- DND, whisper/yell/say/channel and auto-reply
+	-- DND and auto-reply
 	if filtersStatus[2] and (flags == "DND" or Event == 6) and not IsMyFriend then return true end
 
-	--blackWord Filter, whisper/yell/say/channel and party/raid(optional)
+	--blackWord Filter
 	if filtersStatus[3] and not IsMyFriend then
 		local count = 0
 		for k,v in pairs(C.db.blackWordList) do
@@ -328,7 +328,7 @@ local function lootItemFilter(self,_,msg)
 	local itemID = tonumber(msg:match("|Hitem:(%d+)"))
 	if not itemID then return end -- pet cages don't have 'item'
 	if C.db.lootItemFilterList[itemID] then return true end
-	if select(3,GetItemInfo(itemID)) < C.db.lootQualityMin then return true end -- ItemQuality is in ascending order
+	if select(3,GetItemInfo(itemID)) < C.db.lootQualityMin then return true end
 end
 ChatFrame_AddMessageEventFilter("CHAT_MSG_LOOT", lootItemFilter)
 
