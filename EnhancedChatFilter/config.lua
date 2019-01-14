@@ -77,9 +77,6 @@ ecf.init[#ecf.init+1] = function()
 	for Id, info in pairs(C.db.lootItemFilterList) do
 		if info == true then ItemInfoRequested[Id] = 1 end
 	end
-	for Id, info in pairs(C.db.lootCurrencyFilterList) do
-		if info == true then C.db.lootCurrencyFilterList[Id] = GetCurrencyLink(Id) end
-	end
 	C:SetupEvent()
 end
 
@@ -361,11 +358,7 @@ options.args.lootFilter = {
 			order = 2,
 			get = function() return C.UI.lootTypeChosen == "CURRENCY" and C.UI.lootIDChosen end,
 			set = function(_,value) C.UI.lootIDChosen, C.UI.lootTypeChosen = value, "CURRENCY" end,
-			values = function()
-				local currencyFilterLinkList = {}
-				for key,v in pairs(C.db.lootCurrencyFilterList) do currencyFilterLinkList[key] = v end
-				return currencyFilterLinkList
-			end,
+			values = function() return C.db.lootCurrencyFilterList end,
 		},
 		DeleteButton = {
 			type = "execute",

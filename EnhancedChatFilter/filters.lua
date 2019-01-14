@@ -4,7 +4,7 @@ local C, L, G = unpack(ecf)
 
 local _G = _G
 -- Lua
-local format, ipairs, max, min, next, pairs, select, tconcat, tonumber, tremove, twipe = format, ipairs, max, min, next, pairs, select, table.concat, tonumber, tremove, table.wipe
+local format, ipairs, max, min, next, pairs, select, tconcat, tonumber, tremove = format, ipairs, max, min, next, pairs, select, table.concat, tonumber, tremove
 -- WoW
 local Ambiguate, BNGetGameAccountInfoByGUID, C_Timer_After, ChatTypeInfo, GetAchievementLink, GetItemInfo, GetPlayerInfoByGUID, GetTime, C_FriendList_IsFriend, IsGUIDInGroup, IsGuildMember, RAID_CLASS_COLORS = Ambiguate, BNGetGameAccountInfoByGUID, C_Timer.After, ChatTypeInfo, GetAchievementLink, GetItemInfo, GetPlayerInfoByGUID, GetTime, C_FriendList.IsFriend, IsGUIDInGroup, IsGuildMember, RAID_CLASS_COLORS
 
@@ -39,10 +39,8 @@ G.RegexCharList = "[().%%%+%-%*?%[%]$^{}]" -- won't work on regex blackWord, but
 
 -- utf8 functions are taken and modified from utf8replace from @Phanx @Pastamancer
 -- replace UTF-8 characters based on a mapping table
-local utf8tbl = {}
 function G.utf8replace(s)
-	local pos = 1
-	twipe(utf8tbl)
+	local pos, str = 1, ""
 	local mapping = UTF8Symbols
 
 	while pos <= #s do
@@ -58,11 +56,11 @@ function G.utf8replace(s)
 			charbytes = 4
 		end
 		local c = s:sub(pos, pos + charbytes - 1)
-		utf8tbl[#utf8tbl+1] = (mapping[c] or c)
+		str = str..(mapping[c] or c)
 		pos = pos + charbytes
 	end
 
-	return tconcat(utf8tbl)
+	return str
 end
 
 local function SendMessage(event, msg)
@@ -147,10 +145,6 @@ local function ECFfilter(Event,msg,player,flags,IsMyFriend,good)
 	--If it has only symbols, don't change it
 	if msgLine == "" then msgLine = msg end
 
-	--msgdata for repeatFilter
-	local msgtable = {player, {}, GetTime()}
-	for idx=1, #msgLine do msgtable[2][idx] = msgLine:byte(idx) end
-
 	--filter status for each channel
 	local filtersStatus = channelFilter[Event]
 
@@ -199,13 +193,17 @@ local function ECFfilter(Event,msg,player,flags,IsMyFriend,good)
 
 	--Repeat Filter
 	if filtersStatus[7] and not IsMyFriend then
+		local msgtable = {player, {}, GetTime()}
+		for idx=1, #msgLine do msgtable[2][idx] = msgLine:byte(idx) end
+
 		local chatLines = chatLines
 		local chatLinesSize = #chatLines
 		chatLines[chatLinesSize+1] = msgtable
 		for i=1, chatLinesSize do
+			local line = chatLines[i]
 			--if there is not much difference between msgs, filter it
 			--if multiple msgs in 0.6s, filter it (channel & emote only)
-			if chatLines[i][1] == msgtable[1] and ((Event == 3 and msgtable[3] - chatLines[i][3] < 0.6) or strDiff(chatLines[i][2],msgtable[2]) <= 0.1) then
+			if line[1] == msgtable[1] and ((Event == 3 and msgtable[3] - line[3] < 0.6) or strDiff(line[2],msgtable[2]) <= 0.1) then
 				tremove(chatLines, i)
 				return true
 			end
