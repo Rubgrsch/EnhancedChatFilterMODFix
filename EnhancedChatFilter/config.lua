@@ -407,7 +407,7 @@ options.args.lootFilter = {
 						C.db.lootItemFilterList[Id] = link
 					end
 				else
-					local link = GetCurrencyLink(Id)
+					local link = GetCurrencyLink(Id,0)
 					if link then
 						C.db.lootCurrencyFilterList[Id] = link
 					else
