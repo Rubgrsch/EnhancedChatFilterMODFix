@@ -4,9 +4,9 @@ local C, L, G = unpack(ecf)
 
 local _G = _G
 -- Lua
-local format, ipairs, max, min, next, pairs, select, tconcat, tonumber, tremove = format, ipairs, max, min, next, pairs, select, table.concat, tonumber, tremove
+local format, ipairs, max, min, next, pairs, tconcat, tonumber, tremove = format, ipairs, max, min, next, pairs, table.concat, tonumber, tremove
 -- WoW
-local Ambiguate, BNGetGameAccountInfoByGUID, C_Timer_After, ChatTypeInfo, GetAchievementLink, GetItemInfo, GetPlayerInfoByGUID, GetTime, C_FriendList_IsFriend, IsGUIDInGroup, IsGuildMember, RAID_CLASS_COLORS = Ambiguate, BNGetGameAccountInfoByGUID, C_Timer.After, ChatTypeInfo, GetAchievementLink, GetItemInfo, GetPlayerInfoByGUID, GetTime, C_FriendList.IsFriend, IsGUIDInGroup, IsGuildMember, RAID_CLASS_COLORS
+local Ambiguate, BNGetGameAccountInfoByGUID, C_Item_GetItemQualityByID, C_Timer_After, ChatTypeInfo, GetAchievementLink, GetPlayerInfoByGUID, GetTime, C_FriendList_IsFriend, IsGUIDInGroup, IsGuildMember, RAID_CLASS_COLORS = Ambiguate, BNGetGameAccountInfoByGUID, C_Item.GetItemQualityByID, C_Timer.After, ChatTypeInfo, GetAchievementLink, GetPlayerInfoByGUID, GetTime, C_FriendList.IsFriend, IsGUIDInGroup, IsGuildMember, RAID_CLASS_COLORS
 
 -- GLOBALS: NUM_CHAT_WINDOWS
 
@@ -326,7 +326,7 @@ local function lootItemFilter(self,_,msg)
 	local itemID = tonumber(msg:match("|Hitem:(%d+)"))
 	if not itemID then return end -- pet cages don't have 'item'
 	if C.db.lootItemFilterList[itemID] then return true end
-	if select(3,GetItemInfo(itemID)) < C.db.lootQualityMin then return true end
+	if C_Item_GetItemQualityByID(itemID) < C.db.lootQualityMin then return true end
 end
 ChatFrame_AddMessageEventFilter("CHAT_MSG_LOOT", lootItemFilter)
 
