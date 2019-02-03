@@ -256,6 +256,7 @@ local function monsterFilter(self,_,msg)
 	if MSLPos > 7 then MSLPos = MSLPos - 7 end
 end
 ChatFrame_AddMessageEventFilter("CHAT_MSG_MONSTER_SAY", monsterFilter)
+ChatFrame_AddMessageEventFilter("CHAT_MSG_MONSTER_EMOTE", monsterFilter)
 
 --SystemMessage
 local SystemFilterTag = {
