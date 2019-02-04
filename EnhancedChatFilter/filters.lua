@@ -33,8 +33,6 @@ local UTF8Symbols = {
 }
 local RaidAlertTagList = {"%*%*.+%*%*", "EUI[:_]", "PS 死亡:", "|Hspell.+[=>%-]> ", "受伤源自 |Hspell", "已打断.*|Hspell", "→|Hspell", "打断：.+|Hspell", "打断.+>.+<", "<iLvl>", "^%-+$", "<EH>"}
 local QuestReportTagList = {"任务进度提示", "任务完成[%)%-]", "<大脚", "接受任务[%]:%-]", "进度:.+: %d+/%d+", "【爱不易】", "任务.*%[%d+%].+ 已完成!"}
-local NormalTagList = {"<LFG>"}
-local AggressiveTagList = {"|Hjournal"}
 G.RegexCharList = "[().%%%+%-%*?%[%]$^{}]" -- won't work on regex blackWord, but works on others
 
 -- utf8 functions are taken and modified from utf8replace from @Phanx @Pastamancer
@@ -152,9 +150,7 @@ local function ECFfilter(Event,msg,player,flags,IsMyFriend,good)
 	-- AggressiveFilter: Filter AggressiveTags, currently only journal link
 	if filtersStatus[1] and not IsMyFriend then
 		if annoying >= 0.25 and oriLen >= 30 then return true end
-		for _,tag in ipairs(AggressiveTagList) do
-			if msg:find(tag) then return true end
-		end
+		if msg:find("|Hjournal") then return true end
 	end
 
 	-- DND and auto-reply
@@ -186,9 +182,7 @@ local function ECFfilter(Event,msg,player,flags,IsMyFriend,good)
 
 	-- Fk LFG
 	if filtersStatus[6] then
-		for _,tag in ipairs(NormalTagList) do
-			if msg:find(tag) then return true end
-		end
+		if msg:find("<LFG>") then return true end
 	end
 
 	--Repeat Filter
