@@ -138,6 +138,7 @@ local function ECFfilter(Event,msg,player,flags,IsMyFriend,good)
 	local oriLen = #filterString
 	-- remove utf-8 chars/raidicon/symbols
 	filterString = G.utf8replace(filterString):gsub("{rt%d}","")
+	-- use upper to help repeatFilter and also allow regex in blackword
 	local msgLine = filterString:gsub(G.RegexCharList, ""):upper()
 	local annoying = (oriLen - #msgLine) / oriLen
 	--If it has only symbols, don't change it
@@ -160,7 +161,7 @@ local function ECFfilter(Event,msg,player,flags,IsMyFriend,good)
 	if filtersStatus[3] and not IsMyFriend then
 		local count = 0
 		for k,v in pairs(C.db.blackWordList) do
-			if filterString:find(k) then
+			if (v.regex and filterString or msgLine):find(k) then
 				if v.lesser then count = count + 1 else return true end
 			end
 		end
