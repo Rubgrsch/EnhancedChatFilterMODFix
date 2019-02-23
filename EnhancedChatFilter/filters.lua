@@ -210,7 +210,8 @@ end
 local prevLineID, filterResult = 0, false
 local function ECFfilterRecord(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID,guid)
 	-- if it has been worked then use the worked result
-	if lineID ~= prevLineID then
+	-- lineID returned by"CHAT_MSG_TEXT_EMOTE" is always 0
+	if lineID == 0 or lineID ~= prevLineID then
 		prevLineID = lineID
 
 		player = Ambiguate(player, "none")
