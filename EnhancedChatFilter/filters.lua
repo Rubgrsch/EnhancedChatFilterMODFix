@@ -95,7 +95,7 @@ local playerCache = {}
 setmetatable(playerCache, {__index=function() return 0 end})
 
 local chatLines = {}
-local chatChannels = {["CHAT_MSG_WHISPER"] = 1, ["CHAT_MSG_SAY"] = 2, ["CHAT_MSG_YELL"] = 2, ["CHAT_MSG_CHANNEL"] = 3, ["CHAT_MSG_EMOTE"] = 3, ["CHAT_MSG_PARTY"] = 4, ["CHAT_MSG_PARTY_LEADER"] = 4, ["CHAT_MSG_RAID"] = 4, ["CHAT_MSG_RAID_LEADER"] = 4, ["CHAT_MSG_RAID_WARNING"] = 4, ["CHAT_MSG_INSTANCE_CHAT"] = 4, ["CHAT_MSG_INSTANCE_CHAT_LEADER"] = 4, ["CHAT_MSG_TEXT_EMOTE"] = 5, ["CHAT_MSG_DND"] = 6}
+local chatChannels = {["CHAT_MSG_WHISPER"] = 1, ["CHAT_MSG_SAY"] = 2, ["CHAT_MSG_YELL"] = 2, ["CHAT_MSG_CHANNEL"] = 3, ["CHAT_MSG_EMOTE"] = 3, ["CHAT_MSG_TEXT_EMOTE"] = 3, ["CHAT_MSG_PARTY"] = 4, ["CHAT_MSG_PARTY_LEADER"] = 4, ["CHAT_MSG_RAID"] = 4, ["CHAT_MSG_RAID_LEADER"] = 4, ["CHAT_MSG_RAID_WARNING"] = 4, ["CHAT_MSG_INSTANCE_CHAT"] = 4, ["CHAT_MSG_INSTANCE_CHAT_LEADER"] = 4, ["CHAT_MSG_DND"] = 5}
 
 --Store which type of channels have which filters enabled
 local channelFilter = {
@@ -105,17 +105,16 @@ local channelFilter = {
 	{false,	false,	true,	false,	false,	false,	false},
 	{false,	false,	false,	false,	false,	false,	false},
 	{false,	false,	false,	false,	false,	false,	false},
-	{false,	false,	false,	false,	false,	false,	false},
 }
 
 --Config enabled filters
 local optionFilters = {
 	enableAggressive = {1, {1,2,3}},
-	enableDND = {2, {1,2,3,6}},
+	enableDND = {2, {1,2,3,5}},
 	blackWordFilterGroup = {3, {4}},
 	addonRAF = {4, {1,2,4}},
 	addonQRF = {5, {1,2,4}},
-	enableRepeat = {7, {1,2,3,5}},
+	enableRepeat = {7, {1,2,3}},
 	repeatFilterGroup = {7, {4}, "enableRepeat"},
 }
 
