@@ -2,8 +2,8 @@
 local _, ecf = ...
 local C, L, G = unpack(ecf)
 
-local _G = _G
 -- Lua
+local _G = _G
 local format, ipairs, max, min, next, pairs, tconcat, tonumber, tremove = format, ipairs, max, min, next, pairs, table.concat, tonumber, tremove
 -- WoW
 local Ambiguate, BNGetGameAccountInfoByGUID, C_Item_GetItemQualityByID, C_Timer_After, ChatTypeInfo, GetAchievementLink, GetPlayerInfoByGUID, GetTime, C_FriendList_IsFriend, IsGUIDInGroup, IsGuildMember, RAID_CLASS_COLORS = Ambiguate, BNGetGameAccountInfoByGUID, C_Item.GetItemQualityByID, C_Timer.After, ChatTypeInfo, GetAchievementLink, GetPlayerInfoByGUID, GetTime, C_FriendList.IsFriend, IsGUIDInGroup, IsGuildMember, RAID_CLASS_COLORS
@@ -95,10 +95,10 @@ local playerCache = {}
 setmetatable(playerCache, {__index=function() return 0 end})
 
 local chatLines = {}
-local chatChannels = {["CHAT_MSG_WHISPER"] = 1, ["CHAT_MSG_SAY"] = 2, ["CHAT_MSG_YELL"] = 2, ["CHAT_MSG_CHANNEL"] = 3, ["CHAT_MSG_EMOTE"] = 3, ["CHAT_MSG_TEXT_EMOTE"] = 3, ["CHAT_MSG_PARTY"] = 4, ["CHAT_MSG_PARTY_LEADER"] = 4, ["CHAT_MSG_RAID"] = 4, ["CHAT_MSG_RAID_LEADER"] = 4, ["CHAT_MSG_RAID_WARNING"] = 4, ["CHAT_MSG_INSTANCE_CHAT"] = 4, ["CHAT_MSG_INSTANCE_CHAT_LEADER"] = 4, ["CHAT_MSG_DND"] = 5}
+local chatEvents = {["CHAT_MSG_WHISPER"] = 1, ["CHAT_MSG_SAY"] = 2, ["CHAT_MSG_YELL"] = 2, ["CHAT_MSG_CHANNEL"] = 3, ["CHAT_MSG_EMOTE"] = 3, ["CHAT_MSG_TEXT_EMOTE"] = 3, ["CHAT_MSG_PARTY"] = 4, ["CHAT_MSG_PARTY_LEADER"] = 4, ["CHAT_MSG_RAID"] = 4, ["CHAT_MSG_RAID_LEADER"] = 4, ["CHAT_MSG_RAID_WARNING"] = 4, ["CHAT_MSG_INSTANCE_CHAT"] = 4, ["CHAT_MSG_INSTANCE_CHAT_LEADER"] = 4, ["CHAT_MSG_DND"] = 5}
 
---Store which type of channels have which filters enabled
-local channelFilter = {
+--Store which type of channels have which filters enabled, [eventIdx] = {filters}
+local eventStatus = {
 --	aggr, 	dnd,	black,	raid,	quest,	normal,	repeat
 	{false,	false,	true,	false,	false,	true,	false},
 	{false,	false,	true,	false,	false,	false,	false},
@@ -107,7 +107,8 @@ local channelFilter = {
 	{false,	false,	false,	false,	false,	false,	false},
 }
 
---Config enabled filters
+--Config enabled filters, {filterIdx, {events}}
+--For each C.db.xxx enable filterIdx->events
 local optionFilters = {
 	enableAggressive = {1, {1,2,3}},
 	enableDND = {2, {1,2,3,5}},
@@ -121,7 +122,7 @@ local optionFilters = {
 function C:SetupEvent()
 	for opt, v in pairs(optionFilters) do
 		local status, filterIdx, meetRequested = C.db[opt], v[1], not v[3] or C.db[v[3]]
-		for _, idx in ipairs(v[2]) do channelFilter[idx][filterIdx] = meetRequested and status end
+		for _, idx in ipairs(v[2]) do eventStatus[idx][filterIdx] = meetRequested and status end
 	end
 end
 
@@ -135,16 +136,16 @@ local function ECFfilter(Event,msg,player,flags,IsMyFriend,good)
 	-- remove color/hypelink
 	local filterString = msg:gsub("|H.-|h(.-)|h","%1"):gsub("|c%x%x%x%x%x%x%x%x",""):gsub("|r","")
 	local oriLen = #filterString
-	-- remove utf-8 chars/raidicon/symbols
+	-- remove utf-8 chars/symbols/raidicon
 	filterString = G.utf8replace(filterString):gsub("{rt%d}","")
-	-- use upper to help repeatFilter and also allow regex in blackword
+	-- use upper to help repeatFilter, non-regex only
 	local msgLine = filterString:gsub(G.RegexCharList, ""):upper()
 	local annoying = (oriLen - #msgLine) / oriLen
 	--If it has only symbols, don't change it
 	if msgLine == "" then msgLine = msg end
 
 	--filter status for each channel
-	local filtersStatus = channelFilter[Event]
+	local filtersStatus = eventStatus[Event]
 
 	-- AggressiveFilter: Filter strings that has too much symbols
 	-- AggressiveFilter: Filter AggressiveTags, currently only journal link
@@ -207,9 +208,9 @@ local function ECFfilter(Event,msg,player,flags,IsMyFriend,good)
 end
 
 local prevLineID, filterResult = 0, false
-local function ECFfilterRecord(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID,guid)
-	-- if it has been worked then use the worked result
-	-- lineID returned by"CHAT_MSG_TEXT_EMOTE" is always 0
+local function preECFfilter(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID,guid)
+	-- With multiple chat tabs one msg can trigger filters multiple times and repeatFilter will return wrong result
+	-- lineID returned by "CHAT_MSG_TEXT_EMOTE" is always 0
 	if lineID == 0 or lineID ~= prevLineID then
 		prevLineID = lineID
 
@@ -219,13 +220,13 @@ local function ECFfilterRecord(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID,
 			IsMyFriend = BNGetGameAccountInfoByGUID(guid) or C_FriendList_IsFriend(guid)
 			good = IsMyFriend or IsGuildMember(guid) or IsGUIDInGroup(guid)
 		end
-		filterResult = ECFfilter(chatChannels[event],msg,player,flags,IsMyFriend,good)
+		filterResult = ECFfilter(chatEvents[event],msg,player,flags,IsMyFriend,good)
 
 		if filterResult and not good then playerCache[player] = playerCache[player] + 1 end
 	end
 	return filterResult
 end
-for event in pairs(chatChannels) do ChatFrame_AddMessageEventFilter(event, ECFfilterRecord) end
+for event in pairs(chatEvents) do ChatFrame_AddMessageEventFilter(event, preECFfilter) end
 
 --MonsterSayFilter
 --Turn off MSF in certain quests. Chat msg are repeated but important in these quests.
