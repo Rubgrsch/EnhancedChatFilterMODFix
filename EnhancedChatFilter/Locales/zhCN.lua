@@ -1,7 +1,8 @@
 local _, ecf = ...
 local _, L = unpack(ecf)
 
--- zhCN Only --
+--Default locale
+if locale ~= "zhCN" and next(L) then return end
 
 --Common in tab
 L["ClearUp"] = "清空"
@@ -62,5 +63,3 @@ L["LootQualityFilterTooltips"] = "显示拾取物品所需要的最低质量，�
 --AchievementFilter
 L["GotAchievement"] = "[%s]获得了成就%s！"
 L["And"] = "、"
-
-setmetatable(L, {__index=function(_, key) return key end})

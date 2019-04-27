@@ -4,6 +4,7 @@ ecf[1] = {} -- Config
 ecf[2] = {} -- Locales
 ecf[3] = {} -- Globals
 ecf.init = {}
+setmetatable(ecf[2], {__index=function(_, key) return key end})
 
 -- Lua
 local ipairs = ipairs
