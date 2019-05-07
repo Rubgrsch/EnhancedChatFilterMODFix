@@ -108,7 +108,7 @@ local eventStatus = {
 }
 
 --Config enabled filters, {filterIdx, {events}}
---For each C.db.xxx enable filterIdx->events
+--For each C.db.xxx enable filterIdx(column) -> events(row)
 local optionFilters = {
 	enableAggressive = {1, {1,2,3}},
 	enableDND = {2, {1,2,3,5}},
@@ -155,7 +155,7 @@ local function ECFfilter(Event,msg,player,flags,IsMyFriend,good)
 	end
 
 	-- DND and auto-reply
-	if filtersStatus[2] and (flags == "DND" or Event == 6) and not IsMyFriend then return true end
+	if filtersStatus[2] and (flags == "DND" or Event == 5) and not IsMyFriend then return true end
 
 	--blackWord Filter
 	if filtersStatus[3] and not IsMyFriend then
