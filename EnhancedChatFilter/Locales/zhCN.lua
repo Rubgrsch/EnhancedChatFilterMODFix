@@ -2,7 +2,7 @@ local _, ecf = ...
 local _, L = unpack(ecf)
 
 --Default locale
-if locale ~= "zhCN" and next(L) then return end
+if GetLocale() ~= "zhCN" and next(L) then return end
 
 --Common in tab
 L["ClearUp"] = "清空"
