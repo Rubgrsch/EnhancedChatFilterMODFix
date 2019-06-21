@@ -31,7 +31,7 @@ local UTF8Symbols = {
 	['#']='',['&']='',[';']='',[':']='',['~']='',['\\']='',['=']='',
 	["\t"]='',["\n"]='',["\r"]='',[" "]='',
 }
-local RaidAlertTagList = {"%*%*.+%*%*", "EUI[:_]", "PS 死亡:", "|Hspell.+[=>%-]> ", "受伤源自 |Hspell", "已打断.*|Hspell", "→|Hspell", "打断：.+|Hspell", "打断.+>.+<", "<iLvl>", "^%-+$", "<EH>"}
+local RaidAlertTagList = {"%*%*.+%*%*", "EUI[:_]", "PS 死亡:", "|Hspell.+[=>%-]> ", "受伤源自 |Hspell", "已打断.*|Hspell", "→|Hspell", "打断：.+|Hspell", "打断.+>.+<", "<iLvl>", "^%-+$", "<EH>", "|Hspell.+>.+|Hspell"}
 local QuestReportTagList = {"任务进度提示", "任务完成[%)%-]", "<大脚", "接受任务[%]:%-]", "进度:.+: %d+/%d+", "【爱不易】", "任务.*%[%d+%].+ 已完成!"}
 G.RegexCharList = "[().%%%+%-%*?%[%]$^{}]" -- won't work on regex blackWord, but works on others
 
