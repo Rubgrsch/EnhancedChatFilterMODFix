@@ -1,9 +1,9 @@
-## Interface: 80100
+## Interface: 80200
 ## Title: Enhanced Chat Filter MOD Fix
 ## Notes: A chat filter based on blackwords and other triggers
 ## Notes-zhCN: 基于关键词的聊天过滤插件，包含了更多过滤器
 ## Author: Rubgrsch
-## Version: 8.1.5-0-1
+## Version: 8.2.0-0
 ## SavedVariables: ecfDB
 
 libs\LibStub\LibStub.lua
