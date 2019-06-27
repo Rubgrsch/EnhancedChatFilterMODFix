@@ -257,26 +257,18 @@ ChatFrame_AddMessageEventFilter("CHAT_MSG_MONSTER_EMOTE", monsterFilter)
 --SystemMessage
 local SystemFilterTag = {
 	-- !!! Always add parentheses since gsub() has two return values !!!
-	(AZERITE_ISLANDS_XP_GAIN:gsub("%%.-s",".+"):gsub("%%.-d","%%d+")), -- Azerite gain in islands
+	(ERR_LEARN_ABILITY_S:gsub("%%s","(.*)")),
+	(ERR_LEARN_SPELL_S:gsub("%%s","(.*)")),
+	(ERR_SPELL_UNLEARNED_S:gsub("%%s","(.*)")),
+	(ERR_LEARN_PASSIVE_S:gsub("%%s","(.*)")),
+	(ERR_PET_SPELL_UNLEARNED_S:gsub("%%s","(.*)")),
+	(ERR_PET_LEARN_ABILITY_S:gsub("%%s","(.*)")),
+	(ERR_PET_LEARN_SPELL_S:gsub("%%s","(.*)")),
 }
-if UnitLevel("player") == GetMaxPlayerLevel() then -- spell learn, only when max level
-	local SSFilterStrings = {
-		(ERR_LEARN_ABILITY_S:gsub("%%s","(.*)")),
-		(ERR_LEARN_SPELL_S:gsub("%%s","(.*)")),
-		(ERR_SPELL_UNLEARNED_S:gsub("%%s","(.*)")),
-		(ERR_LEARN_PASSIVE_S:gsub("%%s","(.*)")),
-		(ERR_PET_SPELL_UNLEARNED_S:gsub("%%s","(.*)")),
-		(ERR_PET_LEARN_ABILITY_S:gsub("%%s","(.*)")),
-		(ERR_PET_LEARN_SPELL_S:gsub("%%s","(.*)")),
-	}
-	local i = #SystemFilterTag
-	for j, s in ipairs(SSFilterStrings) do SystemFilterTag[i+j] = s end
-end
-
 local function systemMsgFilter(self,_,msg)
 	for _, s in ipairs(SystemFilterTag) do if msg:find(s) then return true end end
 end
-ChatFrame_AddMessageEventFilter("CHAT_MSG_SYSTEM", systemMsgFilter)
+if UnitLevel("player") == GetMaxPlayerLevel() then ChatFrame_AddMessageEventFilter("CHAT_MSG_SYSTEM", systemMsgFilter) end
 
 --AchievementFilter
 local achievements = {}
