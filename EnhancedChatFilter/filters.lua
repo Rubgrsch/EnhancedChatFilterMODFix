@@ -230,7 +230,7 @@ for event in pairs(chatEvents) do ChatFrame_AddMessageEventFilter(event, preECFf
 
 --MonsterSayFilter
 --Turn off MSF in certain quests. Chat msg are repeated but important in these quests.
-local MSFOffQuestT = {[42880] = true} -- 42880: Meeting their Quota
+local MSFOffQuestT = {[42880] = true, [54090]=true,} -- 42880: Meeting their Quota; 54090: Toys For Destruction
 local MSFOffQuestFlag = false
 
 --TODO: If player uses hearthstone to leave questzone, QUEST_REMOVED is not fired.
