@@ -140,9 +140,9 @@ local function ECFfilter(Event,msg,player,flags,IsMyFriend,good)
 	filterString = G.utf8replace(filterString):gsub("{rt%d}","")
 	-- use upper to help repeatFilter, non-regex only
 	local msgLine = filterString:gsub(G.RegexCharList, ""):upper()
-	local annoying = (oriLen - #msgLine) / oriLen
 	--If it has only symbols, don't change it
 	if msgLine == "" then msgLine = msg end
+	local annoying = (oriLen - #msgLine) / oriLen
 
 	--filter status for each channel
 	local filtersStatus = eventStatus[Event]
