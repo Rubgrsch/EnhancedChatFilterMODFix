@@ -5,9 +5,9 @@ Description
 -----------
 
 This is a WoW chat filter addon mainly for CN servers.  
-It is now supporting Battle for Azeroth(8.2).  
+It is now supporting Battle for Azeroth(8.2.5).  
 这是一个主要适用于国服魔兽世界的聊天屏蔽插件。  
-现已更新至争霸艾泽拉斯(8.2)。  
+现已更新至争霸艾泽拉斯(8.2.5)。  
 
 Curse Link: <https://www.curseforge.com/wow/addons/ecfmodfix>
 
