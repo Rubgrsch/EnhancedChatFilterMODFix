@@ -6,7 +6,7 @@ local C, L, G = unpack(ecf)
 local _G = _G
 local format, ipairs, max, min, next, pairs, tconcat, tonumber, tremove = format, ipairs, max, min, next, pairs, table.concat, tonumber, tremove
 -- WoW
-local Ambiguate, BNGetGameAccountInfoByGUID, C_Item_GetItemQualityByID, C_Timer_After, ChatTypeInfo, GetAchievementLink, GetPlayerInfoByGUID, GetTime, C_FriendList_IsFriend, IsGUIDInGroup, IsGuildMember, RAID_CLASS_COLORS = Ambiguate, BNGetGameAccountInfoByGUID, C_Item.GetItemQualityByID, C_Timer.After, ChatTypeInfo, GetAchievementLink, GetPlayerInfoByGUID, GetTime, C_FriendList.IsFriend, IsGUIDInGroup, IsGuildMember, RAID_CLASS_COLORS
+local Ambiguate, C_BattleNet_GetGameAccountInfoByGUID, C_Item_GetItemQualityByID, C_Timer_After, ChatTypeInfo, GetAchievementLink, GetPlayerInfoByGUID, GetTime, C_FriendList_IsFriend, IsGUIDInGroup, IsGuildMember, RAID_CLASS_COLORS = Ambiguate, C_BattleNet.GetGameAccountInfoByGUID, C_Item.GetItemQualityByID, C_Timer.After, ChatTypeInfo, GetAchievementLink, GetPlayerInfoByGUID, GetTime, C_FriendList.IsFriend, IsGUIDInGroup, IsGuildMember, RAID_CLASS_COLORS
 
 -- GLOBALS: NUM_CHAT_WINDOWS
 
@@ -217,7 +217,7 @@ local function preECFfilter(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID,gui
 		player = Ambiguate(player, "none")
 		local IsMyFriend, good
 		if guid then
-			IsMyFriend = BNGetGameAccountInfoByGUID(guid) or C_FriendList_IsFriend(guid)
+			IsMyFriend = C_BattleNet_GetGameAccountInfoByGUID(guid) or C_FriendList_IsFriend(guid)
 			good = IsMyFriend or IsGuildMember(guid) or IsGUIDInGroup(guid)
 		end
 		filterResult = ECFfilter(chatEvents[event],msg,player,flags,IsMyFriend,good)
