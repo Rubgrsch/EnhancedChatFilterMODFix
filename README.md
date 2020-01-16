@@ -1,22 +1,16 @@
 # EnhancedChatFilterMODFix
 EnhancedChatFilter, a WoW chat addon, modded for CN users
 
-Description
------------
-
 This is a WoW chat filter addon mainly for CN servers.  
-It is now supporting Battle for Azeroth(8.2.5).  
+It is now supporting Battle for Azeroth(8.3).  
 这是一个主要适用于国服魔兽世界的聊天屏蔽插件。  
-现已更新至争霸艾泽拉斯(8.2.5)。  
+现已更新至争霸艾泽拉斯(8.3)。  
 
 Curse Link: <https://www.curseforge.com/wow/addons/ecfmodfix>
 
 [Manual/使用说明](https://github.com/Rubgrsch/EnhancedChatFilterMODFix/wiki/Manual)
 
 [ChangeLog/更新日志](https://github.com/Rubgrsch/EnhancedChatFilterMODFix/wiki/ChangeLog)
-
-Note
-----
 
 This addon will not officially support Classic WoW.  
 本插件将不会正式支持怀旧服。  
@@ -48,13 +42,8 @@ FAQ
   - 不要加入标点符号，这些字符会被自动忽略，只需要添加那些汉字。
 
 3. 正则是什么？
-  - 不知道的请不要用。不知道的请不要用。不知道的请不要用。
-  - 如果你想学习请自行百度/谷歌。Lua的正则符号是%
-
-Issues
-------
-
-如有问题请在测试后在Curse/Github上提交Issues。
+  - 不知道的请不要用。不知道的请不要用。如果你想学习请自行百度/谷歌。
+  - Lua的正则符号是%
 
 Licenses
 --------
