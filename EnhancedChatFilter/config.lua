@@ -19,6 +19,7 @@ local defaults = {
 	addonRAF = false, -- RaidAlert Filter
 	addonQRF = false, -- Quest/Group Report Filter
 	blackWordList = {},
+	totalBlackWordsFiltered = 0, -- total blackWord filtered if keywords cleanup enabled, false if disabled
 	lesserBlackWordThreshold = 3, -- in lesserBlackWord
 	blackWordFilterGroup = false, -- blackWord enabled in group and raid
 	lootItemFilterList = {[71096] = true, [49655] = true}, -- item list, [id] = true
@@ -71,11 +72,19 @@ end
 ecf.init[#ecf.init+1] = function()
 	if type(ecfDB) ~= "table" or next(ecfDB) == nil then ecfDB = defaults end
 	C.db = ecfDB
-	-- Start of DB Conversion
-	-- End of DB conversion
 	for k in pairs(C.db) do if defaults[k] == nil then C.db[k] = nil end end -- remove old keys
+	for k,v in pairs(defaults) do
+		if C.db[k] == nil then C.db[k] = v end
+	end
 	for Id, info in pairs(C.db.lootItemFilterList) do
 		if info == true then ItemInfoRequested[Id] = 1 end
+	end
+	--Cleanup blackwordsList: Remove rarely used keywords
+	if C.db.totalBlackWordsFiltered and C.db.totalBlackWordsFiltered > 1000 then
+		for k,v in pairs(C.db.blackWordList) do
+			if v.count <= 1 then C.db.blackWordList[k] = nil else v.count = nil end
+		end
+		C.db.totalBlackWordsFiltered = 0
 	end
 	C:SetupEvent()
 end
@@ -281,18 +290,29 @@ options.args.blackListTab = {
 			name = OPTIONS,
 			order = 20,
 		},
+		AutoCleanup = {
+			type = "toggle",
+			name = L["AutoCleanupKeywords"],
+			desc = L["AutoCleanupKeywordsTooltip"],
+			order = 21,
+			get = function() return type(C.db.totalBlackWordsFiltered) == "number" end,
+			set = function(_,value)
+				C.db.totalBlackWordsFiltered = value and 0 or false
+				if not value then for _,v in pairs(C.db.blackWordList) do v.count = nil end end
+			end,
+		},
 		blackWordFilterGroup = {
 			type = "toggle",
 			name = L["FilterGroup"],
 			desc = L["FilterGroupTooltips"],
-			order = 21,
+			order = 22,
 			set = function(info, value) C.db[info[#info]] = value; C:SetupEvent() end,
 		},
 		lesserBlackWordThreshold = {
 			type = "range",
 			name = L["LesserBlackWordThreshold"],
 			desc = L["LesserBlackWordThresholdTooltips"],
-			order = 22,
+			order = 23,
 			min = 2,
 			max = 5,
 			step = 1,

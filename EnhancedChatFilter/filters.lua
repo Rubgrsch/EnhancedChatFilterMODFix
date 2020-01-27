@@ -97,7 +97,7 @@ setmetatable(playerCache, {__index=function() return 0 end})
 local chatLines = {}
 local chatEvents = {["CHAT_MSG_WHISPER"] = 1, ["CHAT_MSG_SAY"] = 2, ["CHAT_MSG_YELL"] = 2, ["CHAT_MSG_EMOTE"] = 2, ["CHAT_MSG_TEXT_EMOTE"] = 2, ["CHAT_MSG_CHANNEL"] = 3, ["CHAT_MSG_PARTY"] = 4, ["CHAT_MSG_PARTY_LEADER"] = 4, ["CHAT_MSG_RAID"] = 4, ["CHAT_MSG_RAID_LEADER"] = 4, ["CHAT_MSG_RAID_WARNING"] = 4, ["CHAT_MSG_INSTANCE_CHAT"] = 4, ["CHAT_MSG_INSTANCE_CHAT_LEADER"] = 4, ["CHAT_MSG_DND"] = 5}
 
---Store which type of channels have which filters enabled, [eventIdx] = {filters}
+--Store which type of channels enabled which filters, [eventIdx] = {filters}
 local eventStatus = {
 --	aggr, 	dnd,	black,	raid,	quest,	normal,	repeat
 	{false,	false,	true,	false,	false,	true,	false},
@@ -162,7 +162,15 @@ local function ECFfilter(Event,msg,player,flags,IsMyFriend,good)
 		local count = 0
 		for k,v in pairs(C.db.blackWordList) do
 			if (v.regex and filterString or msgLine):find(k) then
-				if v.lesser then count = count + 1 else return true end
+				if v.lesser then
+					count = count + 1
+				else
+					if C.db.totalBlackWordsFiltered then
+						v.count = (v.count or 0) + 1
+						C.db.totalBlackWordsFiltered = C.db.totalBlackWordsFiltered + 1
+					end
+					return true
+				end
 			end
 		end
 		if count >= C.db.lesserBlackWordThreshold then return true end
