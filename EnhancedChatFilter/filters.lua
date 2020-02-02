@@ -165,7 +165,7 @@ local function ECFfilter(Event,msg,player,flags,IsMyFriend,good)
 				if v.lesser then
 					count = count + 1
 				else
-					if C.db.totalBlackWordsFiltered then
+					if C.shouldEnableKeywordCleanup then
 						v.count = (v.count or 0) + 1
 						C.db.totalBlackWordsFiltered = C.db.totalBlackWordsFiltered + 1
 					end

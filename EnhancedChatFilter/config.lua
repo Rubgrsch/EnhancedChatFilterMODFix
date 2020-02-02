@@ -79,12 +79,18 @@ ecf.init[#ecf.init+1] = function()
 	for Id, info in pairs(C.db.lootItemFilterList) do
 		if info == true then ItemInfoRequested[Id] = 1 end
 	end
-	--Cleanup blackwordsList: Remove rarely used keywords
-	if C.db.totalBlackWordsFiltered and C.db.totalBlackWordsFiltered > 1000 then
-		for k,v in pairs(C.db.blackWordList) do
-			if not v.count --[[ or v.count < 1]] then C.db.blackWordList[k] = nil else v.count = nil end
+	if C.db.totalBlackWordsFiltered then
+		--Enable cleanup record only when total keywords > 50
+		local sum = 0
+		for _ in pairs(C.db.blackWordList) do sum = sum + 1 end
+		C.shouldEnableKeywordCleanup = sum > 50 and C.db.totalBlackWordsFiltered
+		--Cleanup blackwordsList: Remove rarely used keywords
+		if C.shouldEnableKeywordCleanup and C.db.totalBlackWordsFiltered > 1000 then
+			for k,v in pairs(C.db.blackWordList) do
+				if not v.count --[[ or v.count < 1]] then C.db.blackWordList[k] = nil else v.count = nil end
+			end
+			C.db.totalBlackWordsFiltered = 0
 		end
-		C.db.totalBlackWordsFiltered = 0
 	end
 	C:SetupEvent()
 end
