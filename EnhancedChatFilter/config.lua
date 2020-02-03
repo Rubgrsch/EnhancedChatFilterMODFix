@@ -87,7 +87,7 @@ ecf.init[#ecf.init+1] = function()
 		--Cleanup blackwordsList: Remove rarely used keywords
 		if C.shouldEnableKeywordCleanup and C.db.totalBlackWordsFiltered > 1000 then
 			for k,v in pairs(C.db.blackWordList) do
-				if not v.count --[[ or v.count < 1]] then C.db.blackWordList[k] = nil else v.count = nil end
+				if not v.lesser and not v.count --[[ or v.count < 1]] then C.db.blackWordList[k] = nil else v.count = nil end
 			end
 			C.db.totalBlackWordsFiltered = 0
 		end
