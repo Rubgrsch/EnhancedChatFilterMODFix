@@ -83,11 +83,11 @@ ecf.init[#ecf.init+1] = function()
 		--Enable cleanup record only when total keywords > 50
 		local sum = 0
 		for _ in pairs(C.db.blackWordList) do sum = sum + 1 end
-		C.shouldEnableKeywordCleanup = sum > 50 and C.db.totalBlackWordsFiltered
+		C.shouldEnableKeywordCleanup = sum > 50
 		--Cleanup blackwordsList: Remove rarely used keywords
 		if C.shouldEnableKeywordCleanup and C.db.totalBlackWordsFiltered > 1000 then
 			for k,v in pairs(C.db.blackWordList) do
-				if not v.lesser and not v.count --[[ or v.count < 1]] then C.db.blackWordList[k] = nil else v.count = nil end
+				if not v.lesser and not v.count then C.db.blackWordList[k] = nil else v.count = nil end
 			end
 			C.db.totalBlackWordsFiltered = 0
 		end
