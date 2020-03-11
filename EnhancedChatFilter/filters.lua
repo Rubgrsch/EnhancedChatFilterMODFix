@@ -151,7 +151,7 @@ local function ECFfilter(Event,msg,player,flags,IsMyFriend,good)
 	-- AggressiveFilter: Filter AggressiveTags, currently only journal link
 	if filtersStatus[1] and not IsMyFriend then
 		if annoying >= 0.25 and oriLen >= 30 then return true end
-		if msg:find("|Hjournal") then return true end
+		if msg:find("|Hjournal") or msg:find("|HclubTicket") then return true end
 	end
 
 	-- DND and auto-reply
