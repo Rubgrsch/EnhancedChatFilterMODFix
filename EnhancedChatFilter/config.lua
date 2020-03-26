@@ -15,6 +15,7 @@ local defaults = {
 	enableMSF = false, -- Monster Say Filter
 	enableAggressive = false, -- Aggressive Filter
 	enableRepeat = true, -- repeatFilter
+	enableInvite = false, -- block invite from strangers
 	repeatFilterGroup = true, -- repeatFilter enabled in group and raid
 	addonRAF = false, -- RaidAlert Filter
 	addonQRF = false, -- Quest/Group Report Filter
@@ -175,6 +176,13 @@ options.args.General = {
 			name = L["Aggressive"],
 			desc = L["AggressiveTooltip"],
 			order = 14,
+		},
+		enableInvite = {
+			type = "toggle",
+			name = L["BlockStrangersInvite"],
+			desc = L["BlockStrangersInviteTooltip"],
+			order = 15,
+			set = function() C:SetBlockInvite() end,
 		},
 		line2 = {
 			type = "header",

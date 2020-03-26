@@ -25,6 +25,8 @@ L["DisplayAdvancedConfig"] = "显示高级选项"
 L["DisplayAdvancedConfigTooltips"] = "如果你是正常人请不要接受，不然你很有可能会把ECF玩坏！如果你同意你不是正常人的话请继续..."
 L["Aggressive"] = "额外过滤器"
 L["AggressiveTooltip"] = "一些会极大提高过滤效果和|cffE2252D误伤机率|r的过滤器集合"
+L["BlockStrangersInvite"] = "屏蔽陌生组队邀请"
+L["BlockStrangersInviteTooltip"] = "屏蔽来自非好友/工会的组队邀请"
 
 --Addon
 L["Addons"] = "插件通告过滤"

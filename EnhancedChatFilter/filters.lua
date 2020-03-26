@@ -340,3 +340,19 @@ local function lootCurrecyFilter(self,_,msg)
 	if C.db.lootCurrencyFilterList[currencyID] then return true end
 end
 ChatFrame_AddMessageEventFilter("CHAT_MSG_CURRENCY", lootCurrecyFilter)
+
+--Invite blocker
+local f = CreateFrame("Frame")
+f:SetScript("OnEvent", function(self, _, _, _, _, _, _, _, guid)
+	if not (C_BattleNet_GetGameAccountInfoByGUID(guid) or C_FriendList_IsFriend(guid) or IsGuildMember(guid)) then
+		DeclineGroup()
+		StaticPopup_Hide("PARTY_INVITE")
+	end
+end)
+function C:SetBlockInvite()
+	if C.db.enableInvite then f:RegisterEvent("PARTY_INVITE_REQUEST") else f:UnregisterEvent("PARTY_INVITE_REQUEST") end
+end
+
+ecf.init[#ecf.init+1] = function()
+	C:SetBlockInvite()
+end
