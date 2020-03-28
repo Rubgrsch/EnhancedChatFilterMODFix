@@ -27,6 +27,7 @@ local defaults = {
 	lootCurrencyFilterList = {}, -- Currency list, [id] = true
 	lootQualityMin = 0, -- loot quality filter, 0..4 = poor..epic
 	advancedConfig = false, -- show advancedConfig
+	blockedPlayers = {}, -- blocked players list, [serverName] = {[guid] = times}
 }
 
 --http://www.wowwiki.com/USERAPI_StringHash
@@ -40,6 +41,14 @@ local function StringHash(text)
 	end
 	return counter%4294967291 -- 2^32 - 5: Prime (and different from the prime in the loop)
 end
+
+local function OnPlayerLogout()
+	C:SaveDBPlayersCache()
+end
+
+local f = CreateFrame("Frame")
+f:RegisterEvent("PLAYER_LOGOUT")
+f:SetScript("OnEvent", OnPlayerLogout)
 
 --------------- ECF functions ---------------
 -- GetItemInfo Cache

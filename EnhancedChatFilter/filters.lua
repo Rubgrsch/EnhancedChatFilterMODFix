@@ -90,9 +90,40 @@ local function strDiff(sA, sB) -- arrays of bytes
 	return this[len_b+1]/max(len_a,len_b)
 end
 
+--Block players that have been filtered many times
 --Record how many times players are filterd
-local playerCache = {}
-setmetatable(playerCache, {__index=function() return 0 end})
+local blockedPlayers = {}
+setmetatable(blockedPlayers, {__index=function() return 0 end})
+
+-- Load DB
+function C:LoadDBPlayersCache()
+	if not C.db.blockedPlayers[playerServer] then C.db.blockedPlayers[playerServer] = {} end
+	for name in pairs(C.db.blockedPlayers[playerServer]) do
+		blockedPlayers[name] = 3
+	end
+end
+
+-- Cross session DB saving, 5min session at least
+local isLongSession = false
+C_Timer_After(300, function() isLongSession = true end)
+
+-- Save DB when logout
+function C:SaveDBPlayersCache()
+	if not isLongSession then return end
+	local serverDB = C.db.blockedPlayers[playerServer]
+	for name,v in pairs(blockedPlayers) do
+		if v > 3 then
+			if not serverDB[name] then serverDB[name] = 1 -- add new players to DB
+			elseif serverDB[name] < 5 then serverDB[name] = serverDB[name] + 1 end -- 5 times max
+		end
+	end
+	for name,v in pairs(serverDB) do
+		if blockedPlayers[name] <= 3 then
+			-- if player is not shown in list then remove it from DB/decrease by 1
+			serverDB[name] = v > 1 and v - 1 or nil
+		end
+	end
+end
 
 local chatLines = {}
 local chatEvents = {["CHAT_MSG_WHISPER"] = 1, ["CHAT_MSG_SAY"] = 2, ["CHAT_MSG_YELL"] = 2, ["CHAT_MSG_EMOTE"] = 2, ["CHAT_MSG_TEXT_EMOTE"] = 2, ["CHAT_MSG_CHANNEL"] = 3, ["CHAT_MSG_PARTY"] = 4, ["CHAT_MSG_PARTY_LEADER"] = 4, ["CHAT_MSG_RAID"] = 4, ["CHAT_MSG_RAID_LEADER"] = 4, ["CHAT_MSG_RAID_WARNING"] = 4, ["CHAT_MSG_INSTANCE_CHAT"] = 4, ["CHAT_MSG_INSTANCE_CHAT_LEADER"] = 4, ["CHAT_MSG_DND"] = 5}
@@ -131,7 +162,7 @@ local function ECFfilter(Event,msg,player,flags,IsMyFriend,good)
 	if player == playerName or flags == "GM" or flags == "DEV" then return end
 
 	-- filter bad players
-	if C.db.enableAggressive and not good and playerCache[player] >= 3 then return true end
+	if C.db.enableAggressive and not good and blockedPlayers[player] >= 3 then return true end
 
 	-- remove color/hypelink
 	local filterString = msg:gsub("|H.-|h(.-)|h","%1"):gsub("|c%x%x%x%x%x%x%x%x",""):gsub("|r","")
@@ -230,7 +261,7 @@ local function preECFfilter(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID,gui
 		end
 		filterResult = ECFfilter(chatEvents[event],msg,player,flags,IsMyFriend,good)
 
-		if filterResult and not good then playerCache[player] = playerCache[player] + 1 end
+		if filterResult and not good then blockedPlayers[player] = blockedPlayers[player] + 1 end
 	end
 	return filterResult
 end
@@ -355,4 +386,5 @@ end
 
 ecf.init[#ecf.init+1] = function()
 	C:SetBlockInvite()
+	C:LoadDBPlayersCache()
 end
