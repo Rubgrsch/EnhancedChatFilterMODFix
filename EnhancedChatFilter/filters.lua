@@ -72,9 +72,9 @@ local function SendMessage(event, msg)
 end
 
 --------------- Filters ---------------
---strDiff for repeatFilter, ranged from 0 to 1, while 0 is absolutely the same
---This function is not utf8 awared, currently not nessesary
---strsub(s,i,i) is really SLOW. Don't use it.
+-- strDiff for repeatFilter, ranged from 0 to 1, while 0 is absolutely the same
+-- This function is not utf8 awared, currently not nessesary
+-- strsub(s,i,i) is really SLOW. Don't use it.
 local last, this = {}, {}
 local function strDiff(sA, sB) -- arrays of bytes
 	local len_a, len_b = #sA, #sB
@@ -90,8 +90,8 @@ local function strDiff(sA, sB) -- arrays of bytes
 	return this[len_b+1]/max(len_a,len_b)
 end
 
---Block players that have been filtered many times
---Record how many times players are filterd
+-- Block players that have been filtered many times
+-- Record how many times players are filterd
 local blockedPlayers = {}
 setmetatable(blockedPlayers, {__index=function() return 0 end})
 
@@ -128,7 +128,7 @@ end
 local chatLines = {}
 local chatEvents = {["CHAT_MSG_WHISPER"] = 1, ["CHAT_MSG_SAY"] = 2, ["CHAT_MSG_YELL"] = 2, ["CHAT_MSG_EMOTE"] = 2, ["CHAT_MSG_TEXT_EMOTE"] = 2, ["CHAT_MSG_CHANNEL"] = 3, ["CHAT_MSG_PARTY"] = 4, ["CHAT_MSG_PARTY_LEADER"] = 4, ["CHAT_MSG_RAID"] = 4, ["CHAT_MSG_RAID_LEADER"] = 4, ["CHAT_MSG_RAID_WARNING"] = 4, ["CHAT_MSG_INSTANCE_CHAT"] = 4, ["CHAT_MSG_INSTANCE_CHAT_LEADER"] = 4, ["CHAT_MSG_DND"] = 5}
 
---Store which type of channels enabled which filters, [eventIdx] = {filters}
+-- Store which type of channels enabled which filters, [eventIdx] = {filters}
 local eventStatus = {
 --	aggr, 	dnd,	black,	raid,	quest,	normal,	repeat
 	{false,	false,	true,	false,	false,	true,	false},
@@ -138,8 +138,8 @@ local eventStatus = {
 	{false,	false,	false,	false,	false,	false,	false},
 }
 
---Config enabled filters, {filterIdx, {events}}
---For each C.db.xxx enable filterIdx(column) -> events(row)
+-- Config enabled filters, {filterIdx, {events}}
+-- For each C.db.xxx enable filterIdx(column) -> events(row)
 local optionFilters = {
 	enableAggressive = {1, {1,2,3}},
 	enableDND = {2, {1,2,3,5}},
@@ -171,11 +171,11 @@ local function ECFfilter(Event,msg,player,flags,IsMyFriend,good)
 	filterString = G.utf8replace(filterString):gsub("{rt%d}","")
 	-- use upper to help repeatFilter, non-regex only
 	local msgLine = filterString:gsub(G.RegexCharList, ""):upper()
-	--If it has only symbols, don't change it
+	-- If it has only symbols, don't change it
 	if msgLine == "" then msgLine = msg end
 	local annoying = (oriLen - #msgLine) / oriLen
 
-	--filter status for each channel
+	-- filter status for each channel
 	local filtersStatus = eventStatus[Event]
 
 	-- AggressiveFilter: Filter strings that has too much symbols
@@ -188,7 +188,7 @@ local function ECFfilter(Event,msg,player,flags,IsMyFriend,good)
 	-- DND and auto-reply
 	if filtersStatus[2] and (flags == "DND" or Event == 5) and not IsMyFriend then return true end
 
-	--blackWord Filter
+	-- blackWord Filter
 	if filtersStatus[3] and not IsMyFriend then
 		local count = 0
 		for k,v in pairs(C.db.blackWordList) do
@@ -225,7 +225,7 @@ local function ECFfilter(Event,msg,player,flags,IsMyFriend,good)
 		if msg:find("<LFG>") then return true end
 	end
 
-	--Repeat Filter
+	-- Repeat Filter
 	if filtersStatus[7] and not IsMyFriend then
 		local msgtable = {player, {}, GetTime()}
 		for idx=1, #msgLine do msgtable[2][idx] = msgLine:byte(idx) end
@@ -235,8 +235,8 @@ local function ECFfilter(Event,msg,player,flags,IsMyFriend,good)
 		chatLines[chatLinesSize+1] = msgtable
 		for i=1, chatLinesSize do
 			local line = chatLines[i]
-			--if there is not much difference between msgs, filter it
-			--if multiple msgs in 0.6s, filter it (channel & emote only)
+			-- if there is not much difference between msgs, filter it
+			-- if multiple msgs in 0.6s, filter it (channel & emote only)
 			if line[1] == msgtable[1] and ((Event == 3 and msgtable[3] - line[3] < 0.6) or strDiff(line[2],msgtable[2]) <= 0.1) then
 				tremove(chatLines, i)
 				return true
@@ -267,8 +267,8 @@ local function preECFfilter(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID,gui
 end
 for event in pairs(chatEvents) do ChatFrame_AddMessageEventFilter(event, preECFfilter) end
 
---MonsterSayFilter
---Turn off MSF in certain quests. Chat msg are repeated but important in these quests.
+-- MonsterSayFilter
+-- Turn off MSF in certain quests. Chat msg are repeated but important in these quests.
 local MSFOffQuestT = {[42880] = true, [54090]=true,} -- 42880: Meeting their Quota; 54090: Toys For Destruction
 local MSFOffQuestFlag = false
 
@@ -293,7 +293,7 @@ end
 ChatFrame_AddMessageEventFilter("CHAT_MSG_MONSTER_SAY", monsterFilter)
 ChatFrame_AddMessageEventFilter("CHAT_MSG_MONSTER_EMOTE", monsterFilter)
 
---SystemMessage
+-- System Message
 local SystemFilterTag = {
 	-- !!! Always add parentheses since gsub() has two return values !!!
 	(AZERITE_ISLANDS_XP_GAIN:gsub("%%.-s",".+"):gsub("%%.-d","%%d+")), -- Azerite gain in islands
@@ -317,7 +317,7 @@ local function systemMsgFilter(self,_,msg)
 end
 ChatFrame_AddMessageEventFilter("CHAT_MSG_SYSTEM", systemMsgFilter)
 
---AchievementFilter
+-- Achievement Filter
 local achievements = {}
 local function achievementReady(id)
 	local area, guild = achievements[id].CHAT_MSG_ACHIEVEMENT, achievements[id].CHAT_MSG_GUILD_ACHIEVEMENT
@@ -357,7 +357,7 @@ end
 ChatFrame_AddMessageEventFilter("CHAT_MSG_ACHIEVEMENT", achievementFilter)
 ChatFrame_AddMessageEventFilter("CHAT_MSG_GUILD_ACHIEVEMENT", achievementFilter)
 
---LootFilter
+-- Loot Filter
 local function lootItemFilter(self,_,msg)
 	local itemID = tonumber(msg:match("|Hitem:(%d+)"))
 	if not itemID then return end -- pet cages don't have 'item'
@@ -372,7 +372,7 @@ local function lootCurrecyFilter(self,_,msg)
 end
 ChatFrame_AddMessageEventFilter("CHAT_MSG_CURRENCY", lootCurrecyFilter)
 
---Invite blocker
+-- Invite blocker
 local f = CreateFrame("Frame")
 f:SetScript("OnEvent", function(self, _, _, _, _, _, _, _, guid)
 	if not (C_BattleNet_GetGameAccountInfoByGUID(guid) or C_FriendList_IsFriend(guid) or IsGuildMember(guid)) then
