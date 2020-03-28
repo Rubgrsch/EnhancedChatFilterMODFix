@@ -191,7 +191,7 @@ options.args.General = {
 			name = L["BlockStrangersInvite"],
 			desc = L["BlockStrangersInviteTooltip"],
 			order = 15,
-			set = function() C:SetBlockInvite() end,
+			set = function(info, value) C.db[info[#info]] = value; C:SetBlockInvite() end,
 		},
 		line2 = {
 			type = "header",
