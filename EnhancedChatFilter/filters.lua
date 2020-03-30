@@ -1,6 +1,6 @@
 -- ECF
 local _, ecf = ...
-local C, L, G = unpack(ecf)
+local B, L, C = unpack(ecf)
 
 -- Lua
 local _G = _G
@@ -33,11 +33,11 @@ local UTF8Symbols = {
 }
 local RaidAlertTagList = {"%*%*.+%*%*", "EUI[:_]", "PS 死亡:", "|Hspell.+[=>%- ]+> ", "受伤源自 |Hspell", "已打断.*|Hspell", "→.?|Hspell", "打断：.+|Hspell", "打断.+>.+<", "<iLvl>", "^%-+$", "<EH>", "<友情提示>"}
 local QuestReportTagList = {"任务进度提示", "任务完成[%)%-]", "<大脚", "接受任务[%]:%-]", "进度:.+: %d+/%d+", "【爱不易】", "【有爱插件】","任务.*%[%d+%].+ 已完成!"}
-G.RegexCharList = "[().%%%+%-%*?%[%]$^{}]" -- won't work on regex blackWord, but works on others
+B.RegexCharList = "[().%%%+%-%*?%[%]$^{}]" -- won't work on regex blackWord, but works on others
 
 -- utf8 functions are taken and modified from utf8replace from @Phanx @Pastamancer
 -- replace UTF-8 characters based on a mapping table
-function G.utf8replace(s)
+function B.utf8replace(s)
 	local pos, str = 1, ""
 	local mapping = UTF8Symbols
 
@@ -96,7 +96,7 @@ local blockedPlayers = {}
 setmetatable(blockedPlayers, {__index=function() return 0 end})
 
 -- Load DB
-function C:LoadDBPlayersCache()
+local function LoadDBPlayersCache()
 	if not C.db.blockedPlayers[playerServer] then C.db.blockedPlayers[playerServer] = {} end
 	for name in pairs(C.db.blockedPlayers[playerServer]) do
 		blockedPlayers[name] = 3
@@ -168,9 +168,9 @@ local function ECFfilter(Event,msg,player,flags,IsMyFriend,good)
 	local filterString = msg:gsub("|H.-|h(.-)|h","%1"):gsub("|c%x%x%x%x%x%x%x%x",""):gsub("|r","")
 	local oriLen = #filterString
 	-- remove utf-8 chars/symbols/raidicon
-	filterString = G.utf8replace(filterString):gsub("{rt%d}","")
+	filterString = B.utf8replace(filterString):gsub("{rt%d}","")
 	-- use upper to help repeatFilter, non-regex only
-	local msgLine = filterString:gsub(G.RegexCharList, ""):upper()
+	local msgLine = filterString:gsub(B.RegexCharList, ""):upper()
 	-- If it has only symbols, don't change it
 	if msgLine == "" then msgLine = msg end
 	local annoying = (oriLen - #msgLine) / oriLen
@@ -273,13 +273,12 @@ local MSFOffQuestT = {[42880] = true, [54090]=true,} -- 42880: Meeting their Quo
 local MSFOffQuestFlag = false
 
 --TODO: If player uses hearthstone to leave questzone, QUEST_REMOVED is not fired.
-local Questf = CreateFrame("Frame")
-Questf:RegisterEvent("QUEST_ACCEPTED")
-Questf:RegisterEvent("QUEST_REMOVED")
-Questf:SetScript("OnEvent", function(self,event,arg1,arg2)
+local function QuestChanged(self,event,arg1,arg2)
 	if event == "QUEST_ACCEPTED" and MSFOffQuestT[arg2] then MSFOffQuestFlag = true end
 	if event == "QUEST_REMOVED" and MSFOffQuestT[arg1] then MSFOffQuestFlag = false end
-end)
+end
+B:AddEventScript("QUEST_ACCEPTED", QuestChanged)
+B:AddEventScript("QUEST_REMOVED", QuestChanged)
 
 local MSL, MSLPos = {}, 1
 local function monsterFilter(self,_,msg)
@@ -373,18 +372,12 @@ end
 ChatFrame_AddMessageEventFilter("CHAT_MSG_CURRENCY", lootCurrecyFilter)
 
 -- Invite blocker
-local f = CreateFrame("Frame")
-f:SetScript("OnEvent", function(self, _, _, _, _, _, _, _, guid)
+B:AddEventScript("PARTY_INVITE_REQUEST", function(self, _, _, _, _, _, _, _, guid)
+	if not C.db.enableInvite then return end
 	if not (C_BattleNet_GetGameAccountInfoByGUID(guid) or C_FriendList_IsFriend(guid) or IsGuildMember(guid)) then
 		DeclineGroup()
 		StaticPopup_Hide("PARTY_INVITE")
 	end
 end)
-function C:SetBlockInvite()
-	if C.db.enableInvite then f:RegisterEvent("PARTY_INVITE_REQUEST") else f:UnregisterEvent("PARTY_INVITE_REQUEST") end
-end
 
-ecf.init[#ecf.init+1] = function()
-	C:SetBlockInvite()
-	C:LoadDBPlayersCache()
-end
+B:AddInitScript(LoadDBPlayersCache)

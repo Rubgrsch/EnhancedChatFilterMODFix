@@ -1,6 +1,6 @@
 -- ECF
 local addonName, ecf = ...
-local C, L, G = unpack(ecf)
+local B, L, C = unpack(ecf)
 
 local _G = _G
 -- Lua
@@ -46,16 +46,12 @@ local function OnPlayerLogout()
 	C:SaveDBPlayersCache()
 end
 
-local f = CreateFrame("Frame")
-f:RegisterEvent("PLAYER_LOGOUT")
-f:SetScript("OnEvent", OnPlayerLogout)
+B:AddEventScript("PLAYER_LOGOUT", OnPlayerLogout)
 
 --------------- ECF functions ---------------
 -- GetItemInfo Cache
 local ItemInfoRequested = {} -- [Id] = value. 0: want to add; 1: old config, true -> link
-local ItemCacheFrame = CreateFrame("Frame")
-ItemCacheFrame:RegisterEvent("GET_ITEM_INFO_RECEIVED")
-ItemCacheFrame:SetScript("OnEvent",function(self,_,Id)
+B:AddEventScript("GET_ITEM_INFO_RECEIVED",function(self,_,Id)
 	local v = ItemInfoRequested[Id]
 	if not v then return end
 	local _, link = GetItemInfo(Id)
@@ -73,13 +69,13 @@ end)
 
 --Make sure that blackWord won't be filtered by filterCharList and utf-8 list
 local function checkBlacklist(blackWord, r)
-	local newWord = G.utf8replace(blackWord)
-	if not r then newWord=newWord:gsub(G.RegexCharList, "") end
+	local newWord = B.utf8replace(blackWord)
+	if not r then newWord=newWord:gsub(B.RegexCharList, "") end
 	if newWord ~= blackWord or blackWord == "" then return true end -- Also report "" as invalid
 end
 
 --Initialize and convert old config to new one
-ecf.init[#ecf.init+1] = function()
+B:AddInitScript(function()
 	if type(ecfDB) ~= "table" or next(ecfDB) == nil then ecfDB = defaults end
 	C.db = ecfDB
 	for k in pairs(C.db) do if defaults[k] == nil then C.db[k] = nil end end -- remove old keys
@@ -103,7 +99,7 @@ ecf.init[#ecf.init+1] = function()
 		end
 	end
 	C:SetupEvent()
-end
+end)
 
 --------------- Options ---------------
 --These settings won't be saved
@@ -191,7 +187,6 @@ options.args.General = {
 			name = L["BlockStrangersInvite"],
 			desc = L["BlockStrangersInviteTooltip"],
 			order = 15,
-			set = function(info, value) C.db[info[#info]] = value; C:SetBlockInvite() end,
 		},
 		line2 = {
 			type = "header",
