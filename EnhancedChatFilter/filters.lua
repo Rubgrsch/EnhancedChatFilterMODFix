@@ -71,9 +71,9 @@ local function SendMessage(event, msg)
 	end
 end
 
---------------- Filters ---------------
 -- strDiff for repeatFilter, ranged from 0 to 1, while 0 is absolutely the same
 -- This function is not utf8 awared, currently not nessesary
+-- This function dosen't support empty string "".
 -- strsub(s,i,i) is really SLOW. Don't use it.
 local last, this = {}, {}
 local function strDiff(sA, sB) -- arrays of bytes
@@ -85,31 +85,27 @@ local function strDiff(sA, sB) -- arrays of bytes
 		for j=1, len_b do
 			this[j+1] = (sA[i] == sB[j]) and last[j] or (min(last[j+1], this[j], last[j]) + 1)
 		end
-		for j=0, len_b do last[j+1]=this[j+1] end
+		for j=1, len_b+1 do last[j]=this[j] end
 	end
 	return this[len_b+1]/max(len_a,len_b)
 end
 
+--------------- Filters ---------------
 -- Block players that have been filtered many times
 -- Record how many times players are filterd
 local blockedPlayers = {}
 setmetatable(blockedPlayers, {__index=function() return 0 end})
 
 -- Load DB
-local function LoadDBPlayersCache()
+local function LoadBlockedPlayers()
 	if not C.db.blockedPlayers[playerServer] then C.db.blockedPlayers[playerServer] = {} end
 	for name in pairs(C.db.blockedPlayers[playerServer]) do
 		blockedPlayers[name] = 3
 	end
 end
 
--- Cross session DB saving, 5min session at least
-local isLongSession = false
-C_Timer_After(300, function() isLongSession = true end)
-
 -- Save DB when logout
-function C:SaveDBPlayersCache()
-	if not isLongSession then return end
+local function SaveBlockedPlayers()
 	local serverDB = C.db.blockedPlayers[playerServer]
 	for name,v in pairs(blockedPlayers) do
 		if v > 3 then
@@ -124,6 +120,9 @@ function C:SaveDBPlayersCache()
 		end
 	end
 end
+
+-- 5min session at least before DB saving
+C_Timer_After(300, function() B:AddEventScript("PLAYER_LOGOUT", SaveBlockedPlayers) end)
 
 local chatLines = {}
 local chatEvents = {["CHAT_MSG_WHISPER"] = 1, ["CHAT_MSG_SAY"] = 2, ["CHAT_MSG_YELL"] = 2, ["CHAT_MSG_EMOTE"] = 2, ["CHAT_MSG_TEXT_EMOTE"] = 2, ["CHAT_MSG_CHANNEL"] = 3, ["CHAT_MSG_PARTY"] = 4, ["CHAT_MSG_PARTY_LEADER"] = 4, ["CHAT_MSG_RAID"] = 4, ["CHAT_MSG_RAID_LEADER"] = 4, ["CHAT_MSG_RAID_WARNING"] = 4, ["CHAT_MSG_INSTANCE_CHAT"] = 4, ["CHAT_MSG_INSTANCE_CHAT_LEADER"] = 4, ["CHAT_MSG_DND"] = 5}
@@ -380,4 +379,4 @@ B:AddEventScript("PARTY_INVITE_REQUEST", function(self, _, _, _, _, _, _, _, gui
 	end
 end)
 
-B:AddInitScript(LoadDBPlayersCache)
+B:AddInitScript(LoadBlockedPlayers)

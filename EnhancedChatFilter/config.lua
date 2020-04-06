@@ -42,12 +42,6 @@ local function StringHash(text)
 	return counter%4294967291 -- 2^32 - 5: Prime (and different from the prime in the loop)
 end
 
-local function OnPlayerLogout()
-	C:SaveDBPlayersCache()
-end
-
-B:AddEventScript("PLAYER_LOGOUT", OnPlayerLogout)
-
 --------------- ECF functions ---------------
 -- GetItemInfo Cache
 local ItemInfoRequested = {} -- [Id] = value. 0: want to add; 1: old config, true -> link
