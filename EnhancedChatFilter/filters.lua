@@ -129,12 +129,12 @@ local chatEvents = {["CHAT_MSG_WHISPER"] = 1, ["CHAT_MSG_SAY"] = 2, ["CHAT_MSG_Y
 
 -- Store which type of channels enabled which filters, [eventIdx] = {filters}
 local eventStatus = {
---	aggr, 	dnd,	black,	raid,	quest,	normal,	repeat
-	{false,	false,	true,	false,	false,	true,	false},
-	{false,	false,	true,	false,	false,	false,	false},
-	{false,	false,	true,	false,	false,	false,	false},
-	{false,	false,	false,	false,	false,	false,	false},
-	{false,	false,	false,	false,	false,	false,	false},
+--	aggr, 	dnd,	black,	raid,	quest,	repeat
+	{false,	false,	true,	false,	false,	false},
+	{false,	false,	true,	false,	false,	false},
+	{false,	false,	true,	false,	false,	false},
+	{false,	false,	false,	false,	false,	false},
+	{false,	false,	false,	false,	false,	false},
 }
 
 -- Config enabled filters, {filterIdx, {events}}
@@ -145,8 +145,8 @@ local optionFilters = {
 	blackWordFilterGroup = {3, {4}},
 	addonRAF = {4, {1,2,4}},
 	addonQRF = {5, {1,2,4}},
-	enableRepeat = {7, {1,2,3}},
-	repeatFilterGroup = {7, {4}, "enableRepeat"},
+	enableRepeat = {6, {1,2,3}},
+	repeatFilterGroup = {6, {4}, "enableRepeat"},
 }
 
 function C:SetupEvent()
@@ -219,13 +219,8 @@ local function ECFfilter(Event,msg,player,flags,IsMyFriend,good)
 		end
 	end
 
-	-- Fk LFG
-	if filtersStatus[6] then
-		if msg:find("<LFG>") then return true end
-	end
-
 	-- Repeat Filter
-	if filtersStatus[7] and not IsMyFriend then
+	if filtersStatus[6] and not IsMyFriend then
 		local msgtable = {player, {}, GetTime()}
 		for idx=1, #msgLine do msgtable[2][idx] = msgLine:byte(idx) end
 
