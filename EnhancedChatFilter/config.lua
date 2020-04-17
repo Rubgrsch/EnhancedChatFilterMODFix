@@ -82,7 +82,7 @@ B:AddInitScript(function()
 	if C.db.totalBlackWordsFiltered then
 		--Enable cleanup record only when total keywords > 50
 		local sum = 0
-		for _ in pairs(C.db.blackWordList) do sum = sum + 1 end
+		for _,v in pairs(C.db.blackWordList) do if not v.lesser then sum = sum + 1 end end
 		C.shouldEnableKeywordCleanup = sum > 50
 		--Cleanup blackwordsList: Remove rarely used keywords
 		if C.shouldEnableKeywordCleanup and C.db.totalBlackWordsFiltered > 1000 then
