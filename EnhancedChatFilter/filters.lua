@@ -178,7 +178,7 @@ local function ECFfilter(Event,msg,player,flags,IsMyFriend,good)
 	local filtersStatus = eventStatus[Event]
 
 	-- AggressiveFilter: Filter strings that has too much symbols
-	-- AggressiveFilter: Filter AggressiveTags, currently only journal link
+	-- AggressiveFilter: Filter journal link and club link
 	if filtersStatus[1] and not IsMyFriend then
 		if annoying >= 0.25 and oriLen >= 30 then return true end
 		if msg:find("|Hjournal") or msg:find("|HclubTicket") then return true end
@@ -241,7 +241,7 @@ local function ECFfilter(Event,msg,player,flags,IsMyFriend,good)
 end
 
 local prevLineID, filterResult = 0, false
-local function preECFfilter(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID,guid)
+local function PreECFfilter(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID,guid)
 	-- With multiple chat tabs one msg can trigger filters multiple times and repeatFilter will return wrong result
 	-- lineID returned by "CHAT_MSG_TEXT_EMOTE" is always 0
 	if lineID == 0 or lineID ~= prevLineID then
@@ -259,7 +259,7 @@ local function preECFfilter(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID,gui
 	end
 	return filterResult
 end
-for event in pairs(chatEvents) do ChatFrame_AddMessageEventFilter(event, preECFfilter) end
+for event in pairs(chatEvents) do ChatFrame_AddMessageEventFilter(event, PreECFfilter) end
 
 -- MonsterSayFilter
 -- Turn off MSF in certain quests. Chat msg are repeated but important in these quests.
@@ -275,7 +275,7 @@ B:AddEventScript("QUEST_ACCEPTED", QuestChanged)
 B:AddEventScript("QUEST_REMOVED", QuestChanged)
 
 local MSL, MSLPos = {}, 1
-local function monsterFilter(self,_,msg)
+local function MonsterFilter(self,_,msg)
 	if not C.db.enableMSF or MSFOffQuestFlag then return end
 
 	for _, v in ipairs(MSL) do if v == msg then return true end end
@@ -283,8 +283,8 @@ local function monsterFilter(self,_,msg)
 	MSLPos = MSLPos + 1
 	if MSLPos > 7 then MSLPos = MSLPos - 7 end
 end
-ChatFrame_AddMessageEventFilter("CHAT_MSG_MONSTER_SAY", monsterFilter)
-ChatFrame_AddMessageEventFilter("CHAT_MSG_MONSTER_EMOTE", monsterFilter)
+ChatFrame_AddMessageEventFilter("CHAT_MSG_MONSTER_SAY", MonsterFilter)
+ChatFrame_AddMessageEventFilter("CHAT_MSG_MONSTER_EMOTE", MonsterFilter)
 
 -- System Message
 local SystemFilterTag = {
@@ -305,18 +305,18 @@ if UnitLevel("player") == GetMaxPlayerLevel() then -- spell learn, only when max
 	for j, s in ipairs(SSFilterStrings) do SystemFilterTag[i+j] = s end
 end
 
-local function systemMsgFilter(self,_,msg)
+local function SystemMsgFilter(self,_,msg)
 	for _, s in ipairs(SystemFilterTag) do if msg:find(s) then return true end end
 end
-ChatFrame_AddMessageEventFilter("CHAT_MSG_SYSTEM", systemMsgFilter)
+ChatFrame_AddMessageEventFilter("CHAT_MSG_SYSTEM", SystemMsgFilter)
 
 -- Achievement Filter
 local achievements = {}
-local function achievementReady(id)
+local function AchievementReady(id)
 	local area, guild = achievements[id].CHAT_MSG_ACHIEVEMENT, achievements[id].CHAT_MSG_GUILD_ACHIEVEMENT
 	if area and guild then -- merge area to guild
-		for name,class in pairs(area) do
-			if guild[name] == class then area[name] = nil end
+		for name in pairs(area) do
+			if guild[name] then area[name] = nil end
 		end
 	end
 	for event,players in pairs(achievements[id]) do
@@ -331,9 +331,8 @@ local function achievementReady(id)
 	achievements[id] = nil
 end
 
-local function achievementFilter(self, event, msg, _, _, _, _, _, _, _, _, _, _, guid)
-	if not C.db.enableCFA then return end
-	if not guid or not guid:find("Player") then return end
+local function AchievementFilter(self, event, msg, _, _, _, _, _, _, _, _, _, _, guid)
+	if not C.db.enableCFA or not guid or not guid:find("Player") then return end
 	local id = tonumber(msg:match("|Hachievement:(%d+)"))
 	if not id then return end
 	local _,class,_,_,_,name,server = GetPlayerInfoByGUID(guid)
@@ -341,14 +340,14 @@ local function achievementFilter(self, event, msg, _, _, _, _, _, _, _, _, _, _,
 	if server ~= "" and server ~= playerServer then name = name.."-"..server end
 	if not achievements[id] then
 		achievements[id] = {}
-		C_Timer_After(0.5, function() achievementReady(id) end)
+		C_Timer_After(0.5, function() AchievementReady(id) end)
 	end
 	achievements[id][event] = achievements[id][event] or {}
 	achievements[id][event][name] = class
 	return true
 end
-ChatFrame_AddMessageEventFilter("CHAT_MSG_ACHIEVEMENT", achievementFilter)
-ChatFrame_AddMessageEventFilter("CHAT_MSG_GUILD_ACHIEVEMENT", achievementFilter)
+ChatFrame_AddMessageEventFilter("CHAT_MSG_ACHIEVEMENT", AchievementFilter)
+ChatFrame_AddMessageEventFilter("CHAT_MSG_GUILD_ACHIEVEMENT", AchievementFilter)
 
 -- Loot Filter
 local function lootItemFilter(self,_,msg)
@@ -367,8 +366,7 @@ ChatFrame_AddMessageEventFilter("CHAT_MSG_CURRENCY", lootCurrecyFilter)
 
 -- Invite blocker
 B:AddEventScript("PARTY_INVITE_REQUEST", function(self, _, _, _, _, _, _, _, guid)
-	if not C.db.enableInvite then return end
-	if not (C_BattleNet_GetGameAccountInfoByGUID(guid) or C_FriendList_IsFriend(guid) or IsGuildMember(guid)) then
+	if C.db.enableInvite and not (C_BattleNet_GetGameAccountInfoByGUID(guid) or C_FriendList_IsFriend(guid) or IsGuildMember(guid)) then
 		DeclineGroup()
 		StaticPopup_Hide("PARTY_INVITE")
 	end
