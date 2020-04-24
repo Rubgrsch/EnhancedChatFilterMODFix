@@ -124,6 +124,16 @@ end
 -- 5min session at least before DB saving
 C_Timer_After(300, function() B:AddEventScript("PLAYER_LOGOUT", SaveBlockedPlayers) end)
 
+-- Add reported players to blocked list
+B:AddEventScript("PLAYER_REPORT_SUBMITTED", function(_,_,guid)
+	local _,_,_,_,_,name,server = GetPlayerInfoByGUID(guid)
+	if not name then return end -- check nil
+	if server ~= "" and server ~= playerServer then name = name.."-"..server end
+	blockedPlayers[name] = 4
+	C.db.blockedPlayers[playerServer][name] = 3
+end)
+
+-- Chat Events
 local chatLines = {}
 local chatEvents = {["CHAT_MSG_WHISPER"] = 1, ["CHAT_MSG_SAY"] = 2, ["CHAT_MSG_YELL"] = 2, ["CHAT_MSG_EMOTE"] = 2, ["CHAT_MSG_TEXT_EMOTE"] = 2, ["CHAT_MSG_CHANNEL"] = 3, ["CHAT_MSG_PARTY"] = 4, ["CHAT_MSG_PARTY_LEADER"] = 4, ["CHAT_MSG_RAID"] = 4, ["CHAT_MSG_RAID_LEADER"] = 4, ["CHAT_MSG_RAID_WARNING"] = 4, ["CHAT_MSG_INSTANCE_CHAT"] = 4, ["CHAT_MSG_INSTANCE_CHAT_LEADER"] = 4, ["CHAT_MSG_DND"] = 5}
 
