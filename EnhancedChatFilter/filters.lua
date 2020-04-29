@@ -8,8 +8,6 @@ local format, ipairs, max, min, next, pairs, tconcat, tonumber, tremove = format
 -- WoW
 local Ambiguate, C_BattleNet_GetGameAccountInfoByGUID, C_Item_GetItemQualityByID, C_Timer_After, ChatTypeInfo, GetAchievementLink, GetPlayerInfoByGUID, GetTime, C_FriendList_IsFriend, IsGUIDInGroup, IsGuildMember, RAID_CLASS_COLORS = Ambiguate, C_BattleNet.GetGameAccountInfoByGUID, C_Item.GetItemQualityByID, C_Timer.After, ChatTypeInfo, GetAchievementLink, GetPlayerInfoByGUID, GetTime, C_FriendList.IsFriend, IsGUIDInGroup, IsGuildMember, RAID_CLASS_COLORS
 
--- GLOBALS: NUM_CHAT_WINDOWS
-
 local playerName, playerServer = GetUnitName("player"), GetRealmName()
 
 -- Some UTF-8 symbols that will be auto-changed
@@ -91,7 +89,7 @@ local function strDiff(sA, sB) -- arrays of bytes
 end
 
 --------------- Filters ---------------
--- Block players that have been filtered many times
+-- Blocked players: have been filtered many times
 -- Record how many times players are filterd
 local blockedPlayers = {}
 setmetatable(blockedPlayers, {__index=function() return 0 end})
@@ -104,7 +102,7 @@ local function LoadBlockedPlayers()
 	end
 end
 
--- Save DB when logout
+-- Save DB when logout, at least 5min session is required
 local function SaveBlockedPlayers()
 	local serverDB = C.db.blockedPlayers[playerServer]
 	for name,v in pairs(blockedPlayers) do
@@ -120,8 +118,6 @@ local function SaveBlockedPlayers()
 		end
 	end
 end
-
--- 5min session at least before DB saving
 C_Timer_After(300, function() B:AddEventScript("PLAYER_LOGOUT", SaveBlockedPlayers) end)
 
 -- Add reported players to blocked list
@@ -170,7 +166,7 @@ local function ECFfilter(Event,msg,player,flags,IsMyFriend,good)
 	-- don't filter player/GM/DEV
 	if player == playerName or flags == "GM" or flags == "DEV" then return end
 
-	-- filter bad players
+	-- filter blocked players
 	if not good and blockedPlayers[player] >= 3 then return true end
 
 	-- remove color/hypelink
