@@ -249,8 +249,7 @@ end
 local prevLineID, filterResult = 0, false
 local function PreECFfilter(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID,guid)
 	-- With multiple chat tabs one msg can trigger filters multiple times and repeatFilter will return wrong result
-	-- lineID returned by "CHAT_MSG_TEXT_EMOTE" is always 0
-	if lineID == 0 or lineID ~= prevLineID then
+	if lineID ~= prevLineID then
 		prevLineID = lineID
 
 		player = Ambiguate(player, "none")
