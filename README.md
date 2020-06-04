@@ -10,7 +10,7 @@ Curse Link: <https://www.curseforge.com/wow/addons/ecfmodfix>
 
 [Manual/使用说明](https://github.com/Rubgrsch/EnhancedChatFilterMODFix/wiki/Manual)
 
-[ChangeLog/更新日志](https://github.com/Rubgrsch/EnhancedChatFilterMODFix/wiki/ChangeLog)
+[ChangeLog/更新日志](https://github.com/Rubgrsch/EnhancedChatFilterMODFix/blob/master/EnhancedChatFilter/changelog.txt)
 
 This addon will not officially support Classic WoW.  
 本插件将不会正式支持怀旧服。  
@@ -23,6 +23,7 @@ Main Features
 |关键词|根据设定关键词过滤信息|
 |'忙碌'玩家|过滤'忙碌'状态的玩家|
 |重复信息|过滤内容相似的聊天信息|
+|屏蔽黑名单|将屏蔽过的玩家加入黑名单|
 |成就刷屏|合并多人获取同一成就|
 |NPC重复说话|过滤NPC的重复说话|
 |任务组队通告|过滤组队、任务进度通告|
