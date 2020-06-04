@@ -79,41 +79,43 @@ end
 -- Blocked players: have been filtered many times
 -- Record how many times players are filterd
 local blockedPlayers = {}
-setmetatable(blockedPlayers, {__index=function() return 0 end})
+local initTime
 
 -- Load DB
+-- Blocked players data should stored per server. So we wont wipe other servers data.
 local function LoadBlockedPlayers()
+	initTime = GetTime()
 	if not C.db.blockedPlayers[playerServer] then C.db.blockedPlayers[playerServer] = {} end
 	for name in pairs(C.db.blockedPlayers[playerServer]) do
-		blockedPlayers[name] = 3
+		blockedPlayers[name] = 0
 	end
 end
 
 -- Save DB when logout, at least 5min session is required
 local function SaveBlockedPlayers()
 	local serverDB = C.db.blockedPlayers[playerServer]
-	for name,v in pairs(blockedPlayers) do
-		if v > 3 then
-			if not serverDB[name] then serverDB[name] = 1 -- add new players to DB
-			elseif serverDB[name] < 5 then serverDB[name] = serverDB[name] + 1 end -- 5 times max
+	local loginTime = GetTime() - initTime
+	if loginTime > 300 then -- 5min
+		for name,v in pairs(blockedPlayers) do
+			local result = (serverDB[name] or 0) + v * loginTime / 600 - 1
+			if result > 0 then
+				serverDB[name] = min(result,100)
+			else
+				serverDB[name] = nil
+			end
 		end
-	end
-	for name,v in pairs(serverDB) do
-		if blockedPlayers[name] <= 3 then
-			-- if player is not shown in list then remove it from DB/decrease by 1
-			serverDB[name] = v > 1 and v - 1 or nil
-		end
+	else
+		for name,v in pairs(blockedPlayers) do if not serverDB[name] then serverDB[name] = v end end
 	end
 end
-C_Timer_After(300, function() B:AddEventScript("PLAYER_LOGOUT", SaveBlockedPlayers) end)
+B:AddEventScript("PLAYER_LOGOUT", SaveBlockedPlayers)
 
 -- Add reported players to blocked list
 B:AddEventScript("PLAYER_REPORT_SUBMITTED", function(_,_,guid)
 	local _,_,_,_,_,name,server = GetPlayerInfoByGUID(guid)
 	if not name then return end -- check nil
 	if server ~= "" and server ~= playerServer then name = name.."-"..server end
-	blockedPlayers[name] = 4
-	C.db.blockedPlayers[playerServer][name] = 3
+	blockedPlayers[name] = 6
 end)
 
 -- Chat Events
@@ -154,7 +156,7 @@ local function ECFfilter(Event,msg,player,flags,IsMyFriend,good)
 	if player == playerName or flags == "GM" or flags == "DEV" then return end
 
 	-- filter blocked players
-	if not good and blockedPlayers[player] >= 3 then return true end
+	if not good and blockedPlayers[player] then return true end
 
 	-- remove color/hypelink
 	local filterString = msg:gsub("|H.-|h(.-)|h","%1"):gsub("|c%x%x%x%x%x%x%x%x",""):gsub("|r","")
@@ -247,7 +249,7 @@ local function PreECFfilter(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID,gui
 		end
 		filterResult = ECFfilter(chatEvents[event],msg,player,flags,IsMyFriend,good)
 
-		if filterResult and not good then blockedPlayers[player] = blockedPlayers[player] + 1 end
+		if filterResult and not good then blockedPlayers[player] = (blockedPlayers[player] or 0) + 1 end
 	end
 	return filterResult
 end
