@@ -79,6 +79,7 @@ end
 -- Blocked players: have been filtered many times
 -- Record how many times players are filterd
 local blockedPlayers = {}
+setmetatable(blockedPlayers, {__index=function() return 0 end})
 local initTime
 
 -- Load DB
@@ -115,7 +116,7 @@ B:AddEventScript("PLAYER_REPORT_SUBMITTED", function(_,_,guid)
 	local _,_,_,_,_,name,server = GetPlayerInfoByGUID(guid)
 	if not name then return end -- check nil
 	if server ~= "" and server ~= playerServer then name = name.."-"..server end
-	blockedPlayers[name] = 6
+	blockedPlayers[name] = 20
 end)
 
 -- Chat Events
@@ -156,7 +157,7 @@ local function ECFfilter(Event,msg,player,flags,IsMyFriend,good)
 	if player == playerName or flags == "GM" or flags == "DEV" then return end
 
 	-- filter blocked players
-	if not good and blockedPlayers[player] then return true end
+	if not good and blockedPlayers[player] >= 3 then return true end
 
 	-- remove color/hypelink
 	local filterString = msg:gsub("|H.-|h(.-)|h","%1"):gsub("|c%x%x%x%x%x%x%x%x",""):gsub("|r","")
@@ -249,7 +250,7 @@ local function PreECFfilter(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID,gui
 		end
 		filterResult = ECFfilter(chatEvents[event],msg,player,flags,IsMyFriend,good)
 
-		if filterResult and not good then blockedPlayers[player] = (blockedPlayers[player] or 0) + 1 end
+		if filterResult and not good then blockedPlayers[player] = blockedPlayers[player] + 1 end
 	end
 	return filterResult
 end
