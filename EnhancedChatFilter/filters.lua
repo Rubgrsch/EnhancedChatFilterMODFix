@@ -87,8 +87,8 @@ local initTime
 local function LoadBlockedPlayers()
 	initTime = GetTime()
 	if not C.db.blockedPlayers[playerServer] then C.db.blockedPlayers[playerServer] = {} end
-	for name in pairs(C.db.blockedPlayers[playerServer]) do
-		blockedPlayers[name] = 0
+	for name,v in pairs(C.db.blockedPlayers[playerServer]) do
+		blockedPlayers[name] = v
 	end
 end
 
@@ -98,7 +98,8 @@ local function SaveBlockedPlayers()
 	local loginTime = GetTime() - initTime
 	if loginTime > 300 then -- 5min
 		for name,v in pairs(blockedPlayers) do
-			local result = (serverDB[name] or 0) + v * loginTime / 600 - 1
+			local last = serverDB[name] or 0
+			local result = (v - last) * loginTime / 600 + last - 1
 			if result > 0 then
 				serverDB[name] = min(result,100)
 			else
