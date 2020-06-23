@@ -423,7 +423,7 @@ options.args.lootFilter = {
 			get = nil,
 			set = function(_,value)
 				local Id = tonumber(value)
-				if not Id then print(L["BadID"]);return end
+				if not Id then print(L["BadID"]) return end
 				if C.UI.lootType == "ITEMS" then
 					ItemInfoRequested[Id] = 0
 					local _, link = GetItemInfo(Id)

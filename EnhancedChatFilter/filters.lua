@@ -78,7 +78,7 @@ end
 --------------- Filters ---------------
 -- Blocked players: have been filtered many times
 -- Record how many times players are filterd
-local blockedPlayers = {}
+local blockedPlayers, blockedMsg = {}, {}
 setmetatable(blockedPlayers, {__index=function() return 0 end})
 local initTime
 
@@ -157,8 +157,8 @@ local function ECFfilter(Event,msg,player,flags,IsMyFriend,good)
 	-- don't filter player/GM/DEV
 	if player == playerName or flags == "GM" or flags == "DEV" then return end
 
-	-- filter blocked players
-	if not good and blockedPlayers[player] >= 3 then return true end
+	-- filter blocked players and blocked msg
+	if not good and (blockedPlayers[player] >= 3 or blockedMsg[msg]) then return true end
 
 	-- remove color/hypelink
 	local filterString = msg:gsub("|H.-|h(.-)|h","%1"):gsub("|c%x%x%x%x%x%x%x%x",""):gsub("|r","")
@@ -251,7 +251,10 @@ local function PreECFfilter(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID,gui
 		end
 		filterResult = ECFfilter(chatEvents[event],msg,player,flags,IsMyFriend,good)
 
-		if filterResult and not good then blockedPlayers[player] = blockedPlayers[player] + 1 end
+		if filterResult and not good then
+			blockedPlayers[player] = blockedPlayers[player] + 1
+			if blockedPlayers[player] >= 3 then blockedMsg[msg] = true end
+		end
 	end
 	return filterResult
 end
