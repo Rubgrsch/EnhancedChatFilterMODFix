@@ -120,6 +120,11 @@ B:AddEventScript("PLAYER_REPORT_SUBMITTED", function(_,_,guid)
 	blockedPlayers[name] = 20
 end)
 
+-- Languages that player understand
+local availableLanguages = {
+	[""] = true,
+}
+
 -- Chat Events
 local chatLines = {}
 local chatEvents = {["CHAT_MSG_WHISPER"] = 1, ["CHAT_MSG_SAY"] = 2, ["CHAT_MSG_YELL"] = 2, ["CHAT_MSG_EMOTE"] = 2, ["CHAT_MSG_TEXT_EMOTE"] = 2, ["CHAT_MSG_CHANNEL"] = 3, ["CHAT_MSG_PARTY"] = 4, ["CHAT_MSG_PARTY_LEADER"] = 4, ["CHAT_MSG_RAID"] = 4, ["CHAT_MSG_RAID_LEADER"] = 4, ["CHAT_MSG_RAID_WARNING"] = 4, ["CHAT_MSG_INSTANCE_CHAT"] = 4, ["CHAT_MSG_INSTANCE_CHAT_LEADER"] = 4, ["CHAT_MSG_DND"] = 5}
@@ -238,10 +243,16 @@ local function ECFfilter(Event,msg,player,flags,IsMyFriend,good)
 end
 
 local prevLineID, filterResult = 0, false
-local function PreECFfilter(self,event,msg,player,_,_,_,flags,_,_,_,_,lineID,guid)
+local function PreECFfilter(self,event,msg,player,language,_,_,flags,_,_,_,_,lineID,guid)
 	-- With multiple chat tabs one msg can trigger filters multiple times and repeatFilter will return wrong result
 	if lineID ~= prevLineID then
 		prevLineID = lineID
+
+		-- filter unknown languages
+		if not availableLanguages[language] and C.db.enableLanguage then
+			filterResult = true
+			return true
+		end
 
 		player = Ambiguate(player, "none")
 		local IsMyFriend, good
@@ -371,4 +382,7 @@ B:AddEventScript("PARTY_INVITE_REQUEST", function(self, _, _, _, _, _, _, _, gui
 	end
 end)
 
-B:AddInitScript(LoadBlockedPlayers)
+B:AddInitScript(function()
+	LoadBlockedPlayers()
+	for i=1, GetNumLanguages() do availableLanguages[GetLanguageByIndex(i)] = true end
+end)

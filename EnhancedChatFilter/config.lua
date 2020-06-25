@@ -16,6 +16,7 @@ local defaults = {
 	enableAggressive = false, -- Aggressive Filter
 	enableRepeat = true, -- repeatFilter
 	enableInvite = false, -- block invite from strangers
+	enableLanguage = false, -- block other languages, like common/orcish
 	repeatFilterGroup = true, -- repeatFilter enabled in group and raid
 	addonRAF = false, -- RaidAlert Filter
 	addonQRF = false, -- Quest/Group Report Filter
@@ -181,6 +182,12 @@ options.args.General = {
 			name = L["BlockStrangersInvite"],
 			desc = L["BlockStrangersInviteTooltip"],
 			order = 15,
+		},
+		enableLanguage = {
+			type = "toggle",
+			name = L["BlockOtherLanguages"],
+			desc = L["BlockOtherLanguagesTooltip"],
+			order = 16,
 		},
 		line2 = {
 			type = "header",

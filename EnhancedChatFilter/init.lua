@@ -1,5 +1,5 @@
 -- ECF
-local addonName, ecf = ...
+local _, ecf = ...
 ecf[1] = {} -- Base
 ecf[2] = {} -- Locales
 ecf[3] = {} -- Config
@@ -26,12 +26,9 @@ end
 
 -- Init
 local init = {}
-B:AddEventScript("ADDON_LOADED", function(self,event,name)
-	if name == addonName then
-		self:UnregisterEvent(event)
-		for _,f in ipairs(init) do f() end
-		init = nil
-	end
+B:AddEventScript("PLAYER_LOGIN", function()
+	for _,f in ipairs(init) do f() end
+	init = nil
 end)
 
 function B:AddInitScript(func) init[#init+1] = func end
