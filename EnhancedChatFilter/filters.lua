@@ -175,8 +175,9 @@ function C:SetupEvent()
 end
 
 local function ECFfilter(Event,msg,player,flags,IsMyFriend,good)
-	-- don't filter player/GM/DEV
-	if player == playerName or flags == "GM" or flags == "DEV" then return end
+	-- don't filter player/system/GM/DEV
+	-- player == "" in local defense channel
+	if player == playerName or player == "" or flags == "GM" or flags == "DEV" then return end
 
 	-- remove color/hypelink
 	local filterString = msg:gsub("|H.-|h(.-)|h","%1"):gsub("|c%x%x%x%x%x%x%x%x",""):gsub("|r","")
