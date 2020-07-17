@@ -29,6 +29,7 @@ local defaults = {
 	lootQualityMin = 0, -- loot quality filter, 0..4 = poor..epic
 	advancedConfig = false, -- show advancedConfig
 	blockedPlayers = {}, -- blocked players list, [serverName] = {[guid] = times}
+	blockedMsgs = {}, -- blocked players' msgs, [serverName] = {[msg] = times}
 }
 
 --http://www.wowwiki.com/USERAPI_StringHash

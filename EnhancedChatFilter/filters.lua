@@ -78,8 +78,9 @@ end
 --------------- Filters ---------------
 -- Blocked players: have been filtered many times
 -- Record how many times players are filterd
-local blockedPlayers, blockedMsg = {}, {}
+local blockedPlayers, blockedMsgs = {}, {}
 setmetatable(blockedPlayers, {__index=function() return 0 end})
+setmetatable(blockedMsgs, {__index=function() return 0 end})
 local initTime
 
 -- Load DB
@@ -90,24 +91,39 @@ local function LoadBlockedPlayers()
 	for name,v in pairs(C.db.blockedPlayers[playerServer]) do
 		blockedPlayers[name] = v
 	end
+	if not C.db.blockedMsgs[playerServer] then C.db.blockedMsgs[playerServer] = {} end
+	for msg,v in pairs(C.db.blockedMsgs[playerServer]) do
+		blockedMsgs[msg] = v
+	end
 end
 
 -- Save DB when logout, at least 5min session is required
 local function SaveBlockedPlayers()
-	local serverDB = C.db.blockedPlayers[playerServer]
+	local blockedPlayersDB = C.db.blockedPlayers[playerServer]
+	local blockedMsgsDB = C.db.blockedMsgs[playerServer]
 	local loginTime = GetTime() - initTime
 	if loginTime > 300 then -- 5min
 		for name,v in pairs(blockedPlayers) do
-			local last = serverDB[name] or 0
+			local last = blockedPlayersDB[name] or 0
 			local result = (v - last) * loginTime / 600 + last - 1
 			if result > 0 then
-				serverDB[name] = min(result,100)
+				blockedPlayersDB[name] = min(result,100)
 			else
-				serverDB[name] = nil
+				blockedPlayersDB[name] = nil
+			end
+		end
+		for msg,v in pairs(blockedMsgs) do
+			local last = blockedMsgsDB[msg] or 0
+			local result = (v - last) * loginTime / 600 + last - 1
+			if result > 0 then
+				blockedMsgsDB[msg] = min(result,100)
+			else
+				blockedMsgsDB[msg] = nil
 			end
 		end
 	else
-		for name,v in pairs(blockedPlayers) do if not serverDB[name] then serverDB[name] = v end end
+		for name,v in pairs(blockedPlayers) do if not blockedPlayersDB[name] then blockedPlayersDB[name] = v end end
+		for msg,v in pairs(blockedMsgs) do if not blockedMsgsDB[msg] then blockedMsgsDB[msg] = v end end
 	end
 end
 B:AddEventScript("PLAYER_LOGOUT", SaveBlockedPlayers)
@@ -162,9 +178,6 @@ local function ECFfilter(Event,msg,player,flags,IsMyFriend,good)
 	-- don't filter player/GM/DEV
 	if player == playerName or flags == "GM" or flags == "DEV" then return end
 
-	-- filter blocked players and blocked msg
-	if not good and (blockedPlayers[player] >= 3 or blockedMsg[msg]) then return true end
-
 	-- remove color/hypelink
 	local filterString = msg:gsub("|H.-|h(.-)|h","%1"):gsub("|c%x%x%x%x%x%x%x%x",""):gsub("|r","")
 	local oriLen = #filterString
@@ -176,18 +189,21 @@ local function ECFfilter(Event,msg,player,flags,IsMyFriend,good)
 	if msgLine == "" then msgLine = msg end
 	local annoying = (oriLen - #msgLine) / oriLen
 
+	-- filter blocked players and blocked msg
+	if not good and (blockedPlayers[player] >= 3 or blockedMsgs[msgLine] >= 3) then return msgLine end
+
 	-- filter status for each channel
 	local filtersStatus = eventStatus[Event]
 
 	-- AggressiveFilter: Filter strings that has too much symbols
 	-- AggressiveFilter: Filter journal link and club link
 	if filtersStatus[1] and not IsMyFriend then
-		if annoying >= 0.25 and oriLen >= 30 then return true end
-		if msg:find("|Hjournal") or msg:find("|HclubTicket") then return true end
+		if annoying >= 0.25 and oriLen >= 30 then return msgLine end
+		if msg:find("|Hjournal") or msg:find("|HclubTicket") then return msgLine end
 	end
 
 	-- DND and auto-reply
-	if filtersStatus[2] and (flags == "DND" or Event == 5) and not IsMyFriend then return true end
+	if filtersStatus[2] and (flags == "DND" or Event == 5) and not IsMyFriend then return msgLine end
 
 	-- blackWord Filter
 	if filtersStatus[3] and not IsMyFriend then
@@ -201,23 +217,23 @@ local function ECFfilter(Event,msg,player,flags,IsMyFriend,good)
 						v.count = (v.count or 0) + 1
 						C.db.totalBlackWordsFiltered = C.db.totalBlackWordsFiltered + 1
 					end
-					return true
+					return msgLine
 				end
 			end
 		end
-		if count >= C.db.lesserBlackWordThreshold then return true end
+		if count >= C.db.lesserBlackWordThreshold then return msgLine end
 	end
 
 	-- raidAlert
 	if filtersStatus[4] then
 		for _,tag in ipairs(RaidAlertTagList) do
-			if msg:find(tag) then return true end
+			if msg:find(tag) then return msgLine end
 		end
 	end
 	-- questReport and partyAnnounce
 	if filtersStatus[5] then
 		for _,tag in ipairs(QuestReportTagList) do
-			if msg:find(tag) then return true end
+			if msg:find(tag) then return msgLine end
 		end
 	end
 
@@ -235,7 +251,7 @@ local function ECFfilter(Event,msg,player,flags,IsMyFriend,good)
 			-- if multiple msgs in 0.6s, filter it (channel & emote only)
 			if line[1] == msgtable[1] and ((Event == 3 and msgtable[3] - line[3] < 0.6) or strDiff(line[2],msgtable[2]) <= 0.1) then
 				tremove(chatLines, i)
-				return true
+				return msgLine
 			end
 		end
 		if chatLinesSize >= 30 then tremove(chatLines, 1) end
@@ -260,11 +276,12 @@ local function PreECFfilter(self,event,msg,player,language,_,_,flags,_,_,_,_,lin
 			IsMyFriend = C_BattleNet_GetGameAccountInfoByGUID(guid) or C_FriendList_IsFriend(guid)
 			good = IsMyFriend or IsGuildMember(guid) or IsGUIDInGroup(guid)
 		end
-		filterResult = ECFfilter(chatEvents[event],msg,player,flags,IsMyFriend,good)
+		local result = ECFfilter(chatEvents[event],msg,player,flags,IsMyFriend,good)
+		filterResult = result
 
-		if filterResult and not good then
+		if result and not good then
 			blockedPlayers[player] = blockedPlayers[player] + 1
-			if blockedPlayers[player] >= 3 then blockedMsg[msg] = true end
+			blockedMsgs[result] = blockedMsgs[result] + 1
 		end
 	end
 	return filterResult
