@@ -2,9 +2,9 @@
 EnhancedChatFilter, a WoW chat addon, modded for CN users
 
 This is a WoW chat filter addon mainly for CN servers.  
-It is now supporting Battle for Azeroth(8.3).  
+It is now supporting Shadowlands(9.0).  
 这是一个主要适用于国服魔兽世界的聊天屏蔽插件。  
-现已更新至争霸艾泽拉斯(8.3)。  
+现已更新至暗影国度(9.0)。  
 
 Curse Link: <https://www.curseforge.com/wow/addons/ecfmodfix>
 
