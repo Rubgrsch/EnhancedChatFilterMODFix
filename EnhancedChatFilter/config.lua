@@ -6,7 +6,7 @@ local _G = _G
 -- Lua
 local format, pairs, print, next, select, tconcat, tonumber, type = format, pairs, print, next, select, table.concat, tonumber, type
 -- WoW
-local GetCurrencyLink, GetItemInfo, ITEMS = GetCurrencyLink, GetItemInfo, ITEMS
+local GetCurrencyLink, GetItemInfo, ITEMS = C_CurrencyInfo.GetCurrencyLink, GetItemInfo, ITEMS
 
 --Default Options
 local defaults = {
