@@ -1,3 +1,4 @@
 *.txt
 *.bat
+*.code-workspace
 !changelog.txt
