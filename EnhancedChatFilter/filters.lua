@@ -295,9 +295,8 @@ local MSFOffQuestT = {[42880] = true, [54090]=true,} -- 42880: Meeting their Quo
 local MSFOffQuestFlag = false
 
 --TODO: If player uses hearthstone to leave questzone, QUEST_REMOVED is not fired.
-local function QuestChanged(self,event,arg1,arg2)
-	if event == "QUEST_ACCEPTED" and MSFOffQuestT[arg2] then MSFOffQuestFlag = true end
-	if event == "QUEST_REMOVED" and MSFOffQuestT[arg1] then MSFOffQuestFlag = false end
+local function QuestChanged(self,event,questId)
+	if MSFOffQuestT[questId] then MSFOffQuestFlag = event == "QUEST_ACCEPTED" end
 end
 B:AddEventScript("QUEST_ACCEPTED", QuestChanged)
 B:AddEventScript("QUEST_REMOVED", QuestChanged)
