@@ -287,7 +287,6 @@ local function PreECFfilter(self,event,msg,player,language,_,_,flags,_,_,_,_,lin
 	end
 	return filterResult
 end
-for event in pairs(chatEvents) do ChatFrame_AddMessageEventFilter(event, PreECFfilter) end
 
 -- MonsterSayFilter
 -- Turn off MSF in certain quests. Chat msg are repeated but important in these quests.
@@ -310,8 +309,6 @@ local function MonsterFilter(self,_,msg)
 	MSLPos = MSLPos + 1
 	if MSLPos > 7 then MSLPos = MSLPos - 7 end
 end
-ChatFrame_AddMessageEventFilter("CHAT_MSG_MONSTER_SAY", MonsterFilter)
-ChatFrame_AddMessageEventFilter("CHAT_MSG_MONSTER_EMOTE", MonsterFilter)
 
 -- System Message
 local SystemFilterTag = {
@@ -335,7 +332,6 @@ end
 local function SystemMsgFilter(self,_,msg)
 	for _, s in ipairs(SystemFilterTag) do if msg:find(s) then return true end end
 end
-ChatFrame_AddMessageEventFilter("CHAT_MSG_SYSTEM", SystemMsgFilter)
 
 -- Achievement Filter
 local achievements = {}
@@ -373,8 +369,6 @@ local function AchievementFilter(self, event, msg, _, _, _, _, _, _, _, _, _, _,
 	achievements[id][event][name] = class
 	return true
 end
-ChatFrame_AddMessageEventFilter("CHAT_MSG_ACHIEVEMENT", AchievementFilter)
-ChatFrame_AddMessageEventFilter("CHAT_MSG_GUILD_ACHIEVEMENT", AchievementFilter)
 
 -- Loot Filter
 local function lootItemFilter(self,_,msg)
@@ -383,13 +377,11 @@ local function lootItemFilter(self,_,msg)
 	if C.db.lootItemFilterList[itemID] then return true end
 	if C_Item_GetItemQualityByID(itemID) < C.db.lootQualityMin then return true end
 end
-ChatFrame_AddMessageEventFilter("CHAT_MSG_LOOT", lootItemFilter)
 
 local function lootCurrecyFilter(self,_,msg)
 	local currencyID = tonumber(msg:match("|Hcurrency:(%d+)"))
 	if C.db.lootCurrencyFilterList[currencyID] then return true end
 end
-ChatFrame_AddMessageEventFilter("CHAT_MSG_CURRENCY", lootCurrecyFilter)
 
 -- Invite blocker
 B:AddEventScript("PARTY_INVITE_REQUEST", function(self, _, _, _, _, _, _, _, guid)
@@ -402,4 +394,13 @@ end)
 B:AddInitScript(function()
 	LoadBlockedPlayers()
 	for i=1, GetNumLanguages() do availableLanguages[GetLanguageByIndex(i)] = true end
+	-- In case db is not ready
+	for event in pairs(chatEvents) do ChatFrame_AddMessageEventFilter(event, PreECFfilter) end
+	ChatFrame_AddMessageEventFilter("CHAT_MSG_MONSTER_SAY", MonsterFilter)
+	ChatFrame_AddMessageEventFilter("CHAT_MSG_MONSTER_EMOTE", MonsterFilter)
+	ChatFrame_AddMessageEventFilter("CHAT_MSG_SYSTEM", SystemMsgFilter)
+	ChatFrame_AddMessageEventFilter("CHAT_MSG_ACHIEVEMENT", AchievementFilter)
+	ChatFrame_AddMessageEventFilter("CHAT_MSG_GUILD_ACHIEVEMENT", AchievementFilter)
+	ChatFrame_AddMessageEventFilter("CHAT_MSG_LOOT", lootItemFilter)
+	ChatFrame_AddMessageEventFilter("CHAT_MSG_CURRENCY", lootCurrecyFilter)
 end)
