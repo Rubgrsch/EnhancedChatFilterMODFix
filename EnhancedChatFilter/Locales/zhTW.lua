@@ -12,6 +12,7 @@ L["FilterGroupTooltips"] = "啟用後，過濾器也會過濾小隊和團隊中�
 
 --General
 L["General"] = "一般"
+L["Chat"] = "聊天"
 L["DND"] = "「忙碌」玩家"
 L["DNDfilterTooltip"] = "過濾「忙碌」玩家及其自動回覆。"
 L["Achievement"] = "成就洗頻"
@@ -25,10 +26,13 @@ L["DisplayAdvancedConfig"] = "顯示高級選項"
 L["DisplayAdvancedConfigTooltips"] = "如果你是正常人請不要接受，不然你很有可能會把ECF玩壞！如果你同意你不是正常人的話請繼續..."
 L["Aggressive"] = "額外過濾器"
 L["AggressiveTooltip"] = "由一些會極大提高過濾效果和|cffE2252D誤傷機率|r的關鍵字合集組成的過濾器。"
+L["Social"] = "社交"
 L["BlockStrangersInvite"] = "陌生组队邀请"
 L["BlockStrangersInviteTooltip"] = "屏蔽来自非好友/工会的组队邀请"
 L["BlockOtherLanguages"] = "其他种族语言"
 L["BlockOtherLanguagesTooltip"] = "屏蔽听不懂的玩家种族语言, 主要来自对立阵营"
+L["BlockCommunityInvite"] = "屏蔽社区邀请"
+L["BlockCommunityInviteTooltip"] = "屏蔽所有社区邀请"
 
 --Addon
 L["Addons"] = "插件通報過濾"

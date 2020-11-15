@@ -17,6 +17,7 @@ local defaults = {
 	enableRepeat = true, -- repeatFilter
 	enableInvite = false, -- block invite from strangers
 	enableLanguage = false, -- block other languages, like common/orcish
+	enableCommunity = false, -- block community invite
 	repeatFilterGroup = true, -- repeatFilter enabled in group and raid
 	addonRAF = false, -- RaidAlert Filter
 	addonQRF = false, -- Quest/Group Report Filter
@@ -151,7 +152,7 @@ options.args.General = {
 		},
 		line1 = {
 			type = "header",
-			name = FILTERS,
+			name = L["Chat"],
 			order = 10,
 		},
 		enableDND = {
@@ -178,19 +179,30 @@ options.args.General = {
 			desc = L["AggressiveTooltip"],
 			order = 14,
 		},
+		line2 = {
+			type = "header",
+			name = L["Social"],
+			order = 20,
+		},
 		enableInvite = {
 			type = "toggle",
 			name = L["BlockStrangersInvite"],
 			desc = L["BlockStrangersInviteTooltip"],
-			order = 15,
+			order = 21,
 		},
 		enableLanguage = {
 			type = "toggle",
 			name = L["BlockOtherLanguages"],
 			desc = L["BlockOtherLanguagesTooltip"],
-			order = 16,
+			order = 22,
 		},
-		line2 = {
+		enableCommunity = {
+			type = "toggle",
+			name = L["BlockCommunityInvite"],
+			desc = L["BlockCommunityInviteTooltip"],
+			order = 23,
+		},
+		line3 = {
 			type = "header",
 			name = L["Addons"],
 			order = 30,
@@ -207,7 +219,7 @@ options.args.General = {
 			desc = L["QuestReportFilterTooltip"],
 			order = 32,
 		},
-		line3 = {
+		line4 = {
 			type = "header",
 			name = L["RepeatOptions"],
 			order = 40,

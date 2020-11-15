@@ -394,6 +394,8 @@ end)
 B:AddInitScript(function()
 	LoadBlockedPlayers()
 	for i=1, GetNumLanguages() do availableLanguages[GetLanguageByIndex(i)] = true end
+	-- Disable community invite
+	SetCVar("showToastClubInvitation", C.db.enableCommunity and 0 or 1)
 	-- In case db is not ready
 	for event in pairs(chatEvents) do ChatFrame_AddMessageEventFilter(event, PreECFfilter) end
 	ChatFrame_AddMessageEventFilter("CHAT_MSG_MONSTER_SAY", MonsterFilter)
