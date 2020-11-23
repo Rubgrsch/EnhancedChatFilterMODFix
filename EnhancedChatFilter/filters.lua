@@ -312,8 +312,7 @@ end
 
 -- System Message
 local SystemFilterTag = {
-	-- !!! Always add parentheses since gsub() has two return values !!!
-	(AZERITE_ISLANDS_XP_GAIN:gsub("%%.-s",".+"):gsub("%%.-d","%%d+")), -- Azerite gain in islands
+	-- !!! Always add parentheses since gsub() has two return values !!! (xxx:gsub())
 }
 if UnitLevel("player") == GetMaxPlayerLevel() then -- spell learn, only when max level
 	local SSFilterStrings = {
