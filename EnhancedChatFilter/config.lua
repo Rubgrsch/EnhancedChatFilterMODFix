@@ -173,11 +173,17 @@ options.args.General = {
 			desc = L["MonsterSayFilterTooltip"],
 			order = 13,
 		},
+		enableLanguage = {
+			type = "toggle",
+			name = L["BlockOtherLanguages"],
+			desc = L["BlockOtherLanguagesTooltip"],
+			order = 14,
+		},
 		enableAggressive = {
 			type = "toggle",
 			name = L["Aggressive"],
 			desc = L["AggressiveTooltip"],
-			order = 14,
+			order = 15,
 		},
 		line2 = {
 			type = "header",
@@ -190,17 +196,11 @@ options.args.General = {
 			desc = L["BlockStrangersInviteTooltip"],
 			order = 21,
 		},
-		enableLanguage = {
-			type = "toggle",
-			name = L["BlockOtherLanguages"],
-			desc = L["BlockOtherLanguagesTooltip"],
-			order = 22,
-		},
 		enableCommunity = {
 			type = "toggle",
 			name = L["BlockCommunityInvite"],
 			desc = L["BlockCommunityInviteTooltip"],
-			order = 23,
+			order = 22,
 		},
 		line3 = {
 			type = "header",
