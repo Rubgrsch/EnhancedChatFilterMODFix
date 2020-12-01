@@ -300,14 +300,24 @@ end
 B:AddEventScript("QUEST_ACCEPTED", QuestChanged)
 B:AddEventScript("QUEST_REMOVED", QuestChanged)
 
-local MSL, MSLPos = {}, 1
-local function MonsterFilter(self,_,msg)
+local MSL, MSLPos, lastMSID, lastMSIDResult = {}, 1, nil, false
+local function MonsterFilter(self,_,msg,_,_,_,_,_,_,_,_,_,lineID)
 	if not C.db.enableMSF or MSFOffQuestFlag then return end
+	if lineID ~= lastMSID then -- for multi chat tabs, check only once
+		lastMSID = lineID
 
-	for _, v in ipairs(MSL) do if v == msg then return true end end
-	MSL[MSLPos] = msg
-	MSLPos = MSLPos + 1
-	if MSLPos > 7 then MSLPos = MSLPos - 7 end
+		for _, v in ipairs(MSL) do
+			if v == msg then
+				lastMSIDResult = true
+				return true
+			end
+		end
+		MSL[MSLPos] = msg
+		MSLPos = MSLPos + 1
+		if MSLPos > 7 then MSLPos = MSLPos - 7 end
+		lastMSIDResult = false
+	end
+	return lastMSIDResult
 end
 
 -- System Message
