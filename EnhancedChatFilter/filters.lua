@@ -84,7 +84,7 @@ setmetatable(blockedMsgs, {__index=function() return 0 end})
 local initTime
 
 -- Load DB
--- Blocked players data should stored per server. So we wont wipe other servers data.
+-- Blocked players data is stored per server. So we wont wipe other servers data.
 local function LoadBlockedPlayers()
 	initTime = GetTime()
 	if not C.db.blockedPlayers[playerServer] then C.db.blockedPlayers[playerServer] = {} end
@@ -190,15 +190,15 @@ local function ECFfilter(Event,msg,player,flags,IsMyFriend,good)
 	if msgLine == "" then msgLine = msg end
 	local annoying = (oriLen - #msgLine) / oriLen
 
-	-- filter blocked players and blocked msg
-	if not good and (blockedPlayers[player] >= 3 or blockedMsgs[msgLine] >= 3) then return msgLine end
-
 	-- filter status for each channel
 	local filtersStatus = eventStatus[Event]
 
-	-- AggressiveFilter: Filter strings that has too much symbols
-	-- AggressiveFilter: Filter journal link and club link
+	-- AggressiveFilter:
+	-- Filter blocked players and blocked msg
+	-- Filter strings that has too much symbols
+	-- Filter journal link and club link
 	if filtersStatus[1] and not IsMyFriend then
+		if blockedPlayers[player] >= 3 or blockedMsgs[msgLine] >= 3 then return msgLine end
 		if annoying >= 0.25 and oriLen >= 30 then return msgLine end
 		if msg:find("|Hjournal") or msg:find("|HclubTicket") then return msgLine end
 	end
