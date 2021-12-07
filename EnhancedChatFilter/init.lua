@@ -32,11 +32,3 @@ B:AddEventScript("PLAYER_LOGIN", function()
 end)
 
 function B:AddInitScript(func) init[#init+1] = func end
-
---Disable profanityFilter
-B:AddInitScript(function()
-	if GetCVar("portal") == "CN" then
-		ConsoleExec("portal TW")
-	end
-	ConsoleExec("profanityFilter 0")
-end)
