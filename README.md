@@ -1,10 +1,14 @@
 # EnhancedChatFilterMODFix
 EnhancedChatFilter, a WoW chat addon, modded for CN users
 
-This is a WoW chat filter addon mainly for CN servers.  
-It is now supporting Shadowlands(9.0).  
-这是一个主要适用于国服魔兽世界的聊天屏蔽插件。  
-现已更新至暗影国度(9.0)。  
+This is a WoW chat filter addon mainly for CN users.  
+It is now supporting DragonFlight (10.0).  
+This addon does not officially support Classic WoW.
+Since CN servers are no longer exists, this addon is not well tested. Use at your own risk.  
+这是一个主要适用于魔兽世界的聊天屏蔽插件。  
+现已更新至巨龙时代(10.0)。  
+本插件未正式支持怀旧服。  
+请注意，由于国服已经终止运行，本插件未进行足够的测试。使用后出现问题请自行承担。  
 
 Curse Link: <https://www.curseforge.com/wow/addons/ecfmodfix>
 
@@ -12,8 +16,6 @@ Curse Link: <https://www.curseforge.com/wow/addons/ecfmodfix>
 
 [ChangeLog/更新日志](https://github.com/Rubgrsch/EnhancedChatFilterMODFix/blob/master/EnhancedChatFilter/changelog.txt)
 
-This addon will not officially support Classic WoW.  
-本插件将不会正式支持怀旧服。  
 
 Main Features
 -------------
@@ -37,7 +39,7 @@ FAQ
 
 1. 如何共享不同账号下的关键词列表和开关设置
   - 同一账户(如wow1)下的不同角色共享设置，不同账户的无法直接共享。
-  - 你可以用字符串导入导出的方法复制关键词列表，然后人工进行设置。或者手动复制设置/设置硬链接。
+  - 你可以用字符串导入导出的方法复制应用关键词列表。或者设置硬链接。
 
 2. 为何我添加关键词时总是会有"包含会被自动过滤的字符，将忽略该关键词！"这一错误？
   - 不要加入标点符号，这些字符会被自动忽略，只需要添加那些汉字。
