@@ -180,7 +180,7 @@ local function ECFfilter(Event,msg,player,flags,IsMyFriend,good)
 	if player == playerName or player == "" or flags == "GM" or flags == "DEV" then return end
 
 	-- remove color/hypelink
-	local filterString = msg:gsub("|H.-|h(.-)|h","%1"):gsub("|c%x%x%x%x%x%x%x%x",""):gsub("|r","")
+	local filterString = msg:gsub("|H.-|h(.-)|h","%1"):gsub("|A.-|a",""):gsub("|c%x%x%x%x%x%x%x%x",""):gsub("|r","")
 	local oriLen = #filterString
 	-- remove utf-8 chars/symbols/raidicon
 	filterString = B.utf8replace(filterString):gsub("{rt%d}","")
