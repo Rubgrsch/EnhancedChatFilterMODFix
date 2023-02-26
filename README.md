@@ -3,12 +3,14 @@ EnhancedChatFilter, a WoW chat addon, modded for CN users
 
 This is a WoW chat filter addon mainly for CN users.  
 It is now supporting DragonFlight (10.0).  
-This addon does not officially support Classic WoW.
-Since CN servers are no longer exists, this addon is not well tested. Use at your own risk.  
-这是一个主要适用于魔兽世界的聊天屏蔽插件。  
+This addon does not officially support Classic WoW.  
+Since CN servers no longer exist, this addon is not well tested.  
+Use at your own risk.  
+这是一个适用于魔兽世界的聊天屏蔽插件。  
 现已更新至巨龙时代(10.0)。  
 本插件未正式支持怀旧服。  
-请注意，由于国服已经终止运行，本插件未进行足够的测试。使用后出现问题请自行承担。  
+请注意，由于国服已经终止运行，本插件未进行足够的测试。  
+使用后出现问题请自行承担。  
 
 Curse Link: <https://www.curseforge.com/wow/addons/ecfmodfix>
 
