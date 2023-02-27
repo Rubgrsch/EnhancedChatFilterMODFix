@@ -12,7 +12,7 @@ local playerName, playerServer = GetUnitName("player"), GetRealmName()
 
 -- Some UTF-8 symbols that will be auto-changed
 local UTF8Symbols = {
-	['１']='1',['２']='2',['３']='3',['４']='4',['５']='5',['６']='6',['７']='7',['８']='8',['９']='9',['０']='0',['⒈']='1',['⒉']='2',['⒊']='3',['⒋']='4',['⒌']='5',['⒍']='6',['⒎']='7',['⒏']='8',['⒐']='9',['①']=1,['②']=2,['③']=3,['④']=4,['⑤']=5,['⑥']=6,['⑦']=7,['⑧']=8,['⑨']=9,['⓪']=0,['⑪']=11,['⑫']=12,['Ａ']='A',['Ｂ']='B',['Ｃ']='C',['Ｄ']='D',['Ｅ']='E',['Ｆ']='F',['Ｇ']='G',['Ｈ']='H',['Ｉ']='I',['Ｊ']='J',['Ｋ']='K',['Ｌ']='L',['Ｍ']='M',['Ｎ']='N',['Ｏ']='O',['Ｐ']='P',['Ｑ']='Q',['Ｒ']='R',['Ｓ']='S',['Ｔ']='T',['Ｕ']='U',['Ｖ']='V',['Ｗ']='W',['Ｘ']='X',['Ｙ']='Y',['Ｚ']='Z',
+	['１']='1',['２']='2',['３']='3',['４']='4',['５']='5',['６']='6',['７']='7',['８']='8',['９']='9',['０']='0',['⒈']='1',['⒉']='2',['⒊']='3',['⒋']='4',['⒌']='5',['⒍']='6',['⒎']='7',['⒏']='8',['⒐']='9',['①']='1',['②']='2',['③']='3',['④']='4',['⑤']='5',['⑥']='6',['⑦']='7',['⑧']='8',['⑨']='9',['⓪']='0',['Ａ']='A',['Ｂ']='B',['Ｃ']='C',['Ｄ']='D',['Ｅ']='E',['Ｆ']='F',['Ｇ']='G',['Ｈ']='H',['Ｉ']='I',['Ｊ']='J',['Ｋ']='K',['Ｌ']='L',['Ｍ']='M',['Ｎ']='N',['Ｏ']='O',['Ｐ']='P',['Ｑ']='Q',['Ｒ']='R',['Ｓ']='S',['Ｔ']='T',['Ｕ']='U',['Ｖ']='V',['Ｗ']='W',['Ｘ']='X',['Ｙ']='Y',['Ｚ']='Z',
 	['·']='',['＠']='',['＃']='',['％']='',['／']='',['＆']='',['＊']='',['－']='',['＋']='',['｜']='',['～']='',['　']='',['，']='',['。']='',['、']='',['｛']='',['｝']='',['﹏']='',['？']='',['！']='',['：']='',['；']='',['￥']='',['＝']='',['—']='',['…']='',['‖']='',['【']='',['】']='',['『']='',['』']='',['《']='',['》']='',['（']='',['）']='',['〔']='',['〕']='',['〈']='',['〉']='',['＇']='',['＂']='',['’']='',['‘']='',['“']='',['”']='',['≈']='',['︾']='',['．']='',['∴']='',['灬']='',['━']='',['↑']='',['↓']='',['→']='',['←']='',['▲']='',['丨'] = '',['〡']='',['▇']='',['√']='',['↘']='',['↙']='',['★']='',['‐']='',
 	['|']='',['@']='',['!']='',['/']='',['<']='',['>']='',['"']='',['`']='',['_']='',["'"]='',['#']='',['&']='',[';']='',[':']='',['~']='',['\\']='',['=']='',['\t']='',['\n']='',['\r']='',[' ']='',
 }
@@ -99,31 +99,31 @@ end
 
 -- Save DB when logout, at least 5min session is required
 local function SaveBlockedPlayers()
-	local blockedPlayersDB = C.db.blockedPlayers[playerServer]
-	local blockedMsgsDB = C.db.blockedMsgs[playerServer]
+	local playersDB = C.db.blockedPlayers[playerServer]
+	local msgsDB = C.db.blockedMsgs[playerServer]
 	local loginTime = GetTime() - initTime
 	if loginTime > 300 then -- 5min
 		for name,v in pairs(blockedPlayers) do
-			local last = blockedPlayersDB[name] or 0
-			local result = (v - last) * loginTime / 600 + last - 1
+			local result = playersDB[name] or 0
+			result = (v - result) * loginTime / 600 + result - 1
 			if result > 0 then
-				blockedPlayersDB[name] = min(result,100)
+				playersDB[name] = min(result,100)
 			else
-				blockedPlayersDB[name] = nil
+				playersDB[name] = nil
 			end
 		end
 		for msg,v in pairs(blockedMsgs) do
-			local last = blockedMsgsDB[msg] or 0
-			local result = (v - last) * loginTime / 600 + last - 1
+			local result = msgsDB[msg] or 0
+			result = (v - result) * loginTime / 600 + result - 1
 			if result > 0 then
-				blockedMsgsDB[msg] = min(result,100)
+				msgsDB[msg] = min(result,100)
 			else
-				blockedMsgsDB[msg] = nil
+				msgsDB[msg] = nil
 			end
 		end
 	else
-		for name,v in pairs(blockedPlayers) do if not blockedPlayersDB[name] then blockedPlayersDB[name] = v end end
-		for msg,v in pairs(blockedMsgs) do if not blockedMsgsDB[msg] then blockedMsgsDB[msg] = v end end
+		for name,v in pairs(blockedPlayers) do if not playersDB[name] then playersDB[name] = v end end
+		for msg,v in pairs(blockedMsgs) do if not msgsDB[msg] then msgsDB[msg] = v end end
 	end
 end
 B:AddEventScript("PLAYER_LOGOUT", SaveBlockedPlayers)

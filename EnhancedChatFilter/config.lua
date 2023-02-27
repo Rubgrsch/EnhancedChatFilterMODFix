@@ -65,7 +65,7 @@ B:AddEventScript("GET_ITEM_INFO_RECEIVED",function(self,_,Id)
 end)
 
 --Make sure that blackWord won't be filtered by filterCharList and utf-8 list
-local function checkBlacklist(blackWord, r)
+local function CheckBlacklist(blackWord, r)
 	local newWord = B.utf8replace(blackWord)
 	if not r then newWord=newWord:gsub(B.RegexCharList, "") end
 	if newWord ~= blackWord or blackWord == "" then return true end -- Also report "" as invalid
@@ -116,7 +116,7 @@ for i=0, 4 do
 end
 
 local function AddBlackWord(word, r, l)
-	if checkBlacklist(word, r) then
+	if CheckBlacklist(word, r) then
 		print(format(L["IncludeAutofilteredWord"],word))
 	else
 		local tbl = {}
