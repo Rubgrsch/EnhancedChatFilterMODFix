@@ -95,7 +95,6 @@ B:AddInitScript(function()
 			C.db.totalBlackWordsFiltered = 0
 		end
 	end
-	C:SetupEvent()
 end)
 
 --------------- Options ---------------
@@ -141,7 +140,6 @@ options.args.General = {
 	type = "group",
 	name = L["General"],
 	order = 1,
-	set = function(info, value) C.db[info[#info]] = value; C:SetupEvent() end,
 	args = {
 		advancedConfig = {
 			type = "toggle",
@@ -338,7 +336,6 @@ options.args.blackListTab = {
 			name = L["FilterGroup"],
 			desc = L["FilterGroupTooltips"],
 			order = 22,
-			set = function(info, value) C.db[info[#info]] = value; C:SetupEvent() end,
 		},
 		lesserBlackWordThreshold = {
 			type = "range",

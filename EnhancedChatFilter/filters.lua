@@ -145,35 +145,6 @@ local availableLanguages = {
 local chatLines = {}
 local chatEvents = {["CHAT_MSG_WHISPER"] = 1, ["CHAT_MSG_SAY"] = 2, ["CHAT_MSG_YELL"] = 2, ["CHAT_MSG_EMOTE"] = 2, ["CHAT_MSG_TEXT_EMOTE"] = 2, ["CHAT_MSG_CHANNEL"] = 3, ["CHAT_MSG_PARTY"] = 4, ["CHAT_MSG_PARTY_LEADER"] = 4, ["CHAT_MSG_RAID"] = 4, ["CHAT_MSG_RAID_LEADER"] = 4, ["CHAT_MSG_RAID_WARNING"] = 4, ["CHAT_MSG_INSTANCE_CHAT"] = 4, ["CHAT_MSG_INSTANCE_CHAT_LEADER"] = 4, ["CHAT_MSG_DND"] = 5}
 
--- Store which type of channels enabled which filters, [eventIdx] = {filters}
-local eventStatus = {
---	aggr, 	dnd,	black,	raid,	quest,	repeat
-	{false,	false,	true,	false,	false,	false},
-	{false,	false,	true,	false,	false,	false},
-	{false,	false,	true,	false,	false,	false},
-	{false,	false,	false,	false,	false,	false},
-	{false,	false,	false,	false,	false,	false},
-}
-
--- Config enabled filters, {filterIdx, {events}}
--- For each C.db.xxx enable filterIdx(column) -> events(row)
-local optionFilters = {
-	enableAggressive = {1, {1,2,3}},
-	enableDND = {2, {1,2,3,5}},
-	blackWordFilterGroup = {3, {4}},
-	addonRAF = {4, {1,2,4}},
-	addonQRF = {5, {1,2,4}},
-	enableRepeat = {6, {1,2,3}},
-	repeatFilterGroup = {6, {4}, "enableRepeat"},
-}
-
-function C:SetupEvent()
-	for opt, v in pairs(optionFilters) do
-		local status, filterIdx, meetRequested = C.db[opt], v[1], not v[3] or C.db[v[3]]
-		for _, idx in ipairs(v[2]) do eventStatus[idx][filterIdx] = meetRequested and status end
-	end
-end
-
 local function ECFfilter(Event,msg,player,flags,IsMyFriend,good)
 	-- don't filter player/system/GM/DEV
 	-- player == "" in local defense channel
@@ -190,56 +161,54 @@ local function ECFfilter(Event,msg,player,flags,IsMyFriend,good)
 	if msgLine == "" then msgLine = msg end
 	local annoying = (oriLen - #msgLine) / oriLen
 
-	-- filter status for each channel
-	local filtersStatus = eventStatus[Event]
-
+	local db = C.db
 	-- AggressiveFilter:
 	-- Filter blocked players and blocked msg
 	-- Filter strings that has too much symbols
 	-- Filter journal link and club link
-	if filtersStatus[1] and not IsMyFriend then
-		if blockedPlayers[player] >= 3 or blockedMsgs[msgLine] >= 3 then return msgLine end
-		if annoying >= 0.25 and oriLen >= 30 then return msgLine end
-		if msg:find("|Hjournal") or msg:find("|HclubTicket") then return msgLine end
+	if db.enableAggressive and Event <= 3 and not good then
+		if (blockedPlayers[player] >= 3 or blockedMsgs[msgLine] >= 3)
+		or (annoying >= 0.25 and oriLen >= 30)
+		or (msg:find("|Hjournal") or msg:find("|HclubTicket")) then return msgLine end
 	end
 
 	-- DND and auto-reply
-	if filtersStatus[2] and (flags == "DND" or Event == 5) and not IsMyFriend then return msgLine end
+	if db.enableDND and ((Event <= 3 and flags == "DND") or Event == 5) and not IsMyFriend then return msgLine end
 
 	-- blackWord Filter
-	if filtersStatus[3] and not IsMyFriend then
+	if Event <= (db.blackWordFilterGroup and 4 or 3) and not IsMyFriend then
 		local count = 0
-		for k,v in pairs(C.db.blackWordList) do
+		for k,v in pairs(db.blackWordList) do
 			if (v.regex and filterString or msgLine):find(k) then
 				if v.lesser then
 					count = count + 1
 				else
 					if C.shouldEnableKeywordCleanup then
 						v.count = (v.count or 0) + 1
-						C.db.totalBlackWordsFiltered = C.db.totalBlackWordsFiltered + 1
+						db.totalBlackWordsFiltered = db.totalBlackWordsFiltered + 1
 					end
 					return msgLine
 				end
 			end
 		end
-		if count >= C.db.lesserBlackWordThreshold then return msgLine end
+		if count >= db.lesserBlackWordThreshold then return msgLine end
 	end
 
 	-- raidAlert
-	if filtersStatus[4] then
+	if db.addonRAF and (Event <= 2 or Event == 4) then
 		for _,tag in ipairs(RaidAlertTagList) do
 			if msg:find(tag) then return msgLine end
 		end
 	end
 	-- questReport and partyAnnounce
-	if filtersStatus[5] then
+	if db.addonQRF and (Event <= 2 or Event == 4) then
 		for _,tag in ipairs(QuestReportTagList) do
 			if msg:find(tag) then return msgLine end
 		end
 	end
 
 	-- Repeat Filter
-	if filtersStatus[6] and not IsMyFriend then
+	if db.enableRepeat and (Event <= (db.repeatFilterGroup and 4 or 3)) and not IsMyFriend then
 		local msgtable = {player, {}, GetTime()}
 		for idx=1, #msgLine do msgtable[2][idx] = msgLine:byte(idx) end
 
