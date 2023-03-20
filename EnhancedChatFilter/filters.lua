@@ -23,7 +23,7 @@ B.RegexCharList = "[().%%%+%-%*?%[%]$^{}]" -- won't work on regex blackWord, but
 -- utf8 functions are taken and modified from utf8replace from @Phanx @Pastamancer
 -- replace UTF-8 characters based on a mapping table
 function B.utf8replace(s)
-	local pos, str = 1, ""
+	local pos, t = 1, {}
 	local mapping = UTF8Symbols
 
 	while pos <= #s do
@@ -39,11 +39,12 @@ function B.utf8replace(s)
 			charbytes = 4
 		end
 		local c = s:sub(pos, pos + charbytes - 1)
-		str = str..(mapping[c] or c)
+		c = mapping[c] or c
+		if c ~= "" then t[#t+1] = c end
 		pos = pos + charbytes
 	end
 
-	return str
+	return tconcat(t)
 end
 
 local function SendMessage(event, msg)
@@ -59,7 +60,6 @@ end
 -- strDiff for repeatFilter, ranged from 0 to 1, while 0 is absolutely the same
 -- This function is not utf8 awared, currently not nessesary
 -- This function dosen't support empty string "".
--- strsub(s,i,i) is really SLOW. Don't use it.
 local last, this = {}, {}
 local function strDiff(sA, sB) -- arrays of bytes
 	local len_a, len_b = #sA, #sB
