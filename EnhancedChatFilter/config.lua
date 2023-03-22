@@ -47,7 +47,11 @@ end
 
 --------------- ECF functions ---------------
 -- GetItemInfo Cache
-local ItemInfoRequested = {} -- [Id] = value. 0: want to add; 1: old config, true -> link
+-- GetItemInfo() returns nil if it's not available locally and requires a query to the server.
+-- ItemInfoRequested: [id] = value.
+-- value =	0: newly added, can be invalid;
+-- 			1: default config in DB, change to link.
+local ItemInfoRequested = {}
 B:AddEventScript("GET_ITEM_INFO_RECEIVED",function(self,_,id)
 	local v = ItemInfoRequested[id]
 	if not v then return end
@@ -82,12 +86,12 @@ B:AddInitScript(function()
 	for id, info in pairs(C.db.lootItemFilterList) do
 		if info == true then ItemInfoRequested[id] = 1 end
 	end
+	--Cleanup blackwordsList: Remove rarely used keywords
 	if C.db.totalBlackWordsFiltered then
-		--Enable cleanup record only when total keywords > 50
 		local sum = 0
 		for _,v in pairs(C.db.blackWordList) do if not v.lesser then sum = sum + 1 end end
+		--Enable cleanup record only when total keywords > 50
 		C.shouldEnableKeywordCleanup = sum > 50
-		--Cleanup blackwordsList: Remove rarely used keywords
 		if C.shouldEnableKeywordCleanup and C.db.totalBlackWordsFiltered > 1000 then
 			for k,v in pairs(C.db.blackWordList) do
 				if not v.lesser and not v.count then C.db.blackWordList[k] = nil else v.count = nil end
