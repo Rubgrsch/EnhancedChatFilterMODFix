@@ -48,20 +48,20 @@ end
 --------------- ECF functions ---------------
 -- GetItemInfo Cache
 local ItemInfoRequested = {} -- [Id] = value. 0: want to add; 1: old config, true -> link
-B:AddEventScript("GET_ITEM_INFO_RECEIVED",function(self,_,Id)
-	local v = ItemInfoRequested[Id]
+B:AddEventScript("GET_ITEM_INFO_RECEIVED",function(self,_,id)
+	local v = ItemInfoRequested[id]
 	if not v then return end
-	local _, link = GetItemInfo(Id)
+	local _, link = GetItemInfo(id)
 	if v == 0 then -- while adding
 		if link then -- if valid
-			C.db.lootItemFilterList[Id] = link
+			C.db.lootItemFilterList[id] = link
 		else
-			print(format(L["NotExists"],ITEMS,Id))
+			print(format(L["NotExists"],ITEMS,id))
 		end
 	elseif v == 1 then -- change true to link
-		C.db.lootItemFilterList[Id] = link
+		C.db.lootItemFilterList[id] = link
 	end
-	ItemInfoRequested[Id] = nil
+	ItemInfoRequested[id] = nil
 end)
 
 --Make sure that blackWord won't be filtered by filterCharList and utf-8 list
@@ -79,8 +79,8 @@ B:AddInitScript(function()
 	for k,v in pairs(defaults) do
 		if C.db[k] == nil then C.db[k] = v end
 	end
-	for Id, info in pairs(C.db.lootItemFilterList) do
-		if info == true then ItemInfoRequested[Id] = 1 end
+	for id, info in pairs(C.db.lootItemFilterList) do
+		if info == true then ItemInfoRequested[id] = 1 end
 	end
 	if C.db.totalBlackWordsFiltered then
 		--Enable cleanup record only when total keywords > 50
@@ -439,21 +439,21 @@ options.args.lootFilter = {
 			order = 11,
 			get = nil,
 			set = function(_,value)
-				local Id = tonumber(value)
-				if not Id then print(L["BadID"]) return end
+				local id = tonumber(value)
+				if not id then print(L["BadID"]) return end
 				if C.UI.lootType == "ITEMS" then
-					ItemInfoRequested[Id] = 0
-					local _, link = GetItemInfo(Id)
+					ItemInfoRequested[id] = 0
+					local _, link = GetItemInfo(id)
 					if link then
-						ItemInfoRequested[Id] = nil
-						C.db.lootItemFilterList[Id] = link
+						ItemInfoRequested[id] = nil
+						C.db.lootItemFilterList[id] = link
 					end
 				else
-					local link = GetCurrencyLink(Id,0)
+					local link = GetCurrencyLink(id,0)
 					if link then
-						C.db.lootCurrencyFilterList[Id] = link
+						C.db.lootCurrencyFilterList[id] = link
 					else
-						print(format(L["NotExists"],C.UI.lootType,Id))
+						print(format(L["NotExists"],C.UI.lootType,id))
 					end
 				end
 			end,
