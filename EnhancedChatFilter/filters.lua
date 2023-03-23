@@ -4,7 +4,7 @@ local B, L, C = unpack(ecf)
 
 -- Lua
 local _G = _G
-local format, ipairs, max, min, next, pairs, tconcat, tonumber, tremove = format, ipairs, max, min, next, pairs, table.concat, tonumber, tremove
+local format, ipairs, max, min, pairs, tconcat, tonumber, tremove = format, ipairs, max, min, pairs, table.concat, tonumber, tremove
 -- WoW
 local Ambiguate, C_BattleNet_GetGameAccountInfoByGUID, C_Item_GetItemQualityByID, C_Timer_After, ChatTypeInfo, GetAchievementLink, GetPlayerInfoByGUID, GetTime, C_FriendList_IsFriend, IsGUIDInGroup, IsGuildMember, RAID_CLASS_COLORS = Ambiguate, C_BattleNet.GetGameAccountInfoByGUID, C_Item.GetItemQualityByID, C_Timer.After, ChatTypeInfo, GetAchievementLink, GetPlayerInfoByGUID, GetTime, C_FriendList.IsFriend, IsGUIDInGroup, IsGuildMember, RAID_CLASS_COLORS
 
@@ -314,21 +314,21 @@ end
 -- Achievement Filter
 local achievements = {}
 local function AchievementReady(id)
-	local area, guild = achievements[id].CHAT_MSG_ACHIEVEMENT, achievements[id].CHAT_MSG_GUILD_ACHIEVEMENT
-	if area and guild then -- merge area to guild
-		for name in pairs(area) do
-			if guild[name] then area[name] = nil end
-		end
-	end
-	for event,players in pairs(achievements[id]) do
-		if next(players) ~= nil then -- skip empty
-			local list = {}
-			for name,class in pairs(players) do
-				list[#list+1] = format("|c%s|Hplayer:%s|h%s|h|r", RAID_CLASS_COLORS[class].colorStr, name, name)
+	local area, guild = {}, {}
+	for guid,event in pairs(achievements[id]) do
+		local _,class,_,_,_,name,server = GetPlayerInfoByGUID(guid)
+		if name then
+			if server ~= "" and server ~= playerServer then name = name.."-"..server end
+			local s = format("|c%s|Hplayer:%s|h%s|h|r", RAID_CLASS_COLORS[class].colorStr, name, name)
+			if event == "CHAT_MSG_ACHIEVEMENT" then
+				area[#area+1] = s
+			else
+				guild[#guild+1] = s
 			end
-			SendMessage(event, format(L["GotAchievement"], tconcat(list, L["And"]), GetAchievementLink(id)))
 		end
 	end
+	if #area > 0 then SendMessage("CHAT_MSG_ACHIEVEMENT", format(L["GotAchievement"], tconcat(area, L["And"]), GetAchievementLink(id))) end
+	if #guild > 0 then SendMessage("CHAT_MSG_GUILD_ACHIEVEMENT", format(L["GotAchievement"], tconcat(guild, L["And"]), GetAchievementLink(id))) end
 	achievements[id] = nil
 end
 
@@ -336,15 +336,12 @@ local function AchievementFilter(self, event, msg, _, _, _, _, _, _, _, _, _, _,
 	if not C.db.enableCFA or not guid or not guid:find("Player") then return end
 	local id = tonumber(msg:match("|Hachievement:(%d+)"))
 	if not id then return end
-	local _,class,_,_,_,name,server = GetPlayerInfoByGUID(guid)
-	if not name then return end -- check nil
-	if server ~= "" and server ~= playerServer then name = name.."-"..server end
 	if not achievements[id] then
 		achievements[id] = {}
 		C_Timer_After(0.5, function() AchievementReady(id) end)
 	end
-	achievements[id][event] = achievements[id][event] or {}
-	achievements[id][event][name] = class
+	local stat = achievements[id][guid]
+	if not stat or (stat == "CHAT_MSG_ACHIEVEMENT" and event == "CHAT_MSG_GUILD_ACHIEVEMENT") then achievements[id][guid] = event end
 	return true
 end
 
