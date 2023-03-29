@@ -57,11 +57,12 @@ local function SendMessage(event, msg)
 	end
 end
 
--- strDiff for repeatFilter, ranged from 0 to 1, while 0 is absolutely the same
--- This function is not utf8 awared, currently not nessesary
+-- strDiff() calculates Levenshtein Distance, ranged from 0 to 1, while 0 is absolutely the same.
+-- sA and sB must be tables of bytes or chars, not whole msg strings.
+-- This function is not utf8 awared, currently not nessesary.
 -- This function dosen't support empty string "".
 local last, this = {}, {}
-local function strDiff(sA, sB) -- arrays of bytes
+local function strDiff(sA, sB)
 	local len_a, len_b = #sA, #sB
 	local last, this = last, this
 	for j=0, len_b do last[j+1] = j end
@@ -70,9 +71,9 @@ local function strDiff(sA, sB) -- arrays of bytes
 		for j=1, len_b do
 			this[j+1] = (sA[i] == sB[j]) and last[j] or (min(last[j+1], this[j], last[j]) + 1)
 		end
-		for j=1, len_b+1 do last[j]=this[j] end
+		last, this = this, last
 	end
-	return this[len_b+1]/max(len_a,len_b)
+	return last[len_b+1]/max(len_a,len_b)
 end
 
 --------------- Filters ---------------
