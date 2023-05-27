@@ -367,6 +367,15 @@ B:AddEventScript("PARTY_INVITE_REQUEST", function(self, _, _, _, _, _, _, _, gui
 	end
 end)
 
+B:AddEventScript("GROUP_INVITE_CONFIRMATION", function()
+	if not C.db.enableInvite then return end
+	local guid = GetNextPendingInviteConfirmation()
+	if guid and not (C_BattleNet_GetGameAccountInfoByGUID(guid) or C_FriendList_IsFriend(guid) or IsGuildMember(guid)) then
+		RespondToInviteConfirmation(guid, false)
+		StaticPopup_Hide("GROUP_INVITE_CONFIRMATION")
+	end
+end)
+
 B:AddInitScript(function()
 	LoadBlockedPlayers()
 	for i=1, GetNumLanguages() do availableLanguages[GetLanguageByIndex(i)] = true end
