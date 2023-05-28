@@ -215,8 +215,8 @@ local function ECFfilter(Event,msg,player,flags,IsMyFriend,good)
 
 		local chatLines = chatLines
 		local chatLinesSize = #chatLines
-		chatLines[chatLinesSize+1] = msgtable
-		for i=1, chatLinesSize do
+		chatLines[chatLinesSize+1] = msgtable -- chatLinesSize is now actual_size-1
+		for i=1, chatLinesSize do -- for every msg except the last
 			local line = chatLines[i]
 			-- if there is not much difference between msgs, filter it
 			-- if multiple msgs in 0.6s, filter it (channel & emote only)
@@ -376,6 +376,7 @@ B:AddEventScript("GROUP_INVITE_CONFIRMATION", function()
 	end
 end)
 
+-- init
 B:AddInitScript(function()
 	LoadBlockedPlayers()
 	for i=1, GetNumLanguages() do availableLanguages[GetLanguageByIndex(i)] = true end
