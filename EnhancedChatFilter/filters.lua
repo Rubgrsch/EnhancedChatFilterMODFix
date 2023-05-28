@@ -313,8 +313,9 @@ local function SystemMsgFilter(self,_,msg)
 end
 
 -- Achievement Filter
-local achievements = {}
-local function AchievementReady(id)
+local achievements, achievementIdx = {}, {}
+local function AchievementReady()
+	local id = achievementIdx[1]
 	local area, guild = {}, {}
 	for guid,event in pairs(achievements[id]) do
 		local _,class,_,_,_,name,server = GetPlayerInfoByGUID(guid)
@@ -331,6 +332,7 @@ local function AchievementReady(id)
 	if #area > 0 then SendMessage("CHAT_MSG_ACHIEVEMENT", format(L["GotAchievement"], tconcat(area, L["And"]), GetAchievementLink(id))) end
 	if #guild > 0 then SendMessage("CHAT_MSG_GUILD_ACHIEVEMENT", format(L["GotAchievement"], tconcat(guild, L["And"]), GetAchievementLink(id))) end
 	achievements[id] = nil
+	tremove(achievementIdx, 1)
 end
 
 local function AchievementFilter(self, event, msg, _, _, _, _, _, _, _, _, _, _, guid)
@@ -339,7 +341,8 @@ local function AchievementFilter(self, event, msg, _, _, _, _, _, _, _, _, _, _,
 	if not id then return end
 	if not achievements[id] then
 		achievements[id] = {}
-		C_Timer_After(0.5, function() AchievementReady(id) end)
+		achievementIdx[#achievementIdx+1] = id
+		C_Timer_After(0.5, AchievementReady)
 	end
 	local stat = achievements[id][guid]
 	if not stat or (stat == "CHAT_MSG_ACHIEVEMENT" and event == "CHAT_MSG_GUILD_ACHIEVEMENT") then achievements[id][guid] = event end
