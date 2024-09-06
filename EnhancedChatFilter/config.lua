@@ -134,7 +134,7 @@ local function adv() return not C.db.advancedConfig end
 
 local options = {
 	type = "group",
-	name = addonName.." "..GetAddOnMetadata(addonName, "Version"),
+	name = addonName.." "..C_AddOns.GetAddOnMetadata(addonName, "Version"),
 	get = function(info) return (C.db[info[#info]] ~= nil and C.db or C.UI)[info[#info]] end,
 	set = function(info, value) (C.db[info[#info]] ~= nil and C.db or C.UI)[info[#info]] = value end,
 	childGroups = "tab",
